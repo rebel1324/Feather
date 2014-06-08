@@ -19,6 +19,14 @@ function GM:PlayerInitialSpawn(client)
 	end)
 end
 
+function GM:CenterDisplay(text, time)
+	netstream.Start(player.GetAll(), "FeatherCenterDisplay", {text, time})
+end
+
+function GM:BroadcastSound(snd)
+	netstream.Start(player.GetAll(), "PlaySound", snd)
+end
+
 function GM:ShutDown()
 	for k, v in pairs(player.GetAll()) do
 		v:saveFeatherData()
@@ -70,7 +78,7 @@ function GM:PlayerLoadout(client)
 
 	if teamdata and teamdata.loadout then
 		for k, v in pairs(teamdata.loadout) do
-			print(v)
+			client:Give(v)
 		end
 	end
 end
@@ -112,7 +120,7 @@ function GM:BecomeJob(client, teamindex, voted)
 		return false
 	end
 
-	if !voted and data.vote and #player.GetAll() > 1 then
+	if !voted and data.vote and #player.GetAll() > 100 then
 		if client.onvote then 
 			client:notify("Your Job vote is on going. Try again later.")
 			return false
@@ -127,5 +135,5 @@ function GM:BecomeJob(client, teamindex, voted)
 
 	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
-	NotifyAll(client:Name() .. " has been " .. name)
+	NotifyAll(client:Name() .. " has been made a " .. name)
 end

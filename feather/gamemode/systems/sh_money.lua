@@ -1,3 +1,4 @@
+// FINISHED
 local playerMeta = FindMetaTable("Player")
 
 if (SERVER) then
@@ -6,11 +7,24 @@ if (SERVER) then
 	end
 
 	function playerMeta:takeMoney(amount)
-		self:GiveMoney(-amount)
+		self:giveMoney(-amount)
 	end
 
 	function playerMeta:setMoney(amount)
 		self:SetLocalVar("money", amount)
+	end
+
+	function playerMeta:payMoney(amount, fail, succ)
+		if self:getMoney() >= amount then
+			self:takeMoney(amount)
+			if succ then
+				self:notify(succ)
+			end
+			return true
+		end
+		
+		self:notify(fail or GetLang"cantafford")
+		return false
 	end
 
 	function GM:CreateMoney(position, angles, amt)

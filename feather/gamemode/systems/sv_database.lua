@@ -12,9 +12,15 @@ local DB_PORT = 3306
 
 local QUERY_CREATE_SQLITE = [[
 	CREATE TABLE IF NOT EXISTS fr_players (
-		_steamID int,
+		_steamID int PRIMARY KEY,
 		_money int,
 		_inventory mediumtext
+	);
+
+	CREATE TABLE IF NOT EXISTS fr_licenses (
+		_uniqueID mediumtext PRIMARY KEY,
+		_name mediumtext,
+		_price int
 	);
 ]]
 

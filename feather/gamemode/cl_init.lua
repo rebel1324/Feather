@@ -22,6 +22,37 @@ surface.CreateFont("fr_HUDNumber", {
 	size = ScreenScale(16)
 })
 
+surface.CreateFont("fr_Progress", {
+	font = "Trebuchet MS",
+	size = ScreenScale(15),
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_License", {
+	font = "Trebuchet MS",
+	size = 30,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_LicenseBtn", {
+	font = "Trebuchet MS",
+	size = 20,
+	weight = 1000,
+	antialias = true
+})
+
+surface.CreateFont("fr_LicenseTitle", {
+	font = "Trebuchet MS",
+	size = 25,
+	weight = 1000,
+	antialias = true
+})
+
+
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts
        

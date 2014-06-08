@@ -1,3 +1,5 @@
+// MAKE GET LANG DONE
+
 GM.Languages = {}
 
 function GetLang(name, ...)

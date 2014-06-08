@@ -6,22 +6,32 @@ GM.TeamBased = true
 
 GM.Language = "english"
 
-GM.ChatPrefix = "[!|/|%.]"
-
+-- In-Character(Normal) Chat Range.
 GM.ChatRange = 512
 
+-- Gamemode's default color.
 GM.DefaultChatColor = Color(62, 142, 200)
 
+-- The delay between changing the job.
 GM.JobChangeDelay = 5
 
+-- The arrest time when player get arrested by goverment.
 GM.DefaultArrestTime = 300
 
+-- The default wanted time that used when no item was provided.
 GM.DefaultWantedTime = 300
 
 -- The time to print money with Money Printer. Default: 160 secs to 300 secs.
 GM.MoneyPrinterTime = {1.60, 3.00}
 
+-- The Gamemode's money model.
 GM.MoneyModel = "models/props/cs_assault/Money.mdl"
+
+-- 
+GM.DefaultLaws = {
+	"You must obey server's rule",
+	"You must not kill people",
+}
 
 GM.Jobs = {}
 
@@ -73,6 +83,8 @@ function GM:CreateTeams()
 		vote = true,
 		loadout = {
 			"weapon_pistol",
+			"weapon_arrest",
+			"weapon_unarrest",
 		},
 	})
 
@@ -80,7 +92,12 @@ function GM:CreateTeams()
 		salary = 25,
 		goverment = true,
 		childjob = TEAM_POLICE,
-		cmd = "citizen",
+		cmd = "chief",
+		loadout = {
+			"weapon_pistol",
+			"weapon_arrest",
+			"weapon_unarrest",
+		},
 	})
 
 	// CRIMES 

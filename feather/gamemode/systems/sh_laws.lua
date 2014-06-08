@@ -1,15 +1,9 @@
+// MAKE ARREST DONE
 
 local playerMeta = FindMetaTable("Player")
 
-GM.WantedList = {}
-
-function playerMeta:IsWanted()
-	return GAMEMODE.WantedList[self]
-end
-
 if SERVER then
 	GM.JailPos = {}
-	GM.JailedList = {}
 
 	function GM:LoadJailPos()
 		// LOAD IT FROM SQL
@@ -17,6 +11,10 @@ if SERVER then
 	
 	function GM:SaveJailPos()
 		// SAVE IT IN TEH SQL.
+	end
+
+	function GM:OnPlayerArrested()
+		return self.DefaultArrestTime, "Arrested"
 	end
 
 	function playerMeta:Arrest(arrester, reason, time)
@@ -32,64 +30,74 @@ if SERVER then
 
 		time, reason = hook.Run("OnPlayerArrested", self, arrester, reason, time)
 
-		self:UnWanted()
+		GAMEMODE:CenterDisplay("" .. self:Name() .. " has been arrested by ".. self:Name() ..".\nArrested time: " .. string.NiceTime(time) .. ".", 3)
+		self:UnWanted(true)
+		self:StripWeapons()
 		self:SetNetVar("arrested", true)
+
+		timer.Create(self:SteamID64() .. "_ARREST", time, 1, function()
+			if !self or !self:IsValid() then
+				return
+			end
+
+			self:UnArrest()
+		end)
 	end
 
 	function playerMeta:UnArrest()
 		self:SetNetVar("arrested", false)
+		hook.Run("PlayerLoadout", self)
 	end
 
 	function playerMeta:Wanted(from, reason, time)
 		NotifyAll("Player " .. self:Name() .. " is now wanted by the police. Reason: " .. reason)
 
-		GAMEMODE.WantedList[self] = CurTime() + time
+		self:SetNetVar("wanted", true)
 		netstream.Start(player.GetAll(), "FeatherWanted", {self, true, time})
 
 		timer.Create(self:SteamID64() .. "_WANTED", time, 1, function()
 			if !self:IsValid() then
-				for k, v in pairs(GAMEMODE.WantedList) do
-					if !k or !k:IsValid() then
-						GAMEMODE.WantedList[k] = nil
-					end
-				end
-
 				return
 			end
 
 			NotifyAll("Player " .. self:Name() .. " is no longer wanted by the police.")
-			GAMEMODE.WantedList[self] = nil
-			netstream.Start(player.GetAll(), "FeatherWanted", {self, false})
+			self:SetNetVar("wanted", false)
 		end)
 	end
 	
-	function playerMeta:UnWanted()
-		NotifyAll("Player " .. self:Name() .. " is no longer wanted by the police.")
+	function playerMeta:UnWanted(mute)
+		if !mute then
+			NotifyAll("Player " .. self:Name() .. " is no longer wanted by the police.")
+		end
 
-		GAMEMODE.WantedList[self] = nil
-		netstream.Start(player.GetAll(), "FeatherWanted", {self, false})
+		self:SetNetVar("wanted", false)
 		timer.Destroy(self:SteamID64() .. "_WANTED")
 	end
 
 	hook.Add("PlayerInitialSpawn", "FeatherJailExtender", function(client)
-		if table.HasValue(GAMEMODE.WantedList, client) then
-			client:Arrest()
-		end
 	end)
+
+	function GAMEMODE:Lockdown(reason)
+		SetNetVar("lockdown", true)
+		SetNetVar("lockdownreason", reason)
+		self:BroadcastSound("npc/overwatch/cityvoice/f_confirmcivilstatus_1_spkr.wav")
+		NotifyAll("Mayor declared the lockdown.")
+	end
+
+	function GAMEMODE:UnLockdown(reason)
+		SetNetVar("lockdown", false)
+		SetNetVar("lockdownreason", nil)
+		NotifyAll("Mayor finished the lockdown.")
+	end
 else
-	netstream.Hook("FeatherWanted", function(data)
-		local target = data[1]
-		local wanted = data[2]
-		if target and target:IsValid() then
-			if wanted then
-				local time = data[3]
-				GAMEMODE.WantedList[target] = CurTime() + time
-			else
-				GAMEMODE.WantedList[target] = nil
-			end
-		end
-	end)
-	// YAY
+end
+
+function playerMeta:IsWanted()
+	return GAMEMODE.WantedList[self]
+end
+
+function playerMeta:IsArrested()
+	return self:GetNetVar("arrested")
 end
 
 function GM:OnWantedPlayer(client, target, reason, time)
@@ -192,3 +200,34 @@ GM:RegisterCommand({
 		target:UnWanted(client)
 	end
 }, "unwanted")
+
+GM:RegisterCommand({
+	desc = "This command allows goverment to get control of the city for temporaliy.",
+	syntax = "<Target Player> <Reason> [time]",
+	onRun = function(client, arguments)
+		local reason = table.concat(arguments, " ")
+
+		if GetNetVar("lockdown") then
+			GAMEMODE:UnLockdown()
+			return	
+		end
+
+		if GAMEMODE:GetJobData(client:Team()).mayor then
+			client:notify("You should be mayor to lockdown the city.", 4)
+			return
+		end
+
+		if !reason or reason == "" then
+			client:notify("You must provide a reason to lockdown the city.", 4)
+			return
+		end
+
+		if hook.Run("CanLockdown", client) == false then
+			return 
+		end
+		
+		//client:notify("You grant " .. target:Name() .. " " .. data.name .. ".", 4)
+		//DO CENTER NOTIFY.
+		GAMEMODE:Lockdown(reason)
+	end
+}, "lockdown")

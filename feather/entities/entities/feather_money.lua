@@ -36,7 +36,7 @@ if (SERVER) then
 
 		if (amount >= 0 and IsValid(activator) and hook.Run("PlayerCanPickupMoney", activator, self) != false) then
 			activator:giveMoney(amount)
-			activator:notify("You have picked up ".. amount ..".")
+			activator:notify("You have picked up ".. MoneyFormat(amount) ..".")
 
 			self:Remove()
 		end
@@ -49,9 +49,15 @@ if (SERVER) then
 		end
 	end
 else
-	/*
-	function ENT:DrawTargetID(x, y, alpha)
-		nut.util.DrawText(x, y, nut.currency.GetName(self:GetNetVar("amount", 0), true), Color(255, 255, 255, alpha))
+	function ENT:DrawScreen()
+		local origin = self:GetPos() + Vector(0, 0, 3)
+		local pos = (origin):ToScreen()
+		local alpha = math.Clamp((1 - origin:DistToSqr(EyePos()) / 256^2) * 255, 0, 255)
+
+		if alpha > 0 then
+			local text = MoneyFormat(self:GetDTInt(0, "amount"))
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0, alpha), 1, 1)
+		end
 	end
-	*/
 end
