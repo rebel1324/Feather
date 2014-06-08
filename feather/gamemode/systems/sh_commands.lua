@@ -41,7 +41,7 @@ function GM:RegisterChat(command, structure)
 		end
 
 		if (!speaker:Alive() and !structure.deadCanTalk) then
-			client:notify(GetLang"canttalk")
+			speaker:notify(GetLang"canttalk")
 
 			return false
 		end
@@ -375,7 +375,7 @@ GM:RegisterCommand({
 			if v.cmd then
 				if string.lower(type(v.cmd)) == "table" then
 					for _, cmd in ipairs(v.cmd) do
-						if v.cmd == job then
+						if cmd == job then
 							GAMEMODE:BecomeJob(client, k)
 						end
 					end

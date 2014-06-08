@@ -4,7 +4,6 @@ function GetLang(name, ...)
 	if !GAMEMODE.Languages[GAMEMODE.Language][name] then
 		return "Failed to get language ".. name	
 	end
-	PrintTable(...)
 	return Format( GAMEMODE.Languages[GAMEMODE.Language][name], ... or nil )
 end
 
@@ -24,6 +23,7 @@ l.plyinvalid = "That player does not exists.."
 l.jobinvalid = "That Job does not exists."
 l.cantbecomejob = "You cannot become job right now."
 l.getjob = "%s has been %."
+l.cantafford = "You can't afford it."
 
 l.broadcast = "(BROADCAST) "
 l.ooc = "(OOC) "

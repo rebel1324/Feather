@@ -5,9 +5,23 @@ GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true
 
 GM.Language = "english"
+
 GM.ChatPrefix = "[!|/|%.]"
+
 GM.ChatRange = 512
+
 GM.DefaultChatColor = Color(62, 142, 200)
+
+GM.JobChangeDelay = 5
+
+GM.DefaultArrestTime = 300
+
+GM.DefaultWantedTime = 300
+
+-- The time to print money with Money Printer. Default: 160 secs to 300 secs.
+GM.MoneyPrinterTime = {1.60, 3.00}
+
+GM.MoneyModel = "models/props/cs_assault/Money.mdl"
 
 GM.Jobs = {}
 
@@ -55,8 +69,11 @@ function GM:CreateTeams()
 	TEAM_POLICE = self:CreateJob("Police", Color(0, 100, 200), {
 		salary = 25,
 		goverment = true,
-		cmd = "police",
+		cmd = {"cop", "cp", "police"},
 		vote = true,
+		loadout = {
+			"weapon_pistol",
+		},
 	})
 
 	TEAM_POLICECHIEF = self:CreateJob("Police Chief", Color(0, 50, 200), {

@@ -85,12 +85,26 @@ function GM:PlayerSay(client, text, public)
 	return text
 end
 
+function GM:Demote(from, to, reason, voted)
+end
+
 function GM:BecomeJob(client, teamindex, voted)
 	local data = self:GetJobData(teamindex)
 	local name = team.GetName(teamindex)
 
+	if !voted and client.nextJob and client.nextJob > CurTime() then
+		client:notify("You're switching Job too fast! Try again later.")
+
+		return false
+	end
+
 	if hook.Run("CanBecomeJob", client, data, teamindex) == false then
 		client:notify(GetLang"cantbecomejob")
+	end
+
+	if teamindex == client:Team() then
+		client:notify("You're already on that job.")
+		return true
 	end
 
 	if data.childjob and data.childjob != client:Team() then
@@ -98,10 +112,20 @@ function GM:BecomeJob(client, teamindex, voted)
 		return false
 	end
 
-	if !voted and data.vote then
+	if !voted and data.vote and #player.GetAll() > 1 then
+		if client.onvote then 
+			client:notify("Your Job vote is on going. Try again later.")
+			return false
+		end
+		
+		client.onvote = true
+		self:StartVote(client, client:Name() .. " wants to be " .. name, 10
+		,function(cl) GAMEMODE:BecomeJob(cl, teamindex, true) client.onvote = false end
+		,function(cl) cl:notify(cl:Name() .. " didn't made to " .. name .. "!") end)
 		return false
 	end
 
+	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
 	NotifyAll(client:Name() .. " has been " .. name)
 end

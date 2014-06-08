@@ -14,13 +14,19 @@ function NotifyAll(message, class)
 	end
 end
 
-function FindPlayer(client, name, mute)
+function FindPlayer(name)
+	for k, v in pairs(player.GetAll()) do
+		if (StringMatches(v:Name(), name)) then
+			return v
+		end
+	end
+end
+
+function NoticeFindPlayer(client, name)
 	local fault = GetLang"plyinvalid"
 
 	if (!name) then
-		if (!mute) then
-			client:notify(fault)
-		end
+		client:notify(fault)
 
 		return
 	end
@@ -28,9 +34,7 @@ function FindPlayer(client, name, mute)
 	local target = nut.util.FindPlayer(name)
 
 	if (!IsValid(target)) then
-		if (!mute) then
-			client:notify(fault)
-		end
+		client:notify(fault)
 	end
 
 	return target

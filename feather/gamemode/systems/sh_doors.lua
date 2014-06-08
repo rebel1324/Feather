@@ -5,3 +5,5 @@ function entityMeta:IsDoor()
 		return true
 	end
 end
+
+// TODO: Door Manager funcitons.
