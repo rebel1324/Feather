@@ -52,6 +52,14 @@ surface.CreateFont("fr_LicenseTitle", {
 	antialias = true
 })
 
+surface.CreateFont("fr_Arrested", {
+	font = "Trebuchet MS",
+	size = 25,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
 
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts

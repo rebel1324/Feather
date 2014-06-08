@@ -44,7 +44,8 @@ function SWEP:PrimaryAttack()
 	if SERVER then
 		local ply = trace.Entity
 
-		if ply:IsPlayer() then
+		if ply:IsPlayer() and ply:IsArrested() then
+			ply:notify("You're unarrested by ".. self.Owner:Name())
 			ply:UnArrest(self.Owner)
 		end
 	end
@@ -53,4 +54,27 @@ function SWEP:PrimaryAttack()
 end
 
 function SWEP:SecondaryAttack()
+end
+
+function SWEP:DrawHUD()
+	local w, h = ScrW(), ScrH()
+
+	local td = {}
+		td.start = self.Owner:GetShootPos()
+		td.endpos = td.start + self.Owner:GetAimVector()*128
+		td.filter = self.Owner
+	local trace = util.TraceLine(td)
+
+	if hook.Run("CanDrawWeaponHUD") then
+		if trace.Entity:IsValid() then
+			draw.SimpleText(GetLang"hudunarrest", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+			if trace.Entity:IsPlayer() then
+				if trace.Entity:IsArrested() then
+					draw.SimpleText(GetLang("hudunarresttarget", trace.Entity:Name()), "fr_Arrested", w/2, h/2 + 60, Color(122, 255, 122), 1, 1)
+				end
+			end
+		else
+			draw.SimpleText(GetLang"hudunarrest", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+		end
+	end
 end

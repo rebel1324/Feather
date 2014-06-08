@@ -31,7 +31,7 @@ if (SERVER) then
 	end
 
 	function ENT:Use(activator)
-		if !self:GetDTBool(0) and activator:payMoney(self:GetNetVar("price"), nil, "You payed " .. MoneyFormat(self:GetNetVar("price")) .. " for the food." ) then
+		if !self:GetDTBool(0) and activator:payMoney(self:GetNetVar("price"), nil, GetLang("purchased", "Food", MoneyFormat(self:GetNetVar("price"))) ) then
 			if self.Owner and self.Owner:IsValid() then
 				self.Owner:addMoney(self:GetNetVar("price") - self.minprice)
 			end
@@ -81,17 +81,17 @@ else
 
 		if alpha > 0 then
 			local text = self.PrintName
-			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y, Color(255, 255, 255, alpha), 1, 1)
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y, Color(0, 0, 0, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y, Color(255, 255, 255, alpha), 1, 1)
 
-			text = "Price: " .. MoneyFormat(self:GetNetVar("price", 0))
-			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 22, Color(255, 255, 255, alpha), 1, 1)
+			text = GetLang("price", MoneyFormat(self:GetNetVar("price", 0)))
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y + 22, Color(0, 0, 0, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 22, Color(255, 255, 255, alpha), 1, 1)
 
 			if self:GetDTBool(0) then
-				text = "Cooking Food" .. string.rep(".", math.floor((CurTime()*2)%4))
-				draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 44, Color(255, 155, 155, alpha), 1, 1)
+				text = GetLang("cookingfood", string.rep(".", math.floor((CurTime()*2)%4)))
 				draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y + 44, Color(0, 0, 0, alpha), 1, 1)
+				draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 44, Color(255, 155, 155, alpha), 1, 1)
 			end
 		end
 	end

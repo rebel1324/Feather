@@ -47,14 +47,14 @@ if SERVER then
 
 	netstream.Hook("SendVote", function(client, data)
 		if hook.Run("CanPlayerThrowVote") == false then
-			client:notify("You can't vote right now.")
+			client:notify(GetLang"cantvote")
 			return
 		end
 
 		local queue = GAMEMODE.VoteQueue[data[1]]
 
 		if !queue then
-			error("Vote is invalid.")
+			error(GetLang("invalid", "vote"))
 			return
 		end
 
@@ -72,7 +72,7 @@ else
 		self.yes = vgui.Create("DButton", self)
 		self.yes:SetSize(69, 25)
 		self.yes:SetPos(5, 120)
-		self.yes:SetText("Yes")
+		self.yes:SetText(GetLang"yes")
 		self.yes.DoClick = function()
 			netstream.Start("SendVote", {self.uid, true})
 			self:Close()
@@ -81,7 +81,7 @@ else
 		self.no = vgui.Create("DButton", self)
 		self.no:SetSize(69, 25)
 		self.no:SetPos(76, 120)
-		self.no:SetText("No")
+		self.no:SetText(GetLang"no")
 		self.no.DoClick = function()
 			netstream.Start("SendVote", {self.uid, false})
 			self:Close()
@@ -103,7 +103,7 @@ else
 	end
 
 	function PNL:Think()
-		self:SetTitle("Time: " .. math.ceil(self.time - CurTime()))
+		self:SetTitle(GetLang("votetime", math.ceil(self.time - CurTime())))
 
 		if (self.time < CurTime()) then
 			self:Close()

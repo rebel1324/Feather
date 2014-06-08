@@ -53,11 +53,25 @@ function GM:HUDPaint()
 	self:ProgressPaint(w, h)
 	self:CenterDisplayPaint(w, h)
 	self:Lockdown(w, h)
+	self:ArrestTimer(w, h)
+	self:DrawDoorInfo(w, h)
+end
+
+function GM:ArrestTimer(w, h)
+	if LocalPlayer():GetNetVar("arrested") then
+		local text = "You're arrested."
+		surface.SetFont("fr_LicenseTitle")
+		local tx, ty = surface.GetTextSize(text)
+		draw.SimpleText(text, "fr_Arrested", w/2 - tx/2, h/5*4, color_white, 0, 0)
+		text = "Your arrest will be lifted in " .. string.NiceTime(math.ceil(LocalPlayer():GetNetVar("arrested") - CurTime())) .. "."
+		local tx, ty = surface.GetTextSize(text)
+		draw.SimpleText(text, "fr_Arrested", w/2 - tx/2, h/5*4 + ty, color_white, 0, 0)
+	end
 end
 
 function GM:Lockdown(w, h)
 	if GetNetVar("lockdown") then
-		local text = "Mayor declared Lockdown. All Citizens in the street will be punished. Reason: " .. GetNetVar("lockdownreason")
+		local text = GetLang("lockdown", GetNetVar("lockdownreason"))
 		surface.SetFont("fr_Progress")
 		local tx, ty = surface.GetTextSize(text)
 		draw.SimpleText(text, "fr_Progress", -RealTime()*200%(w+tx) - tx, ty/5, color_white, 0, 0)
@@ -132,7 +146,7 @@ function GM:CenterDisplay(text, time)
 
 	local prefix = "<font=fr_Progress>"
 	local postfix = "</font>"
-	self.CenterDisplayText = markup.Parse(prefix .. text .. postfix)
+	self.CenterDisplayText = markup.Parse(prefix .. text .. postfix, ScrW())
 	self.CenterDisplayTime = CurTime() + time
 	self.CenterDisplayAlpha = 0
 end
@@ -152,6 +166,10 @@ function GM:Notify(message, class)
 	surface.PlaySound(fileName)
 
 	MsgN(message)
+end
+
+function GM:CanDrawWeaponHUD()
+	return (!self.DrawDoor and self.DisplayTime <= CurTime() and math.floor(self.DisplayAlpha) == 0)
 end
 
 netstream.Hook("fr_Notify", function(message, class)

@@ -22,6 +22,10 @@ function StringMatches(a, b)
 	return false
 end
 
+function GetMap()
+	return string.lower(game.GetMap())
+end
+
 function IsEntityClose(pos, range, class)
 	for k, v in pairs(ents.FindInSphere(pos, range)) do
 		if v:GetClass() == class then

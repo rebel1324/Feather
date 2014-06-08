@@ -1,16 +1,38 @@
 // MAKE ARREST DONE
-
 local playerMeta = FindMetaTable("Player")
+GM.WantedList = {}
 
 if SERVER then
 	GM.JailPos = {}
 
-	function GM:LoadJailPos()
-		// LOAD IT FROM SQL
+	function Vector2SQL(v)
+		return v[1] .. "," .. v[2] .. "," .. v[3]
 	end
-	
+
+	function GM:LoadJailPos()
+		cn.db.query("SELECT * FROM fr_jailpos", function(data)
+			if (IsValid(self)) then
+				PrintTable(data)
+			end
+		end)
+	end
+	hook.Add("InitPostEntity", "FeatherLoadJailPos", GM.LoadJailPos)
+
 	function GM:SaveJailPos()
-		// SAVE IT IN TEH SQL.
+		local clearquery = Format("DELETE * FROM fr_jailpos WHERE _map = '%s'", GetMap())
+		local savequery = "INSERT INTO fr_jailpos (_map, _vector) VALUES ('%s', '%s')"
+		for k, v in ipairs(self.JailPos) do
+			cn.db.query(Format(savequery, GetMap(), Vector2SQL(v)), function()
+			end)
+		end
+	end
+
+	function GM:AddJailPos(vector)
+		table.insert(self.JailPos, vector)
+
+		timer.Create("FeatherJailPosSave", 1, 1, function()
+			self:SaveJailPos()
+		end)
 	end
 
 	function GM:OnPlayerArrested()
@@ -20,20 +42,23 @@ if SERVER then
 	function playerMeta:Arrest(arrester, reason, time)
 		if #GAMEMODE.JailPos > 0 then
 			local jailpos
-			local try = 0
-			while (try <= 100) do
+			jailpos = table.Random(GAMEMODE.JailPos)
 
-
-				try = try + 1
-			end
+			self:SetPos(jailpos)
 		end
 
 		time, reason = hook.Run("OnPlayerArrested", self, arrester, reason, time)
 
-		GAMEMODE:CenterDisplay("" .. self:Name() .. " has been arrested by ".. self:Name() ..".\nArrested time: " .. string.NiceTime(time) .. ".", 3)
+		if self:IsArrested() then 
+			return 
+		end
+
+		GAMEMODE:CenterDisplay(GetLang("arrested", self:Name(), arrester:Name(), string.NiceTime(time)), 3)
+		--GAMEMODE:CenterDisplay("" .. self:Name() .. " has been arrested by ".. arrester:Name() ..".\nArrested time: " .. string.NiceTime(time) .. ".", 3)
+		self:notify(GetLang("arrestedby", arrester:Name()))
 		self:UnWanted(true)
 		self:StripWeapons()
-		self:SetNetVar("arrested", true)
+		self:SetNetVar("arrested", CurTime() + time)
 
 		timer.Create(self:SteamID64() .. "_ARREST", time, 1, function()
 			if !self or !self:IsValid() then
@@ -44,13 +69,21 @@ if SERVER then
 		end)
 	end
 
-	function playerMeta:UnArrest()
-		self:SetNetVar("arrested", false)
-		hook.Run("PlayerLoadout", self)
+	function playerMeta:UnArrest(unarrester)
+		timer.Destroy(self:SteamID64() .. "_ARREST")
+		self:SetNetVar("arrested", nil)
+
+		if unarrester then
+			NotifyAll(GetLang("unarrested", self:Name(), unarrester:Name()))
+			hook.Run("PlayerLoadout", self)
+		else
+			self:notify(GetLang"unarrestedfull")
+			self:Spawn()
+		end
 	end
 
 	function playerMeta:Wanted(from, reason, time)
-		NotifyAll("Player " .. self:Name() .. " is now wanted by the police. Reason: " .. reason)
+		GAMEMODE:CenterDisplay(GetLang("wanted", self:Name(), reason), 3)
 
 		self:SetNetVar("wanted", true)
 		netstream.Start(player.GetAll(), "FeatherWanted", {self, true, time})
@@ -60,14 +93,14 @@ if SERVER then
 				return
 			end
 
-			NotifyAll("Player " .. self:Name() .. " is no longer wanted by the police.")
+			NotifyAll(GetLang("unwanted", self:Name()))
 			self:SetNetVar("wanted", false)
 		end)
 	end
 	
 	function playerMeta:UnWanted(mute)
 		if !mute then
-			NotifyAll("Player " .. self:Name() .. " is no longer wanted by the police.")
+			NotifyAll(GetLang("unwanted", self:Name()))
 		end
 
 		self:SetNetVar("wanted", false)
@@ -77,17 +110,17 @@ if SERVER then
 	hook.Add("PlayerInitialSpawn", "FeatherJailExtender", function(client)
 	end)
 
-	function GAMEMODE:Lockdown(reason)
+	function GM:Lockdown(reason)
 		SetNetVar("lockdown", true)
 		SetNetVar("lockdownreason", reason)
 		self:BroadcastSound("npc/overwatch/cityvoice/f_confirmcivilstatus_1_spkr.wav")
-		NotifyAll("Mayor declared the lockdown.")
+		NotifyAll(GetLang"declarelockdown")
 	end
 
-	function GAMEMODE:UnLockdown(reason)
+	function GM:UnLockdown(reason)
 		SetNetVar("lockdown", false)
 		SetNetVar("lockdownreason", nil)
-		NotifyAll("Mayor finished the lockdown.")
+		NotifyAll(GetLang"finishlockdown")
 	end
 else
 end
@@ -108,12 +141,12 @@ function GM:CanWantedPlayer(client, target)
 	local targetjob = GAMEMODE:GetJobData(target:Team())
 
 	if targetjob.goverment then
-		client:notify("You can't wanted goverment player.", 3)
+		client:notify(GetLang"wantedgoverment", 3)
 		return false
 	end
 
-	if self:IsWanted() then
-		client:notify("That player is already wanted.", 3)
+	if client:IsWanted() then
+		client:notify(GetLang"alreadywanted", 3)
 		return false
 	end
 end
@@ -127,7 +160,7 @@ GM:RegisterCommand({
 		local time = tonumber(arguments[3]) or GAMEMODE.DefaultWantedTime
 
 		if !GAMEMODE:GetJobData(client:Team()).goverment then
-			client:notify("You should be in goverment to do this action.", 4)
+			client:notify(GetLang"begoverment", 4)
 			return
 		end
 
@@ -140,17 +173,17 @@ GM:RegisterCommand({
 		end
 
 		if !target or !target:IsValid() then
-			client:notify("You should find a player to be wanted.", 4)
+			client:notify(GetLang"invalidplayer", 4)
 			return
 		end
 
 		if !reason or reason == "" then
-			client:notify("You must provide a reason to wanted a player.", 4)
+			client:notify(GetLang"invalidreason", 4)
 			return
 		end
 
 		if target == client then
-			client:notify("You can't get your name on ther list be yourself.", 4)
+			client:notify(GetLang"cantdo", 4)
 			return
 		end
 
@@ -165,7 +198,6 @@ GM:RegisterCommand({
 	end
 }, "wanted")
 
-
 GM:RegisterCommand({
 	desc = "This command allows goverment to stop seek certain player for the prosecution.",
 	syntax = "<Target Player> <Reason> [time]",
@@ -173,7 +205,7 @@ GM:RegisterCommand({
 		local ply = arguments[1]
 
 		if !GAMEMODE:GetJobData(client:Team()).goverment then
-			client:notify("You should be in goverment to do this action.", 4)
+			client:notify(GetLang"begoverment", 4)
 			return
 		end
 
@@ -186,7 +218,7 @@ GM:RegisterCommand({
 		end
 
 		if !target or !target:IsValid() then
-			client:notify("You should find a player to be unwanted.", 4)
+			client:notify(GetLang"invalidplayer", 4)
 			return
 		end
 
@@ -202,6 +234,42 @@ GM:RegisterCommand({
 }, "unwanted")
 
 GM:RegisterCommand({
+	desc = "This command allows goverment to stop seek certain player for the prosecution.",
+	syntax = "<Target Player> <Reason> [time]",
+	onRun = function(client, arguments)
+		local ply = arguments[1]
+
+		if !GAMEMODE:GetJobData(client:Team()).goverment then
+			client:notify(GetLang"begoverment", 4)
+			return
+		end
+
+		local trace = client:GetEyeTraceNoCursor()
+
+		client:notify(GetLang"newjailpos")
+		GAMEMODE:AddJailPos(trace.HitPos)
+	end
+}, "addjailpos")
+
+GM:RegisterCommand({
+	desc = "This command allows goverment to stop seek certain player for the prosecution.",
+	syntax = "<Target Player> <Reason> [time]",
+	onRun = function(client, arguments)
+		local ply = arguments[1]
+
+		if !GAMEMODE:GetJobData(client:Team()).goverment then
+			client:notify(GetLang"begoverment", 4)
+			return
+		end
+
+		local trace = client:GetEyeTraceNoCursor()
+
+		client:notify(GetLang"setjailpos")
+		GAMEMODE.JailPos = {trace.HitPos}
+	end
+}, "setjailpos")
+
+GM:RegisterCommand({
 	desc = "This command allows goverment to get control of the city for temporaliy.",
 	syntax = "<Target Player> <Reason> [time]",
 	onRun = function(client, arguments)
@@ -212,13 +280,13 @@ GM:RegisterCommand({
 			return	
 		end
 
-		if GAMEMODE:GetJobData(client:Team()).mayor then
-			client:notify("You should be mayor to lockdown the city.", 4)
+		if !GAMEMODE:GetJobData(client:Team()).mayor then
+			client:notify(GetLang"bemayor", 4)
 			return
 		end
 
 		if !reason or reason == "" then
-			client:notify("You must provide a reason to lockdown the city.", 4)
+			client:notify(GetLang"invalidreason", 4)
 			return
 		end
 

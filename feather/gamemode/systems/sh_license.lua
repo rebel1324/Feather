@@ -30,8 +30,10 @@ if SERVER then
 	local function RevokeAllLicense(client)
 		local l = client:GetLicenses()
 
-		for k, v in pairs(l) do
-			client:RevokeLicense(k)
+		if l then
+			for k, v in pairs(l) do
+				client:RevokeLicense(k)
+			end
 		end
 	end
 	hook.Add("PlayerDeath", "FeatherLicenseRevoke", RevokeAllLicense)
@@ -45,15 +47,15 @@ if SERVER then
 
 	netstream.Hook("RequestLicense", function(client, data)
 		if !IsEntityClose(client:GetPos(), 128, "feather_licensem") then
-			client:notify("You must get closer to the machine.")	
+			client:notify(GetLang"closertomachine")	
 		end
 
 		local info = GAMEMODE:GetLicenseInfo(data)
 		if client:GiveLicense(data) then
 			client:EmitSound("plats/train_use1.wav")
-			client:notify("You got " .. info.name .. " for " .. MoneyFormat(info.price) .. ".")
+			client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
 		else
-			client:notify("You already have this license.")
+			client:notify(GetLang"haslicense")
 		end
 	end)
 else
@@ -89,7 +91,7 @@ else
 		text:Dock(TOP)
 		text:SetContentAlignment(1)
 		text:SetFont("fr_LicenseBtn")
-		text:SetText("$ ".. self.data.price)
+		text:SetText(MoneyFormat(self.data.price))
 		text:DockMargin(17, 0, 5, 5)
 		text:SetAutoStretchVertical( true )
 		text:SetColor(color_black)	
@@ -153,7 +155,7 @@ else
 
 		self.mod = vgui.Create("DButton", self)
 		self.mod:SetFont("fr_LicenseBtn")
-		self.mod:SetText("Modify")
+		self.mod:SetText(GetLang"modify_button")
 		self.mod:SetTall(30)
 		self.mod:SetWide(86)
 		self.mod:SetPos(10, self:GetTall() - 10 - self.mod:GetTall())
@@ -161,7 +163,7 @@ else
 
 		self.pur = vgui.Create("DButton", self)
 		self.pur:SetFont("fr_LicenseBtn")
-		self.pur:SetText("Purchase")
+		self.pur:SetText(GetLang"purchase_button")
 		self.pur:SetTall(30)
 		self.pur:SetWide(86)
 		self.pur:SetPos(10*2 + self.pur:GetWide()*1, self:GetTall() - 10 - self.pur:GetTall())
@@ -174,7 +176,7 @@ else
 
 		local btn = vgui.Create("DButton", self)
 		btn:SetFont("fr_LicenseBtn")
-		btn:SetText("Close")
+		btn:SetText(GetLang"close_button")
 		btn:SetTall(30)
 		btn:SetWide(86)
 		btn:SetPos(10*3 + btn:GetWide()*2, self:GetTall() - 10 - btn:GetTall())
@@ -292,12 +294,12 @@ if SERVER then
 
 	function GM:CanGrantLicense(lic, data, client, target) 
 		if (target:IsArrested() or client:IsArrested()) then
-			client:notify("You can't grant license to arrested personel.", 4)
+			client:notify(GetLang"arrestlicense", 4)
 			return false
 		end
 
 		if (!GAMEMODE:GetJobData(client:Team()).goverment) then
-			client:notify("You should be in goverment to do this action.", 4)
+			client:notify(GetLang"begoverment", 4)
 			return false
 		end
 	end
@@ -319,12 +321,12 @@ GM:RegisterCommand({
 		end
 
 		if (!target or !target:IsValid()) then
-			client:notify("You should find a player to give license.", 4)
+			client:notify(GetLang"invalidplayer", 4)
 			return
 		end
 
 		if (target == client) then
-			client:notify("You can't give license to yourself.", 4)
+			client:notify(GetLang"cantdo", 4)
 			return
 		end
 
@@ -337,8 +339,8 @@ GM:RegisterCommand({
 
 			if (data) then
 				if target:GiveLicense(lic) then
-					client:notify("You grant " .. target:Name() .. " " .. data.name .. ".", 4)
-					target:notify(client:Name() .. " grant you " .. data.name .. ".", 4)
+					client:notify(GetLang("grantlicense", data.name, client:GetName()), 4)
+					target:notify(GetLang("getgrantlicense", client:GetName(), data.name), 4)
 					hook.Run("OnGrantLicense", lic, data, client, target)
 				else
 					client:notify("He already has that license.", 4)
@@ -364,12 +366,12 @@ GM:RegisterCommand({
 		end
 
 		if (!target or !target:IsValid()) then
-			client:notify("You should find a player to give license.", 4)
+			client:notify(GetLang"invalidplayer", 4)
 			return
 		end
 
 		if (target == client) then
-			client:notify("You can't give license to yourself.", 4)
+			client:notify(GetLang"cantdo", 4)
 			return
 		end
 
@@ -382,8 +384,8 @@ GM:RegisterCommand({
 
 			if (data) then
 				if target:RevokeLicense(lic) then
-					client:notify("You revoked " .. data.name .. " from " .. target:Name() .. ".", 4)
-					target:notify(client:Name() .. " revoked " .. data.name .. " from you.", 4)
+					client:notify(GetLang("revokelicense", data.name, client:GetName()), 4)
+					target:notify(GetLang("getrevokelicense", client:GetName(), data.name), 4)
 					hook.Run("OnRevokeLicense", lic, data, client, target)
 				else
 					client:notify("He doesn't have that license.", 4)
@@ -392,6 +394,3 @@ GM:RegisterCommand({
 		end
 	end
 }, "revokelicense")
-
-GM:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
-GM:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)

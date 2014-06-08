@@ -59,12 +59,12 @@ GM:RegisterCommand({
 		end
 
 		if !target or !target:IsValid() then
-			client:notify("You should find a player to give your money.", 4)
+			client:notify(GetLang("invalid", "player"), 4)
 			return
 		end
 
 		if target == client then
-			client:notify("You can't give money to yourself.", 4)
+			client:notify(GetLang"cantdo", 4)
 			return
 		end
 
@@ -75,15 +75,15 @@ GM:RegisterCommand({
 			end
 
 			if amt >= 5 then
-				client:notify("You gave ".. amt .. " to " .. target:Name() .. ".")
+				client:notify(GetLang("givemoney", MoneyFormat(amt), target:Name()))
 				client:giveMoney(-amt)
 				target:giveMoney(amt)
 			else
-				client:notify("You should provide number that bigger than 5.")
+				client:notify(GetLang("biggerthan", 5))
 			end
 		end
 	end
-}, "givemoney")
+}, "give")
 
 GM:RegisterCommand({
 	onRun = function(client, arguments)
@@ -111,7 +111,7 @@ GM:RegisterCommand({
 				money:GetPhysicsObject():SetVelocity(client:GetAimVector() * force)
 			end
 		else
-			client:notify("You should provide number that bigger than 5.")
+			client:notify(GetLang("biggerthan", 5))
 		end
 	end
 }, "dropmoney")

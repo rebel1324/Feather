@@ -23,7 +23,7 @@ function FindPlayer(name)
 end
 
 function NoticeFindPlayer(client, name)
-	local fault = GetLang"plyinvalid"
+	local fault = GetLang("invalid", "player")
 
 	if (!name) then
 		client:notify(fault)

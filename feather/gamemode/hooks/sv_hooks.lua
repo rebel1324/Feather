@@ -14,7 +14,7 @@ function GM:PlayerInitialSpawn(client)
 				return client:notify(reason or GetLang"nopay")
 			end
 
-			hook.Run("PlayerReceivePay", client, amount)
+			hook.Run("PlayerReceivePay", client, MoneyFormat(amount))
 		end
 	end)
 end
@@ -43,7 +43,7 @@ function GM:PlayerDisconnected(client)
 end
 
 function GM:PlayerCanReceivePay(client)
-	return true
+	return !client:GetNetVar("arrested")
 end
 
 function GM:PlayerGetPayAmount(client)
@@ -135,5 +135,50 @@ function GM:BecomeJob(client, teamindex, voted)
 
 	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
+	hook.Run("PlayerLoadout", client)
 	NotifyAll(client:Name() .. " has been made a " .. name)
+end
+
+function GM:CanDrive(client)
+	return client:IsAdmin()
+end
+
+function GM:CanProperty(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerGiveSWEP(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnEffect(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnNPC(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnNPC(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnProp()
+	return true
+end
+
+function GM:PlayerSpawnSENT(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnSWEP(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnVehicle(client)
+	return client:IsAdmin()
+end
+
+function GM:PlayerSpawnObject(client)
+	return true
 end

@@ -103,7 +103,7 @@ function GM:RunCommand(client, command, arguments, noMsgOnFail)
 			end
 		end
 	elseif (!noMsgOnFail) then
-		client:notify(GetLang"cmdinvalid")
+		client:notify(GetLang("invalid", "command"))
 	end
 
 	if (!echo) then
@@ -388,3 +388,21 @@ GM:RegisterCommand({
 		end
 	end
 }, "job")
+
+GM:RegisterCommand({
+	onRun = function(client, arguments)
+		local job = arguments[1]
+	end
+}, "setspawn")
+
+GM:RegisterCommand({
+	onRun = function(client, arguments)
+		local range = arguments[1]
+	end
+}, "removespawn")
+
+GM:RegisterCommand({
+	onRun = function(client, arguments)
+		local range = arguments[1]
+	end
+}, "getspawn")

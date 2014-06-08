@@ -18,9 +18,14 @@ local QUERY_CREATE_SQLITE = [[
 	);
 
 	CREATE TABLE IF NOT EXISTS fr_licenses (
-		_uniqueID mediumtext PRIMARY KEY,
+		_uniqueID mediumtext unique,
 		_name mediumtext,
 		_price int
+	);
+
+	CREATE TABLE IF NOT EXISTS fr_jailpos (
+		_map mediumtext,
+		_vector mediumtext
 	);
 ]]
 

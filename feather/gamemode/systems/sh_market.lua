@@ -73,7 +73,7 @@ function GM:BuyEntity(client, uniqueid, data)
 		ent:Spawn()
 	end
 
-	if ent:IsValid() then
+	if ent and ent:IsValid() then
 		//client:addMoney(-data.price)
 		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
 	end
@@ -101,7 +101,7 @@ GM:RegisterCommand({
 		end
 
 		if !buy or buy == "" then
-			client:notify("You must provide the uniqueid")
+			client:notify(GetLang("provide", "Unique ID."))
 			return
 		end
 
@@ -111,13 +111,18 @@ GM:RegisterCommand({
 				return
 			end
 
-			client:notify("You purchased ".. data.name .. " for " .. MoneyFormat(data.price) .. ".")
+			client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
+
 			if buycat == 0 then
 				GAMEMODE:BuyEntity(client, buy, data)
 			elseif buycat == 1 then
 				GAMEMODE:BuyWeapon(client, buy, data)
 			end
+
+			return
 		end
+
+		client:notify()
 	end
 }, "buy")
 
@@ -131,7 +136,7 @@ GM:RegisterCommand({
 		local target = trace.Entity
 
 		if (!target or !target:IsValid()) then
-			client:notify("You should find a entity to give license.", 4)
+			client:notify(GetLang"entinvalid", 4)
 			return
 		end
 
@@ -140,13 +145,7 @@ GM:RegisterCommand({
 		if (eprice) then			
 			target:SetNetVar("price", price)
 		else
-			client:notify("You must face the entity that you can set the price.")
+			client:notify(GetLang"faceadjent")
 		end
 	end
 }, "setprice")
-
-
-GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
-GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
-
-GM:AddWeapon("pistol", "weapon_pistol", 10, "9mm Pistol", "Sidearm", "Pistol", "models/weapons/w_pistol.mdl", 100)

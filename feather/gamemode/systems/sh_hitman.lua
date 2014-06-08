@@ -8,7 +8,7 @@ if SERVER then
 
 	function GM:CanAcceptHit(client)
 		if !client:IsArrested() then
-			
+			return false
 		end
 	end
 

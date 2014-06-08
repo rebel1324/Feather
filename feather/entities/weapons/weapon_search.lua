@@ -31,13 +31,124 @@ function SWEP:GetViewModelPosition(pos, ang)
 	return pos, ang
 end
 
-function SWEP:Reload()
+if SERVER then
+	function SWEP:PrimaryAttack()
+		local td = {}
+			td.start = self.Owner:GetShootPos()
+			td.endpos = td.start + self.Owner:GetAimVector()*64
+			td.filter = self.Owner
+		local trace = util.TraceLine(td)
+
+		if trace.Entity:IsValid() and trace.Entity:IsPlayer() then
+			self:StartSearch(trace.Entity)	
+		end
+
+		self:SetNextPrimaryFire(CurTime() + .5)
+	end
+
+	function SWEP:StartSearch(client)
+		self.target = client
+		local searchtime = 1
+		netstream.Start(self.Owner, "FeatherProgressDisplay", {GetLang"hudsearchname", searchtime})
+
+		timer.Create(self:EntIndex() .. "_SEARCH", searchtime, 1, function()
+			if self:IsValid() and self.Owner:IsValid() and self.Owner:Alive() then
+				local result = {}
+				for k, v in pairs(self.target:GetWeapons()) do
+					table.insert(result, v:GetClass())
+				end
+				netstream.Start(self.Owner, "FeatherWeaponSearch", result)
+				self.target = nil
+			end
+		end)
+	end
+	
+	function SWEP:OnRemove()
+		self:StopSearch()
+	end
+
+	function SWEP:StopSearch()
+		self.target = nil
+		netstream.Start(self.Owner, "FeatherProgressDisplay", {"", 0})
+
+		timer.Destroy(self:EntIndex() .. "_SEARCH")
+	end
+
+	function SWEP:Think()
+		if self.target and self.target:IsValid() then
+			local dist = self.target:GetPos():Distance(self.Owner:GetPos())
+			if dist >= 64*1.5 then
+				self:StopSearch()	
+			end
+		end
+	end
+else
+	local PNL = {}
+
+	function PNL:Init()
+		self:SetSize(400, 250)
+		self:Center()
+		self:MakePopup()
+		self:SetTitle("Result")
+
+		local text = vgui.Create("DLabel", self)
+		text:Dock(TOP)
+		text:SetContentAlignment(2)
+		text:SetFont("fr_License")
+		text:SetText(GetLang"searchwindow")
+		text:DockMargin(5, 5, 5, 5)
+		text:SetAutoStretchVertical( true )
+		text:SetColor(color_white)	
+
+		self.content = vgui.Create("DScrollPanel", self)
+		self.content:Dock(FILL)
+		self.content:DockMargin(5,5,5,5)
+		self.content:SetDrawBackground(true)
+	end
+	
+	function PNL:AddWeapon(name)
+		local text = vgui.Create("DLabel", self.content)
+		text:Dock(TOP)
+		text:SetContentAlignment(1)
+		text:SetFont("fr_LicenseBtn")
+		text:DockMargin(10, 5, 5, 0)
+		text:SetText(name)
+		text:SetAutoStretchVertical( true )
+		text:SetColor(color_black)	
+	end
+
+	vgui.Register("FeatherWeaponSearch", PNL, "DFrame")
+
+	netstream.Hook("FeatherWeaponSearch", function(data)
+		if WeaponResult and WeaponResult:IsValid() then
+			WeaponResult:Close()
+			WeaponResult = nil
+		end
+
+		WeaponResult = vgui.Create("FeatherWeaponSearch")
+		for k, v in pairs(data) do
+			WeaponResult:AddWeapon(v)
+		end
+	end)
 end
 
-function SWEP:PrimaryAttack()
-	print(1)
-	self:SetNextPrimaryFire(CurTime() + .5)
-end
+function SWEP:DrawHUD()
+	local w, h = ScrW(), ScrH()
 
-function SWEP:SecondaryAttack()
+	local td = {}
+		td.start = self.Owner:GetShootPos()
+		td.endpos = td.start + self.Owner:GetAimVector()*64
+		td.filter = self.Owner
+	local trace = util.TraceLine(td)
+
+	if hook.Run("CanDrawWeaponHUD") then
+		if trace.Entity:IsValid() then
+			draw.SimpleText(GetLang"hudsearch", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+			if trace.Entity:IsPlayer() then
+				draw.SimpleText(GetLang("hudsearchtarget", trace.Entity:Name()), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
+			end
+		else
+			draw.SimpleText(GetLang"hudsearch", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+		end
+	end
 end

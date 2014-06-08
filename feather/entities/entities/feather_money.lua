@@ -36,7 +36,7 @@ if (SERVER) then
 
 		if (amount >= 0 and IsValid(activator) and hook.Run("PlayerCanPickupMoney", activator, self) != false) then
 			activator:giveMoney(amount)
-			activator:notify("You have picked up ".. MoneyFormat(amount) ..".")
+			activator:notify(GetLang("moneyfound", MoneyFormat(amount)))
 
 			self:Remove()
 		end
@@ -56,8 +56,8 @@ else
 
 		if alpha > 0 then
 			local text = MoneyFormat(self:GetDTInt(0, "amount"))
-			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255, alpha), 1, 1)
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255, alpha), 1, 1)
 		end
 	end
 end
