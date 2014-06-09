@@ -74,7 +74,30 @@ function GM:BuyEntity(client, uniqueid, data)
 	end
 
 	if ent and ent:IsValid() then
-		//client:addMoney(-data.price)
+		client:addMoney(-data.price)
+		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
+	end
+	
+	return ent
+end
+
+function GM:BuyFood(client, uniqueid, data)
+	local td = {}
+		td.start = client:GetShootPos()
+		td.endpos = td.start + client:GetAimVector()*64
+		td.filter = client
+	local trace = util.TraceLine(td)
+	
+	local ent = ents.Create("feather_food")
+	ent:SetPos(trace.HitPos)
+	ent:SetAngles(Angle(0, 0, 0))
+	ent:Spawn()
+	ent:Activate()
+
+	ent:SetFood(uniqueid)
+
+	if ent and ent:IsValid() then
+		client:addMoney(-data.price)
 		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
 	end
 	
@@ -95,9 +118,18 @@ GM:RegisterCommand({
 
 		local buycat = 0
 		local data = GAMEMODE.EntityList[buy]
+
 		if !data then
 			buycat = 1
 			data = GAMEMODE.WeaponList[buy]
+		end
+
+		if !data then
+			buycat = 2
+			data = GAMEMODE.FoodList[buy]
+			if !data.buyable then
+				data = nil
+			end
 		end
 
 		if !buy or buy == "" then
@@ -117,6 +149,8 @@ GM:RegisterCommand({
 				GAMEMODE:BuyEntity(client, buy, data)
 			elseif buycat == 1 then
 				GAMEMODE:BuyWeapon(client, buy, data)
+			elseif buycat == 2 then
+				GAMEMODE:BuyFood(client, buy, data)
 			end
 
 			return

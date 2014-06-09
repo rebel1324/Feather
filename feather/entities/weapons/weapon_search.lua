@@ -39,7 +39,7 @@ if SERVER then
 			td.filter = self.Owner
 		local trace = util.TraceLine(td)
 
-		if trace.Entity:IsValid() and trace.Entity:IsPlayer() then
+		if trace.Entity:IsValid() and trace.Entity:IsPlayer() and !self.target then
 			self:StartSearch(trace.Entity)	
 		end
 

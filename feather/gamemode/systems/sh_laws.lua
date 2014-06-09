@@ -1,6 +1,5 @@
 // MAKE ARREST DONE
 local playerMeta = FindMetaTable("Player")
-GM.WantedList = {}
 
 if SERVER then
 	GM.JailPos = {}
@@ -83,10 +82,9 @@ if SERVER then
 	end
 
 	function playerMeta:Wanted(from, reason, time)
-		GAMEMODE:CenterDisplay(GetLang("wanted", self:Name(), reason), 3)
+		GAMEMODE:CenterDisplay(GetLang("wanted", self:Name(), from:Name(), reason), 3)
 
-		self:SetNetVar("wanted", true)
-		netstream.Start(player.GetAll(), "FeatherWanted", {self, true, time})
+		self:SetNetVar("wanted", {time, reason})
 
 		timer.Create(self:SteamID64() .. "_WANTED", time, 1, function()
 			if !self:IsValid() then
@@ -94,7 +92,7 @@ if SERVER then
 			end
 
 			NotifyAll(GetLang("unwanted", self:Name()))
-			self:SetNetVar("wanted", false)
+			self:SetNetVar("wanted", nil)
 		end)
 	end
 	
@@ -103,7 +101,7 @@ if SERVER then
 			NotifyAll(GetLang("unwanted", self:Name()))
 		end
 
-		self:SetNetVar("wanted", false)
+		self:SetNetVar("wanted", nil)
 		timer.Destroy(self:SteamID64() .. "_WANTED")
 	end
 
@@ -126,7 +124,7 @@ else
 end
 
 function playerMeta:IsWanted()
-	return GAMEMODE.WantedList[self]
+	return self:GetNetVar("wanted")
 end
 
 function playerMeta:IsArrested()

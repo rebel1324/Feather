@@ -51,6 +51,10 @@ if SERVER then
 	end
 else
 	function GM:DrawDoorInfo(w, h)
+		if hook.Run("CanDrawDoorInfo") == false then
+			return
+		end
+		
 		local trace = LocalPlayer():GetEyeTraceNoCursor()
 		local door = trace.Entity
 		if door:IsValid() and door:IsDoor() and door:GetPos():Distance(EyePos()) < 128 and !door:GetNetVar("hidden") then

@@ -15,6 +15,9 @@ function GM:HUDPaint()
 	draw.SimpleText("Money: $"..LocalPlayer():getMoney(), "BudgetLabel", 8, 8, color_white, 0, 0)
 	draw.SimpleText("Salary: $"..(self.Jobs[teamID] and self.Jobs[teamID].salary or 0), "BudgetLabel", 8, 24, color_white, 0, 0)
 	draw.SimpleText("Job: "..team.GetName(teamID), "BudgetLabel", 8, 40, color_white, 0, 0)
+	if self.HungerMode then
+		draw.SimpleText("Hunger: ".. math.Round(LocalPlayer():GetHungerPercent() * 100) .. "%", "BudgetLabel", 8, 80, color_white, 0, 0)
+	end
 
 	local position = LocalPlayer():GetPos()
 	local shootPos = LocalPlayer():GetShootPos()
@@ -99,7 +102,7 @@ function GM:ProgressPaint(w, h)
 		surface.SetDrawColor(0, 0, 0, self.DisplayAlpha)
 		surface.DrawRect(w/2 - sizex/2, h/2 + sizey/3, sizex, sizey)
 		surface.SetDrawColor(col.r, col.g, col.b, self.DisplayAlpha)
-		surface.DrawRect(w/2 - sizex/2, h/2 + sizey/3, sizex * (1 - ft), sizey)
+		surface.DrawRect(w/2 - sizex/2 + 2, h/2 + sizey/3 + 2, sizex * (1 - ft) - 4, sizey - 4)
 	end
 end
 
@@ -169,7 +172,7 @@ function GM:Notify(message, class)
 end
 
 function GM:CanDrawWeaponHUD()
-	return (!self.DrawDoor and self.DisplayTime <= CurTime() and math.floor(self.DisplayAlpha) == 0)
+	return !(self.DrawDoor or self.DisplayTime > CurTime() or math.floor(self.DisplayAlpha) > 0)
 end
 
 netstream.Hook("fr_Notify", function(message, class)

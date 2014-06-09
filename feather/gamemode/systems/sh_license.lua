@@ -53,7 +53,7 @@ if SERVER then
 		local info = GAMEMODE:GetLicenseInfo(data)
 		if client:GiveLicense(data) then
 			client:EmitSound("plats/train_use1.wav")
-			client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
+			client:notify(GetLang("purchase", info.name, MoneyFormat(info.price)))
 		else
 			client:notify(GetLang"haslicense")
 		end

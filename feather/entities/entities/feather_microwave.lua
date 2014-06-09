@@ -31,7 +31,7 @@ if (SERVER) then
 	end
 
 	function ENT:Use(activator)
-		if !self:GetDTBool(0) and activator:payMoney(self:GetNetVar("price"), nil, GetLang("purchased", "Food", MoneyFormat(self:GetNetVar("price"))) ) then
+		if !self:GetDTBool(0) and activator:payMoney(self:GetNetVar("price"), nil, GetLang("purchase", "Food", MoneyFormat(self:GetNetVar("price", 0))) ) then
 			if self.Owner and self.Owner:IsValid() then
 				self.Owner:addMoney(self:GetNetVar("price") - self.minprice)
 			end
@@ -50,12 +50,13 @@ if (SERVER) then
 	end
 
 	function ENT:PopFood()
-		local entity = ents.Create("prop_physics")
-		entity:SetModel("models/props_junk/garbage_takeoutcarton001a.mdl")
+		local entity = ents.Create("feather_food")
 		entity:SetPos(self:GetPos() + self:OBBCenter() + self:GetForward()*10)
 		entity:SetAngles(AngleRand())
 		entity:Spawn()
 		entity:Activate()
+
+		entity:SetFood("chinese")
 	end
 
 	function ENT:OnRemove()

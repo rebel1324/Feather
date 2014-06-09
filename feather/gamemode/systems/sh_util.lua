@@ -37,5 +37,5 @@ function IsEntityClose(pos, range, class)
 end
 
 function MoneyFormat(num)
-	return "$ " .. string.Comma(num)
+	return GAMEMODE.Currency .. string.Comma(num)
 end
