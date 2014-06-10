@@ -22,7 +22,9 @@ if (SERVER) then
 
 		local time = GAMEMODE.MoneyPrinterTime
 		timer.Simple(math.Rand(time[1], time[2]), function()
-			self:PrintMoney()
+			if (self:IsValid()) then
+				self:PrintMoney()
+			end
 		end)
 	end
 
@@ -56,9 +58,12 @@ if (SERVER) then
 	function ENT:Use(activator)
 	end
 else
-	/*
-	function ENT:DrawTargetID(x, y, alpha)
-		nut.util.DrawText(x, y, nut.currency.GetName(self:GetNetVar("amount", 0), true), Color(255, 255, 255, alpha))
+	function ENT:DrawTargetInfo()
+		local origin = self:GetPos() + Vector(0, 0, 5)
+		local pos = (origin):ToScreen()
+
+		local text = "Money Printer"
+		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
+		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
 	end
-	*/
 end

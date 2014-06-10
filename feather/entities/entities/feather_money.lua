@@ -35,7 +35,7 @@ if (SERVER) then
 		local amount = self:GetDTInt(0) or 0
 
 		if (amount >= 0 and IsValid(activator) and hook.Run("PlayerCanPickupMoney", activator, self) != false) then
-			activator:giveMoney(amount)
+			activator:GiveMoney(amount)
 			activator:notify(GetLang("moneyfound", MoneyFormat(amount)))
 
 			self:Remove()
@@ -49,15 +49,12 @@ if (SERVER) then
 		end
 	end
 else
-	function ENT:DrawScreen()
+	function ENT:DrawTargetInfo()
 		local origin = self:GetPos() + Vector(0, 0, 3)
 		local pos = (origin):ToScreen()
-		local alpha = math.Clamp((1 - origin:DistToSqr(EyePos()) / 256^2) * 255, 0, 255)
 
-		if alpha > 0 then
-			local text = MoneyFormat(self:GetDTInt(0, "amount"))
-			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0, alpha), 1, 1)
-			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255, alpha), 1, 1)
-		end
+		local text = MoneyFormat(self:GetDTInt(0, "amount"))
+		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
+		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
 	end
 end

@@ -38,7 +38,7 @@ GM.LockPickTime = 5
 GM.HungerMode = true
 
 -- The time (seconds) player can stand without eating food. Default: 200 seconds.
-GM.HungerTime = 200
+GM.HungerTime = 2000
 
 -- The time server
 GM.HungerThinkRate = 2
@@ -46,11 +46,20 @@ GM.HungerThinkRate = 2
 -- The currency that server uses
 GM.Currency = "$"
 
+-- You mail based systems. Requires server restart/changemap to get stable result.
+GM.UseMail = false
+
 -- Default Laws
 GM.DefaultLaws = {
 	"You must obey server's rule",
 	"You must not kill people",
 }
+
+-- Hit Cost
+GM.HitCost = 500
+
+-- When money get deleted
+GM.MoneyRemoveTime = 300
 
 GM.Jobs = {}
 
@@ -88,8 +97,6 @@ function GM:CreateTeams()
 		salary = 25,
 		cmd = "medic",
 	})
-
-	// GOVERMENTS 
 
 	TEAM_MAYOR = self:CreateJob("Mayor", Color(0, 255, 0), {
 		salary = 25,
@@ -131,8 +138,6 @@ function GM:CreateTeams()
 		},
 	})
 
-	// CRIMES 
-
 	TEAM_MOBSTER = self:CreateJob("Mobster", Color(100, 100, 100), {
 		salary = 25,
 		convicts = true,
@@ -164,16 +169,16 @@ cn.util.includeFolder("systems", "feather")
 cn.util.includeFolder("meta", "feather")
 cn.util.includeFolder("hooks", "feather")
 
-GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
-GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
+GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", {}, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
+GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", {TEAM_COOK}, "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
 
-GM:AddWeapon("pistol", "weapon_pistol", 10, "9mm Pistol", "Sidearm", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 100)
-GM:AddWeapon("smg", "weapon_smg1", 10, "Sub Machinegun", "Primary", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 200)
+GM:AddWeapon("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Sidearm", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 100)
+GM:AddWeapon("smg", "weapon_smg1", 10, {TEAM_GUNDEALER}, "Sub Machinegun", "Primary", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 200)
 
 GM:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
 GM:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)
 
-GM:AddFood("chinese", "Chinese Takeout", "models/props_junk/garbage_takeoutcarton001a.mdl", GM.HungerTime, 10)
-GM:AddFood("watermelon", "Watermelon", "models/props_junk/watermelon01.mdl", GM.HungerTime * .1, 20, true)
-GM:AddFood("fastfood", "Fast Food", "models/props_junk/garbage_bag001a.mdl", GM.HungerTime * .3, 100, true)
-GM:AddFood("soda", "Soda", "models/props_junk/PopCan01a.mdl", GM.HungerTime * .05, 10, true)
+GM:AddFood("chinese", "Chinese Takeout", "models/props_junk/garbage_takeoutcarton001a.mdl", {TEAM_COOK}, GM.HungerTime, 10)
+GM:AddFood("watermelon", "Watermelon", "models/props_junk/watermelon01.mdl", {TEAM_COOK}, GM.HungerTime * .1, 20, true)
+GM:AddFood("fastfood", "Fast Food", "models/props_junk/garbage_bag001a.mdl", {TEAM_COOK}, GM.HungerTime * .3, 100, true)
+GM:AddFood("soda", "Soda", "models/props_junk/PopCan01a.mdl", {TEAM_COOK}, GM.HungerTime * .05, 10, true)

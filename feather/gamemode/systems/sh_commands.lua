@@ -377,15 +377,21 @@ GM:RegisterCommand({
 					for _, cmd in ipairs(v.cmd) do
 						if cmd == job then
 							GAMEMODE:BecomeJob(client, k)
+
+							return
 						end
 					end
 				else
 					if v.cmd == job then
 						GAMEMODE:BecomeJob(client, k)
+
+						return
 					end
 				end
 			end
 		end
+
+		client:notify(GetLang"invalidjob")
 	end
 }, "job")
 

@@ -4,7 +4,7 @@
 GM.EntityList = {}
 GM.WeaponList = {}
 
-function GM:AddEntity(uniqueid, classname, name, category, desc, model, price, job)
+function GM:AddEntity(uniqueid, classname, name, category, job, desc, model, price)
 	self.EntityList[uniqueid] = {
 		classname = classname,
 		name = name,
@@ -18,7 +18,7 @@ function GM:AddEntity(uniqueid, classname, name, category, desc, model, price, j
 	return self.EntityList[classname]
 end
 
-function GM:AddWeapon(uniqueid, classname, amount, name, category, desc, model, price, job, allowsingle)
+function GM:AddWeapon(uniqueid, classname, amount, job, name, category, desc, model, price, allowsingle)
 	self.WeaponList[uniqueid] = {
 		classname = classname,
 		name = name,
@@ -34,14 +34,37 @@ function GM:AddWeapon(uniqueid, classname, amount, name, category, desc, model, 
 	return self.WeaponList[classname]
 end
 
+function GM:CanBuyWeapon(client, uniqueid, data, menu)
+	if (data.job and #data.job != 0 and !table.HasValue(data.job, client:Team())) then
+		if (!menu) then
+			client:notify(GetLang"yourjobcantbuy")
+		end
+		return false
+	end
+
+	if (client:IsArrested()) then
+		if (!menu) then
+			client:notify(GetLang"yourearrested")
+		end
+	end
+
+	if (!menu and !client:PayMoney(data.price)) then
+		return false
+	end
+end
+
 function GM:BuyWeapon(client, uniqueid, data, single)
+	if (hook.Run("CanBuyWeapon", client, uniqueid, data, single)) == false then
+		return false	
+	end
+
 	local td = {}
 		td.start = client:GetShootPos()
 		td.endpos = td.start + client:GetAimVector()*64
 		td.filter = client
 	local trace = util.TraceLine(td)
 
-	if !single then
+	if (!single) then
 		local ent = ents.Create("feather_shipment")
 		ent:SetPos(trace.HitPos)
 		ent:SetAngles(Angle(0, 0, 0))
@@ -54,7 +77,36 @@ function GM:BuyWeapon(client, uniqueid, data, single)
 	end
 end
 
+function GM:CanBuyEntity(client, uniqueid, data, menu)
+	if (data.job and #data.job != 0 and !table.HasValue(data.job, client:Team())) then
+		if (!menu) then
+			client:notify(GetLang"yourjobcantbuy")
+		end
+		return false
+	end
+
+	if (client:IsArrested()) then
+		if (!menu) then
+			client:notify(GetLang"yourearrested")
+		end
+	end
+
+	if (!menu and !client:PayMoney(data.price)) then
+		return false
+	end
+end
+
 function GM:BuyEntity(client, uniqueid, data)
+	if hook.Run("CanBuyEntity", client, uniqueid, data) == false then
+		return false	
+	end
+	
+	print(#client.market[uniqueid])
+	if client.market and client.market[uniqueid] and #client.market[uniqueid] >= (data.max or 2) then
+		client:notify(GetLang("entmax", data.max or 2))
+		return false
+	end
+
 	local td = {}
 		td.start = client:GetShootPos()
 		td.endpos = td.start + client:GetAimVector()*64
@@ -63,25 +115,49 @@ function GM:BuyEntity(client, uniqueid, data)
 
 	local sent = scripted_ents.GetStored( data.classname )
 	local SpawnFunction = scripted_ents.GetMember( data.classname, "SpawnFunction" )
-	
+	local ent
 	if ( !isfunction( SpawnFunction ) ) then 
 		ent = SpawnFunction( sent, client, trace, data.classname )
 	else
-		local ent = ents.Create(data.classname)
+		ent = ents.Create(data.classname)
 		ent:SetPos(trace.HitPos)
 		ent:SetAngles(Angle(0, 0, 0))
 		ent:Spawn()
 	end
 
-	if ent and ent:IsValid() then
-		client:addMoney(-data.price)
+	if (ent and ent:IsValid()) then
 		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
 	end
 	
 	return ent
 end
 
+function GM:CanBuyFood(client, uniqueid, data)
+	if (data.job and #data.job != 0 and !table.HasValue(data.job, client:Team())) then
+		if (!menu) then
+			client:notify(GetLang"yourjobcantbuy")
+		end
+		return false
+	end
+
+	if (client:IsArrested()) then
+		if (!menu) then
+			client:notify(GetLang"yourearrested")
+		end
+	end
+
+	if (!menu and !client:PayMoney(data.price)) then
+		return false
+	end
+
+	return data.buyable
+end
+
 function GM:BuyFood(client, uniqueid, data)
+	if (hook.Run("CanBuyFood", client, uniqueid, data) == false) then
+		return false	
+	end
+
 	local td = {}
 		td.start = client:GetShootPos()
 		td.endpos = td.start + client:GetAimVector()*64
@@ -95,21 +171,52 @@ function GM:BuyFood(client, uniqueid, data)
 	ent:Activate()
 
 	ent:SetFood(uniqueid)
-
-	if ent and ent:IsValid() then
-		client:addMoney(-data.price)
-		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
-	end
 	
 	return ent
 end
 
 if SERVER then
-	function GM:OnPurchasedEntity(client, uniqueid, data, ent)
-		if data.postbuy then
-			data.postbuy(client, ent)
+	function GM:OnPurchasedEntity(client, uniqueid, data, entity)
+		if (data.postbuy) then
+			data.postbuy(client, entity)
+		end
+
+		entity.Owner = client
+		client.market = client.market or {}
+		client.market[uniqueid] = client.market[uniqueid] or {}
+		print(#client.market[uniqueid], entity.Owner)
+		if (!norecord) then
+			table.insert(client.market[uniqueid], entity)
+			print('printrecorded')
 		end
 	end
+
+	hook.Add("EntityRemoved", "FeatherMarketRemove", function(entity)
+		local owner = entity.Owner
+		if owner then
+			if !owner.market then return end
+
+			for cat, dat in pairs(owner.market) do
+				for k, e in pairs(dat) do
+					if !e or !e:IsValid() then
+						table.remove(owner.market[cat], k)
+					end
+				end
+			end
+		end
+	end)
+
+	hook.Add("PlayerDisconnected", "FeatherMarketDestroy", function(client)
+		if !client.market then return end
+		
+		for _, dat in pairs(client.market) do
+			for _, e in ipairs(dat) do
+				if e:IsValid() then
+					e:Remove()
+				end
+			end
+		end
+	end)	
 end
 
 GM:RegisterCommand({
@@ -119,12 +226,12 @@ GM:RegisterCommand({
 		local buycat = 0
 		local data = GAMEMODE.EntityList[buy]
 
-		if !data then
+		if (!data) then
 			buycat = 1
 			data = GAMEMODE.WeaponList[buy]
 		end
 
-		if !data then
+		if (!data) then
 			buycat = 2
 			data = GAMEMODE.FoodList[buy]
 			if !data.buyable then
@@ -132,31 +239,28 @@ GM:RegisterCommand({
 			end
 		end
 
-		if !buy or buy == "" then
+		if (!buy or buy == "") then
 			client:notify(GetLang("provide", "Unique ID."))
 			return
 		end
 
-		if data then
-			if !client:canAfford(data.price) then
-				client:notify(GetLang"cantafford")
-				return
-			end
-
-			client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
-
-			if buycat == 0 then
-				GAMEMODE:BuyEntity(client, buy, data)
-			elseif buycat == 1 then
-				GAMEMODE:BuyWeapon(client, buy, data)
-			elseif buycat == 2 then
-				GAMEMODE:BuyFood(client, buy, data)
+		if (data) then
+			if (buycat == 0) then
+				if GAMEMODE:BuyEntity(client, buy, data) != false then
+					client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
+				end
+			elseif (buycat == 1) then
+				if GAMEMODE:BuyWeapon(client, buy, data) != false then
+					client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
+				end
+			elseif (buycat == 2) then
+				if GAMEMODE:BuyFood(client, buy, data) != false then
+					client:notify(GetLang("purchase", data.name, MoneyFormat(data.price)))
+				end
 			end
 
 			return
 		end
-
-		client:notify()
 	end
 }, "buy")
 

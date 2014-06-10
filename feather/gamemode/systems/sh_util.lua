@@ -39,3 +39,11 @@ end
 function MoneyFormat(num)
 	return GAMEMODE.Currency .. string.Comma(num)
 end
+
+function NameToJobIndex(name)
+	for k, v in pairs(team.GetAllTeams()) do
+		if (StringMatches(team.GetName(k), name)) then
+			return k
+		end
+	end
+end

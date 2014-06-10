@@ -1,4 +1,3 @@
-// FINISHED
 if SERVER then	
 	GM.VoteQueue = {}
 

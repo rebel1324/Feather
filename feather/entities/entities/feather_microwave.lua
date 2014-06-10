@@ -31,7 +31,7 @@ if (SERVER) then
 	end
 
 	function ENT:Use(activator)
-		if !self:GetDTBool(0) and activator:payMoney(self:GetNetVar("price"), nil, GetLang("purchase", "Food", MoneyFormat(self:GetNetVar("price", 0))) ) then
+		if !self:GetDTBool(0) and activator:PayMoney(self:GetNetVar("price"), nil, GetLang("purchase", "Food", MoneyFormat(self:GetNetVar("price", 0))) ) then
 			if self.Owner and self.Owner:IsValid() then
 				self.Owner:addMoney(self:GetNetVar("price") - self.minprice)
 			end

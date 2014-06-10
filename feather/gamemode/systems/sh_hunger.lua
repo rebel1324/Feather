@@ -10,13 +10,15 @@ function playerMeta:GetHungerPercent()
 	return math.Clamp(((self:GetHunger() - CurTime()) / GAMEMODE.HungerTime), 0 ,1)
 end
 
-function GM:AddFood(uniqueID, name, model, hunger, price, buyable)
+function GM:AddFood(uniqueID, name, model, job, hunger, price, buyable)
 	GM.FoodList[uniqueID] = {
 		name = name,
 		model = model,
+		job = job,
 		hunger = hunger,
 		price = price,
 		buyable = buyable or false,
+		category = "Food"
 	}
 
 	return GM.FoodList[uniqueID]
@@ -64,6 +66,9 @@ if SERVER then
 	function GM:PlayerHungerInit(client)
 		client:SetHunger(self.HungerTime)
 	end
+	hook.Add("PlayerAuthed", "FeatherHungerInit", function(client)
+		GAMEMODE:PlayerHungerInit(client)
+	end)
 	hook.Add("PlayerSpawn", "FeatherHungerInit", function(client)
 		GAMEMODE:PlayerHungerInit(client)
 	end)

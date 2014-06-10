@@ -1,5 +1,9 @@
 function GM:PlayerInitialSpawn(client)
 	client:SetTeam(TEAM_CITIZEN)
+end
+
+-- Load Data when player is on control.
+function GM:PlayerAuthed(client)
 	client:loadFeatherData()
 
 	local uniqueID = "fr_PayCheck"..client:SteamID()
@@ -14,7 +18,7 @@ function GM:PlayerInitialSpawn(client)
 				return client:notify(reason or GetLang"nopay")
 			end
 
-			hook.Run("PlayerReceivePay", client, MoneyFormat(amount))
+			hook.Run("PlayerReceivePay", client, amount)
 		end
 	end)
 end
@@ -34,8 +38,11 @@ function GM:ShutDown()
 end
 
 function GM:PlayerReceivePay(client, amount)
-	client:giveMoney(amount)
-	client:notify(GetLang("payday", amount))
+	if client:IsArrested() then
+		amount = 0
+	end
+	client:GiveMoney(amount)
+	client:notify(GetLang("payday", MoneyFormat(amount)))
 end
 
 function GM:PlayerDisconnected(client)
@@ -43,7 +50,6 @@ function GM:PlayerDisconnected(client)
 end
 
 function GM:PlayerCanReceivePay(client)
-	return !client:GetNetVar("arrested")
 end
 
 function GM:PlayerGetPayAmount(client)
@@ -70,8 +76,16 @@ function GM:GetBaseLoadout(client)
 	client:Give("weapon_key")
 end
 
+function GM:CanPlayerLoadout(client)
+	return (!client:IsArrested())
+end
+
 function GM:PlayerLoadout(client)
-	hook.Call("GetBaseLoadout", GAMEMODE, client)
+	if hook.Run("CanPlayerLoadout", client) == false then
+		return
+	end
+
+	hook.Run("GetBaseLoadout", client)
 
 	local index = client:Team()
 	local teamdata = self:GetJobData(index)
@@ -96,12 +110,26 @@ end
 function GM:Demote(from, to, reason, voted)
 end
 
+function GM:CanBecomeJob(client, data, teamindex)
+	if (client:IsArrested()) then
+		client:notify(GetLang"yourearrested")
+	end
+
+	if (client.banned) then
+		client:notify(GetLang"cantdo")
+	end
+end
+
 function GM:BecomeJob(client, teamindex, voted)
 	local data = self:GetJobData(teamindex)
 	local name = team.GetName(teamindex)
 
+	if !data then
+		client:notify(GetLang"invalidjob")
+	end
+
 	if !voted and client.nextJob and client.nextJob > CurTime() then
-		client:notify("You're switching Job too fast! Try again later.")
+		client:notify(GetLang"toofast")
 
 		return false
 	end
@@ -111,32 +139,32 @@ function GM:BecomeJob(client, teamindex, voted)
 	end
 
 	if teamindex == client:Team() then
-		client:notify("You're already on that job.")
+		client:notify(GetLang"onjob")
 		return true
 	end
 
 	if data.childjob and data.childjob != client:Team() then
-		client:notify("You need to be " .. team.GetName(data.childjob) .. " first!")
+		client:notify(GetLang("needtobe", team.GetName(data.childjob)))
 		return false
 	end
 
-	if !voted and data.vote and #player.GetAll() > 100 then
+	if !voted and data.vote and #player.GetAll() > 1 then
 		if client.onvote then 
-			client:notify("Your Job vote is on going. Try again later.")
+			client:notify(GetLang"onjobvote")
 			return false
 		end
 		
 		client.onvote = true
-		self:StartVote(client, client:Name() .. " wants to be " .. name, 10
+		self:StartVote(client, GetLang("wantstobe", client:Name(), name), 10
 		,function(cl) GAMEMODE:BecomeJob(cl, teamindex, true) client.onvote = false end
-		,function(cl) cl:notify(cl:Name() .. " didn't made to " .. name .. "!") end)
+		,function(cl) cl:notify(GetLang("jobvotefail", cl:Name(), name)) end)
 		return false
 	end
 
 	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
 	hook.Run("PlayerLoadout", client)
-	NotifyAll(client:Name() .. " has been made a " .. name)
+	NotifyAll(GetLang("becamejob", client:Name(), name))
 end
 
 function GM:CanDrive(client)

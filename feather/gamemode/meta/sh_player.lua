@@ -22,6 +22,14 @@ function FindPlayer(name)
 	end
 end
 
+function FindRandomPlayer()
+	return table.Random(player.GetAll())
+end
+
+function FindRandomPlayerWithJob(jobindex)
+	return table.Random(team.GetPlayers(jobindex))
+end
+
 function NoticeFindPlayer(client, name)
 	local fault = GetLang("invalid", "player")
 

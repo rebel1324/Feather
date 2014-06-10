@@ -162,7 +162,7 @@ GM:RegisterCommand({
 			return
 		end
 
-		if !client:payMoney(GAMEMODE.DoorPrice) then
+		if !client:PayMoney(GAMEMODE.DoorPrice) then
 			return
 		end
 

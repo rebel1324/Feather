@@ -2,21 +2,21 @@
 local playerMeta = FindMetaTable("Player")
 
 if (SERVER) then
-	function playerMeta:giveMoney(amount)
-		self:SetLocalVar("money", self:GetLocalVar("money", 0) + amount)
+	function playerMeta:GiveMoney(amount)
+		self:SetLocalVar("money", self:GetLocalVar("money", 0) + tonumber(amount or 0))
 	end
 
-	function playerMeta:takeMoney(amount)
-		self:giveMoney(-amount)
+	function playerMeta:TakeMoney(amount)
+		self:GiveMoney(-amount)
 	end
 
-	function playerMeta:setMoney(amount)
+	function playerMeta:SetMoney(amount)
 		self:SetLocalVar("money", amount)
 	end
 
-	function playerMeta:payMoney(amount, fail, succ)
-		if self:getMoney() >= amount then
-			self:takeMoney(amount)
+	function playerMeta:PayMoney(amount, fail, succ)
+		if self:GetMoney() >= amount then
+			self:TakeMoney(amount)
 			if succ then
 				self:notify(succ)
 			end
@@ -33,16 +33,22 @@ if (SERVER) then
 		money:SetPos(position or Vector(0, 0, 0))
 		money:SetAngles(angles or Angle(0, 0, 0))
 		money:Spawn()
+
+		timer.Simple(self.MoneyRemoveTime, function()
+			if money:IsValid() then
+				money:Remove()
+			end
+		end)
 		return money
 	end
 end
 
-function playerMeta:getMoney()
+function playerMeta:GetMoney()
 	return self:GetLocalVar("money", 0)
 end
 
-function playerMeta:canAfford(amt)
-	return (amt > 0) and (self:getMoney() >= amt)
+function playerMeta:CanAfford(amt)
+	return (amt > 0) and (self:GetMoney() >= amt)
 end
 
 GM:RegisterCommand({
@@ -69,15 +75,15 @@ GM:RegisterCommand({
 		end
 
 		if target:GetPos():Distance(client:GetPos()) <= 128 then
-			if !client:canAfford(amt) then
+			if !client:CanAfford(amt) then
 				client:notify(GetLang"cantafford")
 				return
 			end
 
 			if amt >= 5 then
 				client:notify(GetLang("givemoney", MoneyFormat(amt), target:Name()))
-				client:giveMoney(-amt)
-				target:giveMoney(amt)
+				client:GiveMoney(-amt)
+				target:GiveMoney(amt)
 			else
 				client:notify(GetLang("biggerthan", 5))
 			end
@@ -90,7 +96,7 @@ GM:RegisterCommand({
 		local amt = math.Clamp(tonumber(arguments[1]) or 0, 0, math.huge)
 		local force = math.Clamp(tonumber(arguments[2]) or 0, 0, 500)
 
-		if !client:canAfford(amt) then
+		if !client:CanAfford(amt) then
 			client:notify(GetLang"cantafford")
 			return
 		end
@@ -104,7 +110,7 @@ GM:RegisterCommand({
 			local position = trace.HitPos
 
 			local money = GAMEMODE:CreateMoney(position, Angle(0, 0, 0), amt)
-			client:giveMoney(-amt)
+			client:GiveMoney(-amt)
 
 			if force and force > 0 then
 				money:SetPos(client:GetShootPos() + client:GetAimVector() * 30)

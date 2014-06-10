@@ -10,29 +10,109 @@ end
 
 function GM:HUDPaint()
 	local w, h = ScrW(), ScrH()
-	local teamID = LocalPlayer():Team()
 
-	draw.SimpleText("Money: $"..LocalPlayer():getMoney(), "BudgetLabel", 8, 8, color_white, 0, 0)
-	draw.SimpleText("Salary: $"..(self.Jobs[teamID] and self.Jobs[teamID].salary or 0), "BudgetLabel", 8, 24, color_white, 0, 0)
-	draw.SimpleText("Job: "..team.GetName(teamID), "BudgetLabel", 8, 40, color_white, 0, 0)
-	if self.HungerMode then
-		draw.SimpleText("Hunger: ".. math.Round(LocalPlayer():GetHungerPercent() * 100) .. "%", "BudgetLabel", 8, 80, color_white, 0, 0)
+	-- Overrideable Functions.
+	-- Everything is overrideable by any addons/modifications.
+	self:LocalPlayerInfo(w, h) 
+	self:PlayerInfo(w, h)
+	self:ProgressPaint(w, h)
+	self:CenterDisplayPaint(w, h)
+	self:Lockdown(w, h)
+	self:ArrestTimer(w, h)
+	self:DrawDoorInfo(w, h)
+
+	local td = {}
+		td.start = LocalPlayer():GetShootPos()
+		td.endpos = td.start + LocalPlayer():GetAimVector()*(128)
+		td.filter = LocalPlayer()
+	local ent = util.TraceLine(td).Entity
+
+	if (ent and ent.DrawTargetInfo) then
+		ent:DrawTargetInfo(w, h)
 	end
 
+	for k, v in ipairs(ents.GetAll()) do
+		if v.DrawScreen then
+			v:DrawScreen(w, h)
+		end
+	end
+end
+
+function GM:HUDShouldDraw(name)
+	if (
+		name == "CHudHealth" or
+		name == "CHudBattery" or
+		name == "CHudSecondaryAmmo" or
+		name == "CHudAmmo"
+	) then
+		return false
+	end
+
+	return true
+end
+
+local tagw = 6
+local function DrawHUDBar(x, y, w, h, col, p)
+	p = p or 1
+	surface.SetDrawColor(44, 62, 80, col.a)
+	surface.DrawRect(x, y, tagw, h)
+
+	surface.SetDrawColor(22, 34, 52, col.a)
+	surface.DrawRect(x + tagw, y, w, h)
+
+	surface.SetDrawColor(col.r, col.g, col.b, col.a)
+	surface.DrawRect(x + tagw, y, math.Round(w * p), h)
+end
+
+
+local margin = 20
+local sx, sy = 200, 45
+local curhpp = 0
+local curhupp = 0
+local textmargin = 15
+function GM:LocalPlayerInfo(w, h)
+	local teamID = LocalPlayer():Team()
+
+	local posx, posy = margin, h - margin 
+	
+	if self.HungerMode then
+		posy = posy - 5
+		curhupp = Lerp(FrameTimeC(), curhupp, math.Clamp(LocalPlayer():GetHungerPercent(), 0, 1))
+		DrawHUDBar( posx, posy, sx, 5, Color(58, 83, 155), curhupp)
+	end
+	
+	posx, posy = posx, posy - sy
+	curhpp = Lerp(FrameTimeC(), curhpp, math.Clamp(LocalPlayer():Health()/100, 0, 1))
+	DrawHUDBar( posx, posy, sx, sy, Color(150, 40, 27), curhpp)
+	draw.SimpleText(math.Clamp(LocalPlayer():Health(), 0, math.huge), "fr_HUDFont", margin + tagw + 10, posy + sy/2, color_white, 0, 1)
+
+	posx, posy = posx + tagw , posy - 25
+	local data = self:GetJobData(teamID) 
+	local tx, ty = draw.SimpleText(MoneyFormat(LocalPlayer():GetMoney()), "fr_HUDFont", posx, posy, color_white, 0, 1)
+	if data then
+		draw.SimpleText("+" .. MoneyFormat(data.salary) or 0, "fr_HUDFont", posx + tx + 6, posy, Color(46, 204, 113), 0, 1)
+	end
+
+	posy = posy - ty - 0
+	local tx, ty = draw.SimpleText(team.GetName(teamID), "fr_HUDFont", posx, posy, color_white, 0, 1)
+end
+
+function GM:PlayerInfo(w, h)
 	local position = LocalPlayer():GetPos()
 	local shootPos = LocalPlayer():GetShootPos()
 	local aimVector = LocalPlayer():GetAimVector()
 
 	for k, v in ipairs(player.GetAll()) do
 		if (v != LocalPlayer() and v:Alive()) then
-			local theirShootPos = v:GetShootPos()
-			local origin = theirShootPos + (v:Crouching() and OFFSET_CROUCH or OFFSET_NORMAL)
+			local bi = v:LookupBone("ValveBiped.Bip01_Head1")
+			local bonepos = v:GetBonePosition(bi)
+			local origin = (bi != 0) and (bonepos + Vector(0, 0, 11)) or (v:GetShootPos() + (v:Crouching() and OFFSET_CROUCH or OFFSET_NORMAL)) 
 			local alpha = (1 - origin:DistToSqr(position) / 262144) * 255 + 150
 
 			if (alpha > 0) then
 				local trace = util.TraceLine({
 					start = shootPos,
-					endpos = theirShootPos,
+					endpos = v:GetShootPos(),
 				})
 
 				if (trace.Hit and trace.Entity != v) then continue end
@@ -46,18 +126,6 @@ function GM:HUDPaint()
 			end
 		end
 	end
-
-	for k, v in ipairs(ents.GetAll()) do
-		if v.DrawScreen then
-			v:DrawScreen(w, h)
-		end
-	end
-
-	self:ProgressPaint(w, h)
-	self:CenterDisplayPaint(w, h)
-	self:Lockdown(w, h)
-	self:ArrestTimer(w, h)
-	self:DrawDoorInfo(w, h)
 end
 
 function GM:ArrestTimer(w, h)
@@ -182,3 +250,12 @@ end)
 netstream.Hook("PlaySound", function(data)
 	surface.PlaySound(data)
 end)
+
+function GM:ShowSpare1()
+end
+
+function GM:ShowSpare2()
+end
+
+function GM:ShowTeam()
+end

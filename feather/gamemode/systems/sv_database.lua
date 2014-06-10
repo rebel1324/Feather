@@ -47,7 +47,7 @@ do
 					cn.db.query("INSERT INTO fr_players (_steamID, _money, _inventory) VALUES ("..self:SteamID64()..", 500, \"\")")
 				end
 
-				self:setMoney(tonumber(data._money) or 500)
+				self:SetMoney(tonumber(data._money) or 500)
 
 				MsgN("Loaded data for "..self:Name()..".")
 			end
@@ -55,7 +55,7 @@ do
 	end
 
 	function playerMeta:saveFeatherData()
-		local query = "UPDATE fr_players SET _money = "..self:getMoney()..", _inventory = \"\" WHERE _steamID = "..self:SteamID64()
+		local query = "UPDATE fr_players SET _money = "..self:GetMoney()..", _inventory = \"\" WHERE _steamID = "..self:SteamID64()
 		local name = self:Name()
 
 		cn.db.query(query, function()

@@ -76,7 +76,35 @@ surface.CreateFont("fr_3d2dTextContext", {
 	antialias = true
 })
 
+surface.CreateFont("fr_HUDFont", {
+	font = "Calibri",
+	size = 30,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
 
+surface.CreateFont("fr_HUDStatusFont", {
+	font = "Calibri",
+	size = 25,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_MenuFont", {
+	font = "Calibri",
+	size = 30,
+	weight = 1000,
+	antialias = true
+})
+
+surface.CreateFont("fr_CategoryFont", {
+	font = "Calibri",
+	size = 25,
+	weight = 1000,
+	antialias = true
+})
 
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts
