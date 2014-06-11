@@ -97,10 +97,16 @@ end
 
 function PNL:OnCursorEntered()
 	self.hover = true
+	surface.PlaySound("UI/buttonrollover.wav")
 end
 
 function PNL:OnCursorExited()
 	self.hover = false
+end
+
+function PNL:DoClick()
+	self:OnClick()
+	surface.PlaySound("weapons/pistol/pistol_empty.wav")
 end
 
 function PNL:Think()
@@ -179,7 +185,7 @@ function PNL:LoadJob()
 			continue
 		end
 
-		local pnl = vgui.Create("DButton", self.content)
+		local pnl = vgui.Create("Button", self.content)
 		pnl:SetTall(50)
 		pnl:SetText(team.GetName(k))
 		pnl:SetFont("fr_MenuFont")
@@ -294,12 +300,13 @@ end
 function PNL:AddButton(str, func)
 	local btn = vgui.Create("FeatherMainMenuButton", self.menu)
 	btn:Dock(TOP)
+	btn:DockMargin(0, 1, 0, 0)
 	btn:SetText(str)
 	btn:SetFont("fr_MenuFont")
 	btn:SetColor(color_white)
 	btn:SetTall(45)
 	if func then
-		btn.DoClick = func
+		btn.OnClick = func
 	end
 end
 

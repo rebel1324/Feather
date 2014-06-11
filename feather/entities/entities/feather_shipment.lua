@@ -2,7 +2,7 @@ AddCSLuaFile()
 
 ENT.Type = "anim"
 ENT.PrintName = "Shipment"
-ENT.Author = "Chessnut"
+ENT.Author = "Black Tea"
 ENT.Category = "NutScript"
 
 if (SERVER) then
@@ -12,7 +12,7 @@ if (SERVER) then
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
-		self:SetNetVar("amount", 0)
+		self.health = 100
 
 		local physObj = self:GetPhysicsObject()
 
@@ -39,19 +39,56 @@ if (SERVER) then
 		self:SetDTInt(0, amount)
 	end
 
-	function ENT:Use(activator)
+	function ENT:OnTakeDamage(dmginfo)
+		local damage = dmginfo:GetDamage()
+		self.health = self.health - damage
+
+		if (self.health < 0) then
+			local data = GAMEMODE.WeaponList[self:GetContent()]
+			for i = 1, math.Clamp(self:GetAmount(), 0, 5) do
+				SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40 + VectorRand()*10, Angle(0, 0, 0), data.classname)
+				self:GibBreakServer(VectorRand()*100)
+				self:Remove()
+			end
+		end
+	end
+
+	function ENT:OpenShipment()
 		local data = GAMEMODE.WeaponList[self:GetContent()]
 
-		local ent = ents.Create(data.classname)
-		ent:SetPos(self:GetPos() + self:OBBCenter() + self:GetUp()*40)
-		ent:SetAngles(Angle(0, 0, 0))
-		ent:Spawn()
+		if !data.entity then
+			SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40, Angle(0, 0, 0), data.classname)
+		else
+			ent = ents.Create(data.classname)
+			ent:SetPos(self:GetPos() + self:OBBCenter() + self:GetUp()*40)
+			ent:SetAngles(Angle(0, 0, 0))
+			ent:Spawn()
+		end
 
 		self:SetAmount(self:GetAmount() - 1)
 
-		if self:GetAmount() <= 0 then
+		if (self:GetAmount() <= 0) then
 			self:Remove()
 		end
+	end
+	
+	function ENT:Use(activator)
+		if (self:GetDTBool(0)) then
+			return
+		end
+
+		self:SetDTBool(0, true)
+		self:EmitSound("items/ammocrate_open.wav")
+
+		timer.Simple(1, function()
+			if (!self:IsValid()) then
+				return
+			end
+
+			self:EmitSound("items/ammo_pickup.wav")
+			self:OpenShipment()
+			self:SetDTBool(0, false)
+		end)
 	end
 
 	function ENT:StartTouch(entity)
@@ -62,15 +99,15 @@ if (SERVER) then
 	end
 else
 	function ENT:DrawTargetInfo()
-		local origin = self:GetPos() + Vector(0, 0, 30)
+		local origin = self:GetPos() + self:GetUp()*30
 		local pos = (origin):ToScreen()
 		local data = GAMEMODE.WeaponList[self:GetDTString(0)]
 
-		local text = "Weapon Shipment"
+		local text = data.name .. " Shipment"
 		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
 		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
 
-		if data then
+		if (data) then
 			pos.y = pos.y + 25
 			text = data.name
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
@@ -80,6 +117,13 @@ else
 			text = "Amount : " .. self:GetDTInt(0)
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
 			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
+		end
+
+		if (self:GetDTBool(0)) then
+			pos.y = pos.y + 22
+			text = GetLang("opening", string.rep(".", math.floor((CurTime()*2)%4)))
+			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y, Color(0, 0, 0, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y, Color(52, 152, 219, alpha), 1, 1)
 		end
 	end
 end

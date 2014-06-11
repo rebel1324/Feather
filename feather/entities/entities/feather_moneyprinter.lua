@@ -14,6 +14,7 @@ if (SERVER) then
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
 		self:SetDTBool(0, false)
+		self.health = 100
 
 		local physObj = self:GetPhysicsObject()
 
@@ -29,11 +30,32 @@ if (SERVER) then
 		end)
 	end
 
+	function ENT:OnTakeDamage(dmginfo)
+		local damage = dmginfo:GetDamage()
+		self.health = self.health - damage
+
+		if (self.health < 0) then
+			local effectData = EffectData()
+			effectData:SetStart(self:GetPos())
+			effectData:SetOrigin(self:GetPos())
+				
+			util.Effect("Explosion", effectData, true, true)
+			self:Remove()
+		end
+	end
+
 	function ENT:GoneWrong()
 		self.exploding = true
-		self:Ignite()
+		self:Ignite(3)
 
-		timer.Simple(1, function() 
+		timer.Simple(3, function() 
+			if (!self:IsValid()) then return end
+			local effectData = EffectData()
+			effectData:SetStart(self:GetPos())
+			effectData:SetOrigin(self:GetPos())
+				
+			util.Effect("Explosion", effectData, true, true)
+			util.BlastDamage( self, self.Owner or self, self:GetPos() + Vector( 0, 0, 1 ), 256, 120 )
 			self:Remove()
 		end)
 	end
@@ -51,7 +73,7 @@ if (SERVER) then
 			GAMEMODE:CreateMoney(self:GetPos() + self:OBBCenter() + self:GetUp()*25, self:GetAngles(), 200)
 
 			local dice = math.Rand(0, 100)
-			if (dice < 1) then
+			if (dice < GAMEMODE.MoneyPrinterExplodeRate) then
 				self:GoneWrong()
 			end
 
@@ -76,7 +98,7 @@ else
 		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
 		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
 
-		if self:GetDTBool(0) then
+		if (self:GetDTBool(0)) then
 			text = GetLang("printingmoney", string.rep(".", math.floor((CurTime()*2)%4)))
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y + 20, Color(0, 0, 0, alpha), 1, 1)
 			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 20, Color(255, 155, 155, alpha), 1, 1)
@@ -92,7 +114,7 @@ else
 		pos = pos + self:GetRight() * -12
 
 		render.SetMaterial(glowMaterial)
-		if self:GetDTBool(0) then
+		if (self:GetDTBool(0)) then
 			render.DrawSprite(pos, 12, 12, Color( 44, 255, 44, alpha ) )
 		else
 			render.DrawSprite(pos, 12, 12, Color( 255, 44, 44, alpha ) )

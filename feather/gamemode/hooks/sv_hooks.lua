@@ -63,7 +63,11 @@ function GM:PlayerGetPayAmount(client)
 end
 
 function GM:Notify(message, class, receiver)
-	netstream.Start(receiver, "fr_Notify", message, class or NOTIFY_GENERIC)
+	netstream.Start(receiver, "FeatherNotify", message, class or NOTIFY_GENERIC)
+end
+
+function GM:FadeScreen(client, color, dur)
+	netstream.Start(client, "FeatherFade", {color, dur})
 end
 
 function GM:GetBaseLoadout(client)
@@ -185,11 +189,11 @@ function GM:BecomeJob(client, teamindex, voted)
 
 	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
+	client:StripWeapons()
 
 	hook.Run("PlayerLoadout", client)
 	hook.Run("OnPlayerBecomeJob", client, teamindex)
 	NotifyAll(GetLang("becamejob", client:Name(), name))
-
 end
 
 function GM:CanDrive(client)

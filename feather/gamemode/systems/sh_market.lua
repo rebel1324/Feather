@@ -11,14 +11,14 @@ function GM:AddEntity(uniqueid, classname, name, category, job, desc, model, pri
 		category = category,
 		desc = desc,
 		model = model,
+		price = price,
 		job = job,
-		price = price
 	}
 
-	return self.EntityList[classname]
+	return self.EntityList[uniqueid]
 end
 
-function GM:AddWeapon(uniqueid, classname, amount, job, name, category, desc, model, price, allowsingle)
+function GM:AddShipment(uniqueid, classname, amount, job, name, category, desc, model, price, allowsingle)
 	self.WeaponList[uniqueid] = {
 		classname = classname,
 		name = name,
@@ -27,11 +27,11 @@ function GM:AddWeapon(uniqueid, classname, amount, job, name, category, desc, mo
 		model = model,
 		amount = amount,
 		single = allowsingle,
+		price = price,
 		job = job,
-		price = price
 	}
 
-	return self.WeaponList[classname]
+	return self.WeaponList[uniqueid]
 end
 
 function GM:CanBuyWeapon(client, uniqueid, data, menu)
@@ -46,6 +46,7 @@ function GM:CanBuyWeapon(client, uniqueid, data, menu)
 		if (!menu) then
 			client:notify(GetLang"yourearrested")
 		end
+		return false
 	end
 
 	if (!menu and !client:PayMoney(data.price)) then
@@ -89,6 +90,7 @@ function GM:CanBuyEntity(client, uniqueid, data, menu)
 		if (!menu) then
 			client:notify(GetLang"yourearrested")
 		end
+		return false
 	end
 
 	if (!menu and !client:PayMoney(data.price)) then
@@ -132,7 +134,6 @@ function GM:BuyEntity(client, uniqueid, data)
 end
 
 function GM:CanBuyFood(client, uniqueid, data)
-	print(data.job and #data.job != 0 and !table.HasValue(data.job, client:Team()))
 	if (data.job and #data.job != 0 and !table.HasValue(data.job, client:Team())) then
 		if (!menu) then
 			client:notify(GetLang"yourjobcantbuy")
@@ -144,6 +145,7 @@ function GM:CanBuyFood(client, uniqueid, data)
 		if (!menu) then
 			client:notify(GetLang"yourearrested")
 		end
+		return false
 	end
 
 	if (!menu and !client:PayMoney(data.price)) then

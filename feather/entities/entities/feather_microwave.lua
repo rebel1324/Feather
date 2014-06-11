@@ -28,15 +28,22 @@ if (SERVER) then
 	end
 
 	function ENT:GetOwner()
-		return self.Owner or self:GetNetVar("owner")
+		return (self.Owner or self:GetNetVar("owner"))
 	end
 
 	function ENT:Use(activator)
-		if (!self:GetDTBool(0) and activator:PayMoney(self:GetNetVar("price"), nil, GetLang("purchase", "Food", MoneyFormat(self:GetNetVar("price", 0))))) then
+		if (!self:GetDTBool(0)) then
+			if (self.Owner != activator) then
+				if activator:PayMoney(self:GetNetVar("price"), nil, GetLang("purchase", "Food", MoneyFormat(self:GetNetVar("price", 0)))) == false then
+					return false
+				end
+			end
+
 			if (self.Owner and self.Owner:IsValid()) then
-				local profit = self:GetNetVar("price") - GAMEMODE:GetFood(self.FoodStock).price
-				
-				if self.Owner:PayMoney(-profit) == false then
+				local price = GAMEMODE:GetFood(self.FoodStock).price
+				local profit = self:GetNetVar("price") - price
+
+				if (self.Owner:PayMoney(price) == false) then
 					return false
 				end
 
@@ -110,7 +117,7 @@ else
 				text = GetLang("profit", MoneyFormat(profit))
 
 				local col = Color(46, 204, 113)
-				if profit < 0 then
+				if profit <= 0 then
 					col = Color(192, 57, 43)
 				end
 				col.a = alpha
@@ -119,7 +126,7 @@ else
 				draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y, col, 1, 1)
 			end
 
-			if self:GetDTBool(0) then
+			if (self:GetDTBool(0)) then
 				pos.y = pos.y + 22
 				text = GetLang("cookingfood", string.rep(".", math.floor((CurTime()*2)%4)))
 				draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y, Color(0, 0, 0, alpha), 1, 1)

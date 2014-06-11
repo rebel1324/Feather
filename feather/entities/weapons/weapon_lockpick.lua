@@ -13,7 +13,7 @@ SWEP.SlotPos = 1
 SWEP.DrawAmmo = false
 SWEP.ViewModelFlip = false
 
-SWEP.Primary.ClipSize = 0
+SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = ""
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
@@ -39,7 +39,7 @@ if SERVER then
 			td.filter = self.Owner
 		local trace = util.TraceLine(td)
 
-		if trace.Entity:IsValid() and trace.Entity:IsDoor() and !self.target then
+		if (trace.Entity:IsValid() and trace.Entity:IsDoor() and !self.target) then
 			self:StartPick(trace.Entity)	
 		end
 
@@ -73,7 +73,7 @@ if SERVER then
 	end
 
 	function SWEP:Think()
-		if self.target and self.target:IsValid() then
+		if (self.target and self.target:IsValid()) then
 			local td = {}
 				td.start = self.Owner:GetShootPos()
 				td.endpos = td.start + self.Owner:GetAimVector()*64
@@ -86,6 +86,9 @@ if SERVER then
 		end
 	end
 else
+	function SWEP:PrimaryAttack()
+	end
+
 	hook.Add("CanDrawDoorInfo", "FeatherLockpick", function()
 		return !(LocalPlayer():GetActiveWeapon():IsValid() and LocalPlayer():GetActiveWeapon():GetClass() == "weapon_lockpick")
 	end)
@@ -100,14 +103,12 @@ function SWEP:DrawHUD()
 		td.filter = self.Owner
 	local trace = util.TraceLine(td)
 
-	if hook.Run("CanDrawWeaponHUD") != false then
-		if trace.Entity:IsValid() then
-			draw.SimpleText(GetLang"hudpick", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+	if (hook.Run("CanDrawWeaponHUD") != false) then
+		draw.SimpleText(GetLang"hudpick", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+		if (trace.Entity:IsValid()) then
 			if trace.Entity:IsDoor() then
 				draw.SimpleText(GetLang("hudpicktarget", string.NiceTime(GAMEMODE.LockPickTime)), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 			end
-		else
-			draw.SimpleText(GetLang"hudpick", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 		end
 	end
 end

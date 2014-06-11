@@ -13,7 +13,7 @@ SWEP.SlotPos = 1
 SWEP.DrawAmmo = false
 SWEP.ViewModelFlip = false
 
-SWEP.Primary.ClipSize = 0
+SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = ""
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
@@ -65,8 +65,9 @@ function SWEP:DrawHUD()
 	local trace = util.TraceLine(td)
 
 	if hook.Run("CanDrawWeaponHUD") then
+		draw.SimpleText(GetLang"hudarrest", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
+		
 		if trace.Entity:IsValid() then
-			draw.SimpleText(GetLang"hudarrest", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 			if trace.Entity:IsPlayer() then
 				if trace.Entity:IsArrested() then
 					draw.SimpleText(GetLang("hudarresttargetback", trace.Entity:Name()), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
@@ -74,8 +75,6 @@ function SWEP:DrawHUD()
 					draw.SimpleText(GetLang("hudarresttarget", trace.Entity:Name(), string.NiceTime(GAMEMODE.DefaultArrestTime)), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 				end
 			end
-		else
-			draw.SimpleText(GetLang"hudarrest", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 		end
 	end
 end

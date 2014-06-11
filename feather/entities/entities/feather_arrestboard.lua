@@ -73,7 +73,7 @@ else
 				draw.SimpleText(string.NiceTime(math.ceil(v[2] - CurTime())), "fr_3d2dTextContext", bx2, by + nums*rs, Color(255 ,255, 255), 2, 0)
 
 				nums = nums + 1
-				if nums == 12 then
+				if (nums == 12) then
 					draw.SimpleText("And More..", "fr_3d2dTextContext", bx, by + nums*rs, Color(255 ,255, 255), 0, 0)
 					break 
 				end

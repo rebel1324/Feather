@@ -13,7 +13,7 @@ SWEP.SlotPos = 1
 SWEP.DrawAmmo = false
 SWEP.ViewModelFlip = false
 
-SWEP.Primary.ClipSize = 0
+SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = ""
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
@@ -83,6 +83,9 @@ if SERVER then
 		end
 	end
 else
+	function SWEP:PrimaryAttack()
+	end
+
 	local PNL = {}
 
 	function PNL:Init()
@@ -142,13 +145,11 @@ function SWEP:DrawHUD()
 	local trace = util.TraceLine(td)
 
 	if hook.Run("CanDrawWeaponHUD") then
+		draw.SimpleText(GetLang"hudsearch", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 		if trace.Entity:IsValid() then
-			draw.SimpleText(GetLang"hudsearch", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 			if trace.Entity:IsPlayer() then
 				draw.SimpleText(GetLang("hudsearchtarget", trace.Entity:Name()), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 			end
-		else
-			draw.SimpleText(GetLang"hudsearch", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 		end
 	end
 end

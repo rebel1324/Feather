@@ -25,7 +25,7 @@ if (SERVER) then
 	function ENT:SetFood(uniqueID)
 		local food = GAMEMODE:GetFood(uniqueID)
 
-		if food then
+		if (food) then
 			self:SetDTString(0, uniqueID)
 			self:SetModel(food.model)
 		end
@@ -45,7 +45,7 @@ else
 		local alpha = math.Clamp((1 - origin:DistToSqr(EyePos()) / 256^2) * 255, 0, 255)
 		local food = GAMEMODE:GetFood(self:GetDTString(0))
 
-		if alpha > 0 then
+		if (alpha > 0) then
 			local text = (food) and (food.name) or ("Food")
 			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0, alpha), 1, 1)
 			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255, alpha), 1, 1)

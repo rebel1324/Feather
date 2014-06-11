@@ -5,7 +5,7 @@ local OFFSET_CROUCH = Vector(0, 0, -16)
 local OFFSET_NORMAL = Vector(0, 0, 16)
 
 function FrameTimeC()
-	return math.Clamp(FrameTime(), 1/60, 1)
+	return math.Clamp(FrameTime(), 1/60, 2)
 end
 
 function GM:HUDPaint()
@@ -20,6 +20,7 @@ function GM:HUDPaint()
 	self:Lockdown(w, h)
 	self:ArrestTimer(w, h)
 	self:DrawDoorInfo(w, h)
+	self:ScreenFade(w, h)
 
 	local td = {}
 		td.start = LocalPlayer():GetShootPos()
@@ -36,6 +37,15 @@ function GM:HUDPaint()
 			v:DrawScreen(w, h)
 		end
 	end
+end
+
+GM.FadeSpeed = 1
+GM.FadeAlpha = 0
+GM.FadeColor = color_white
+function GM:ScreenFade(w, h)
+	self.FadeAlpha = Lerp(FrameTimeC() * self.FadeSpeed, self.FadeAlpha, 0)
+	surface.SetDrawColor(self.FadeColor.r, self.FadeColor.g, self.FadeColor.b, math.floor(self.FadeAlpha))
+	surface.DrawRect(0, 0, w, h)
 end
 
 function GM:HUDShouldDraw(name)
@@ -70,6 +80,7 @@ local sx, sy = 200, 45
 local curhpp = 0
 local curhupp = 0
 local textmargin = 15
+local curmoney = 0
 function GM:LocalPlayerInfo(w, h)
 	local teamID = LocalPlayer():Team()
 
@@ -86,9 +97,11 @@ function GM:LocalPlayerInfo(w, h)
 	DrawHUDBar( posx, posy, sx, sy, Color(150, 40, 27), curhpp)
 	draw.SimpleText(math.Clamp(LocalPlayer():Health(), 0, math.huge), "fr_HUDFont", margin + tagw + 10, posy + sy/2, color_white, 0, 1)
 
+	curmoney = Lerp(FrameTimeC() * 2, curmoney, LocalPlayer():GetMoney())
+
 	posx, posy = posx + tagw , posy - 25
 	local data = self:GetJobData(teamID) 
-	local tx, ty = draw.SimpleText(MoneyFormat(LocalPlayer():GetMoney()), "fr_HUDFont", posx, posy, color_white, 0, 1)
+	local tx, ty = draw.SimpleText(MoneyFormat(math.ceil(curmoney)), "fr_HUDFont", posx, posy, color_white, 0, 1)
 	if data then
 		draw.SimpleText("+" .. MoneyFormat(data.salary) or 0, "fr_HUDFont", posx + tx + 6, posy, Color(46, 204, 113), 0, 1)
 	end
@@ -243,8 +256,14 @@ function GM:CanDrawWeaponHUD()
 	return !(self.DrawDoor or self.DisplayTime > CurTime() or math.floor(self.DisplayAlpha) > 0)
 end
 
-netstream.Hook("fr_Notify", function(message, class)
+netstream.Hook("FeatherNotify", function(message, class)
 	GAMEMODE:Notify(message, class)
+end)
+
+netstream.Hook("FeatherFade", function(data)
+	GAMEMODE.FadeSpeed = data[2]
+	GAMEMODE.FadeAlpha = data[1].a
+	GAMEMODE.FadeColor = data[1]
 end)
 
 netstream.Hook("PlaySound", function(data)
