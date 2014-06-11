@@ -54,9 +54,4 @@ else
 		render.SetMaterial(glowMaterial)
 		render.DrawSprite(pos, 6, 6, Color( 44, 255, 44, alpha ) )
 	end
-	/*
-	function ENT:DrawTargetID(x, y, alpha)
-		nut.util.DrawText(x, y, nut.currency.GetName(self:GetNetVar("amount", 0), true), Color(255, 255, 255, alpha))
-	end
-	*/
 end

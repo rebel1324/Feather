@@ -61,7 +61,25 @@ if (SERVER) then
 		end
 	end
 else
-	function ENT:DrawTargetID(x, y, alpha)
-		nut.util.DrawText(x, y, nut.currency.GetName(self:GetNetVar("amount", 0), true), Color(255, 255, 255, alpha))
+	function ENT:DrawTargetInfo()
+		local origin = self:GetPos() + Vector(0, 0, 30)
+		local pos = (origin):ToScreen()
+		local data = GAMEMODE.WeaponList[self:GetDTString(0)]
+
+		local text = "Weapon Shipment"
+		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
+		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
+
+		if data then
+			pos.y = pos.y + 25
+			text = data.name
+			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
+
+			pos.y = pos.y + 25
+			text = "Amount : " .. self:GetDTInt(0)
+			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
+		end
 	end
 end

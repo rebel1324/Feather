@@ -101,7 +101,6 @@ function GM:BuyEntity(client, uniqueid, data)
 		return false	
 	end
 	
-	print(#client.market[uniqueid])
 	if client.market and client.market[uniqueid] and #client.market[uniqueid] >= (data.max or 2) then
 		client:notify(GetLang("entmax", data.max or 2))
 		return false
@@ -133,6 +132,7 @@ function GM:BuyEntity(client, uniqueid, data)
 end
 
 function GM:CanBuyFood(client, uniqueid, data)
+	print(data.job and #data.job != 0 and !table.HasValue(data.job, client:Team()))
 	if (data.job and #data.job != 0 and !table.HasValue(data.job, client:Team())) then
 		if (!menu) then
 			client:notify(GetLang"yourjobcantbuy")
@@ -182,12 +182,11 @@ if SERVER then
 		end
 
 		entity.Owner = client
+		entity:SetNetVar("owner", client)
 		client.market = client.market or {}
 		client.market[uniqueid] = client.market[uniqueid] or {}
-		print(#client.market[uniqueid], entity.Owner)
 		if (!norecord) then
 			table.insert(client.market[uniqueid], entity)
-			print('printrecorded')
 		end
 	end
 
@@ -234,7 +233,7 @@ GM:RegisterCommand({
 		if (!data) then
 			buycat = 2
 			data = GAMEMODE.FoodList[buy]
-			if !data.buyable then
+			if !data or !data.buyable then
 				data = nil
 			end
 		end

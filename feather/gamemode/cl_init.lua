@@ -94,7 +94,7 @@ surface.CreateFont("fr_HUDStatusFont", {
 
 surface.CreateFont("fr_MenuFont", {
 	font = "Calibri",
-	size = 30,
+	size = 26,
 	weight = 1000,
 	antialias = true
 })

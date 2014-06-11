@@ -4,6 +4,7 @@ ENT.Type = "anim"
 ENT.PrintName = "Money Printer"
 ENT.Author = "Black Tea"
 ENT.Category = "Feather"
+ENT.RenderGroup = RENDERGROUP_BOTH
 
 if (SERVER) then
 	function ENT:Initialize()
@@ -12,7 +13,7 @@ if (SERVER) then
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
-		self:SetNetVar("amount", 0)
+		self:SetDTBool(0, false)
 
 		local physObj = self:GetPhysicsObject()
 
@@ -38,20 +39,29 @@ if (SERVER) then
 	end
 
 	function ENT:PrintMoney()
-		local time = GAMEMODE.MoneyPrinterTime
-		GAMEMODE:CreateMoney(self:GetPos() + self:OBBCenter() + self:GetUp()*25, self:GetAngles(), 200)
-
-		local dice = math.Rand(0, 100)
-		if dice < 1 then
-			self:GoneWrong()
-		end
-
-		timer.Simple(math.Rand(time[1], time[2]), function()
-			if !self:IsValid() or self.exploding then 
+		self:SetDTBool(0, true)
+		self:EmitSound("ambient/machines/combine_terminal_idle4.wav", 110, 150)
+		timer.Simple(2, function()
+			if (!self:IsValid()) then
 				return
 			end
+			self:SetDTBool(0, false)
 			
-			self:PrintMoney()
+			local time = GAMEMODE.MoneyPrinterTime
+			GAMEMODE:CreateMoney(self:GetPos() + self:OBBCenter() + self:GetUp()*25, self:GetAngles(), 200)
+
+			local dice = math.Rand(0, 100)
+			if (dice < 1) then
+				self:GoneWrong()
+			end
+
+			timer.Simple(math.Rand(time[1], time[2]), function()
+				if (!self:IsValid() or self.exploding) then 
+					return
+				end
+				
+				self:PrintMoney()
+			end)
 		end)
 	end
 
@@ -65,5 +75,27 @@ else
 		local text = "Money Printer"
 		draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y , Color(0, 0, 0), 1, 1)
 		draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y , Color(255, 255, 255), 1, 1)
+
+		if self:GetDTBool(0) then
+			text = GetLang("printingmoney", string.rep(".", math.floor((CurTime()*2)%4)))
+			draw.SimpleText(text, "fr_BigTargetShadow", pos.x, pos.y + 20, Color(0, 0, 0, alpha), 1, 1)
+			draw.SimpleText(text, "fr_BigTarget", pos.x, pos.y + 20, Color(255, 155, 155, alpha), 1, 1)
+		end
+	end
+
+	local glowMaterial = Material("sprites/glow04_noz")
+
+	function ENT:DrawTranslucent()
+		local pos = self:GetPos()
+		pos = pos + self:GetUp() * 8
+		pos = pos + self:GetForward() * 17
+		pos = pos + self:GetRight() * -12
+
+		render.SetMaterial(glowMaterial)
+		if self:GetDTBool(0) then
+			render.DrawSprite(pos, 12, 12, Color( 44, 255, 44, alpha ) )
+		else
+			render.DrawSprite(pos, 12, 12, Color( 255, 44, 44, alpha ) )
+		end
 	end
 end

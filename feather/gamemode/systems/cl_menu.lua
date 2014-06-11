@@ -174,11 +174,15 @@ function PNL:LoadJob()
 	self.content:AddItem(notice)
 
 	for k, v in ipairs(team.GetAllTeams()) do
+		local data = GAMEMODE:GetJobData(k)
+		if data.childjob and data.childjob != LocalPlayer():Team() then
+			continue
+		end
+
 		local pnl = vgui.Create("DButton", self.content)
 		pnl:SetTall(50)
 		pnl:SetText(team.GetName(k))
 		pnl:SetFont("fr_MenuFont")
-		local data = GAMEMODE:GetJobData(k)
 		if data then
 			pnl.DoClick = function()
 				LocalPlayer():ConCommand("say /job ".. ((string.lower(type(data.cmd)) == "table") and (table.Random(data.cmd)) or (data.cmd)))
@@ -202,10 +206,11 @@ end
 	
 function PNL:LoadItems()
 	self.content:Clear()
+	local client = LocalPlayer()
 
 	local catlist = {}
 	for k, v in SortedPairsByMemberValue(GAMEMODE.EntityList) do
-		if hook.Run("CanBuyEntity", LocalPlayer(), v.__key, v, true) == false then
+		if hook.Run("CanBuyEntity", client, v.__key, v, true) == false then
 			continue
 		end
 
@@ -224,13 +229,13 @@ function PNL:LoadItems()
 		pnl:SetText(v.name)
 		pnl:SetFont("fr_MenuFont")
 		pnl.DoClick = function()
-			LocalPlayer():ConCommand("say /buy ".. v.__key)
+			client:ConCommand("say /buy ".. v.__key)
 		end
 		self.content:AddItem(pnl)
 	end
 
 	for k, v in SortedPairsByMemberValue(GAMEMODE.WeaponList) do
-		if hook.Run("CanBuyWeapon", LocalPlayer(), v.__key, v, true) == false then
+		if hook.Run("CanBuyWeapon", client, v.__key, v, true) == false then
 			continue
 		end
 
@@ -249,13 +254,13 @@ function PNL:LoadItems()
 		pnl:SetText(v.name)
 		pnl:SetFont("fr_MenuFont")
 		pnl.DoClick = function()
-			LocalPlayer():ConCommand("say /buy ".. v.__key)
+			client:ConCommand("say /buy ".. v.__key)
 		end
 		self.content:AddItem(pnl)
 	end
 	
 	for k, v in SortedPairsByMemberValue(GAMEMODE.FoodList) do
-		if hook.Run("CanBuyFood", LocalPlayer(), v.__key, v, true) == false then
+		if hook.Run("CanBuyFood", client, v.__key, v, true) == false then
 			continue
 		end
 
@@ -274,7 +279,7 @@ function PNL:LoadItems()
 		pnl:SetText(v.name or 0)
 		pnl:SetFont("fr_MenuFont")
 		pnl.DoClick = function()
-			LocalPlayer():ConCommand("say /buy ".. v.__key)
+			client:ConCommand("say /buy ".. v.__key)
 		end
 		self.content:AddItem(pnl)
 	end

@@ -106,7 +106,8 @@ if SERVER then
 
 		if (condition1 != false and condition2 != false) then
 			hook.Run("OnHitAccepted", client, target, request, money)
-			client:notify(GetLang("hitrequested", target))	
+			client:notify(GetLang("hitrequested", target:GetName()))	
+			request:notify(GetLang("hitrequested", target:GetName()))	
 		else
 			print('failed')
 		end

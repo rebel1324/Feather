@@ -110,6 +110,22 @@ end
 function GM:Demote(from, to, reason, voted)
 end
 
+function GM:MoneyEntityCreated(self)
+	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
+		if self:GetDTInt(0) <= 100 then
+			self:SetModel("models/props/cs_assault/Dollar.mdl")
+		end
+	end
+end
+
+function GM:MoneyEntityChanged(self)
+	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
+		if self:GetDTInt(0) <= 100 then
+			self:SetModel("models/props/cs_assault/Dollar.mdl")
+		end
+	end
+end
+
 function GM:CanBecomeJob(client, data, teamindex)
 	if (client:IsArrested()) then
 		client:notify(GetLang"yourearrested")
@@ -118,6 +134,12 @@ function GM:CanBecomeJob(client, data, teamindex)
 	if (client.banned) then
 		client:notify(GetLang"cantdo")
 	end
+end
+
+function GM:OnPlayerBecomeJob(client, teamindex)
+	local effectData = EffectData()
+	effectData:SetStart(client:GetPos())
+	util.Effect("FeatherJob", effectData)
 end
 
 function GM:BecomeJob(client, teamindex, voted)
@@ -163,8 +185,11 @@ function GM:BecomeJob(client, teamindex, voted)
 
 	client.nextJob = CurTime() + GAMEMODE.JobChangeDelay
 	client:SetTeam(teamindex)
+
 	hook.Run("PlayerLoadout", client)
+	hook.Run("OnPlayerBecomeJob", client, teamindex)
 	NotifyAll(GetLang("becamejob", client:Name(), name))
+
 end
 
 function GM:CanDrive(client)

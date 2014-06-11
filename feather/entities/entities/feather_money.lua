@@ -45,6 +45,7 @@ if (SERVER) then
 	function ENT:StartTouch(entity)
 		if (entity:GetClass() == "feather_money") then
 			self:SetMoney(self:GetDTInt(0, "amount") + entity:GetDTInt(0, "amount"))
+			hook.Run("MoneyEntityChanged", self)
 			entity:Remove()
 		end
 	end
