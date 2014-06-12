@@ -3,6 +3,8 @@
 GM.Languages = {}
 
 function GetLang(name, ...)
+	GAMEMODE = GAMEMODE or GM -- get error and shit.
+
 	if GAMEMODE.Languages[GAMEMODE.Language] or GAMEMODE.Languages[GAMEMODE.Language][name] then
 		return string.format( GAMEMODE.Languages[GAMEMODE.Language][name], ... )
 	end
@@ -65,7 +67,7 @@ l.arrested = "%s is arrested by %s.\nArrest Time: %s."
 l.arrestedby = "You're arrested by %s."
 l.unarrested = "%s is unarrested by %s"
 l.unarrestedfull = "You're now back to the life."
-l.wantedgoverment = "You can't wanted govement player."
+l.wantedgoverment = "You can't wanted goverment player."
 l.alreadywanted = "That player is already wanted."
 
 l.unowned = "Unowned"
@@ -140,3 +142,30 @@ l.hudpickname = "Picking the Lock"
 l.hudheal = "Press <PRIMARY> to heal the player."
 l.hudhealsec = "Press <SECONDARY> to heal yourself."
 l.hudhealtarget = "Heal %s."
+
+l.jobcitizen = [[This is citizen who lives in the city.]]
+l.jobcook = [[You can get some profit by selling some foods to hungry players on the city.
+You can buy 'Microwave' in the Shop Category and can set it's price with '/setprice <amount>' command.]]
+l.jobgundealer = [[You can get some profit by selling some guns to players on the city.
+Mostly you're not allowed to kill other with your own guns.
+You can buy Weapon Shipments in the Shop Category.]]
+l.jobmedic = [[You can save other citizen's live in the city.
+Also you can get paid by healing other player's Health.
+You can buy some medical supplies in the Shop Category.]]
+l.jobmayor = [[This job is Goverment Job.
+You can control the city when you're mayor. This job requires Job Vote.
+You can lockdown the city with '/lockdown <reason>'.
+You can give license to the player with '/givelicense <licenseid>'.
+You can wanted a player with '/wanted <player> <reason>'.
+You can warrant the player with '/warrant <player> <reason>'.]]
+l.jobpolice = [[This job is Goverment Job.
+You can wanted a player with '/wanted <player> <reason>'.
+You can warrant the player with '/warrant <player> <reason>'.]]
+l.jobpolicechief = [[This job is Goverment Job.
+You can wanted a player with '/wanted <player> <reason>'.
+You can warrant the player with '/warrant <player> <reason>'.]]
+l.jobmobster = [[This is citizen who lives in the city.]]
+l.jobmobsterboss = [[This is citizen who lives in the city.]]
+l.jobhitman = [[This is citizen who lives in the city.]]
+
+l.jobmenutip = "You can see job's info by right clicking the button."

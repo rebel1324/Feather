@@ -10,7 +10,7 @@ ENT.FoodStock = "chinese"
 
 if (SERVER) then
 	function ENT:Initialize()
-		self:SetModel("models/props_c17/tv_monitor01.mdl")
+		self:SetModel("models/props/cs_office/microwave.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -70,8 +70,13 @@ if (SERVER) then
 	end
 
 	function ENT:PopFood()
+		local pos = self:GetPos()
+		pos = pos + self:GetUp() * 8
+		pos = pos + self:GetForward() * 2.5	
+		pos = pos + self:GetRight() * -11
+
 		local entity = ents.Create("feather_food")
-		entity:SetPos(self:GetPos() + self:OBBCenter() + self:GetForward()*10)
+		entity:SetPos(pos)
 		entity:SetAngles(AngleRand())
 		entity:Spawn()
 		entity:Activate()
@@ -86,17 +91,21 @@ else
 	local glowMaterial = Material("sprites/glow04_noz")
 
 	function ENT:DrawTranslucent()
-		local pos = self:GetPos() + self:OBBCenter()
-		pos = pos + self:GetUp() * 5
-		pos = pos + self:GetForward() * 8	
-		pos = pos + self:GetRight() * -8
+		local pos = self:GetPos()
+		pos = pos + self:GetUp() * 14
+		pos = pos + self:GetForward() * -12.5	
+		pos = pos + self:GetRight() * -11
 
 		render.SetMaterial(glowMaterial)
-		render.DrawSprite(pos, 6, 6, Color( 44, 255, 44, alpha ) )
+		if (!self:GetDTBool(0)) then
+			render.DrawSprite(pos, 16, 16, Color( 44, 255, 44, alpha ) )
+		else
+			render.DrawSprite(pos, 16, 16, Color( 255, 44, 44, alpha ) )
+		end
 	end
 
 	function ENT:DrawScreen()
-		local origin = self:GetPos() + Vector(0, 0, 14)
+		local origin = self:GetPos() + Vector(0, 0, 25)
 		local pos = (origin):ToScreen()
 		local alpha = math.Clamp((1 - origin:DistToSqr(EyePos()) / 256^2) * 255, 0, 255)
 

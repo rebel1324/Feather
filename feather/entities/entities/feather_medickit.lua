@@ -27,7 +27,7 @@ if (SERVER) then
 	end
 
 	function ENT:Use(activator)
-		if (activator:Health() == activator:GetMaxHealth() or self.activated) then
+		if (activator:Health() >= activator:GetMaxHealth() or self.activated) then
 			return
 		end
 

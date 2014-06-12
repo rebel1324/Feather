@@ -92,10 +92,12 @@ function GM:PlayerLoadout(client)
 	hook.Run("GetBaseLoadout", client)
 
 	local index = client:Team()
-	local teamdata = self:GetJobData(index)
+	local jobdata = self:GetJobData(index)
 
-	if teamdata and teamdata.loadout then
-		for k, v in pairs(teamdata.loadout) do
+	if jobdata and jobdata.loadout then
+		client:SetModel(table.Random(jobdata.model))
+
+		for k, v in pairs(jobdata.loadout) do
 			client:Give(v)
 		end
 	end
@@ -140,10 +142,12 @@ function GM:CanBecomeJob(client, data, teamindex)
 	end
 end
 
-function GM:OnPlayerBecomeJob(client, teamindex)
+function GM:OnPlayerBecomeJob(client, data, teamindex)
 	local effectData = EffectData()
 	effectData:SetStart(client:GetPos())
 	util.Effect("FeatherJob", effectData)
+	
+	hook.Run("PlayerLoadout", client)
 end
 
 function GM:BecomeJob(client, teamindex, voted)
@@ -191,8 +195,7 @@ function GM:BecomeJob(client, teamindex, voted)
 	client:SetTeam(teamindex)
 	client:StripWeapons()
 
-	hook.Run("PlayerLoadout", client)
-	hook.Run("OnPlayerBecomeJob", client, teamindex)
+	hook.Run("OnPlayerBecomeJob", client, data, teamindex)
 	NotifyAll(GetLang("becamejob", client:Name(), name))
 end
 

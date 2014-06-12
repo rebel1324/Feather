@@ -113,6 +113,148 @@ function PNL:Think()
 end
 vgui.Register("FeatherMainMenuButton", PNL, "DButton")
 
+
+
+local PNL = {}
+
+function PNL:Init()
+end
+
+function PNL:SetData(tbl, index)
+	self.data = tbl
+	self.index = index
+end
+
+function PNL:Paint(w, h)
+	if self.hover then
+		surface.SetDrawColor(103, 128, 159)
+	else
+		surface.SetDrawColor(62, 83, 104)
+	end
+	surface.DrawRect(0, 0, w, h)
+end
+
+function PNL:OnRemove()
+	if self.info and self.info.Close then
+		self.info:Close()
+	end
+end
+
+function PNL:DoRightClick()
+	if self.info then 
+		if self.info.Close then
+			self.info:Close()
+		end
+		self.info = nil
+	end
+	
+	self.info = vgui.Create("FeatherFrame")
+	self.info:SetSize(300, 300)
+	self.info:Center()
+	self.info:SetText("Job Information")
+	self.info:MakePopup()
+
+	local text = vgui.Create("DLabel", self.info)
+	text:Dock(TOP)
+	text:SetContentAlignment(2)
+	text:SetFont("fr_MenuBigFont")
+	text:SetText(team.GetName(self.index))
+	text:DockMargin(5, 20, 5, 0)
+	text:SetAutoStretchVertical( true )
+	text:SetColor(color_black)	
+
+	local scroll = vgui.Create("PanelList", self.info)
+	scroll:Dock(FILL)
+	scroll:EnableVerticalScrollbar()
+	scroll:SetSpacing(10)
+	scroll:SetPadding(10)
+	scroll.Paint = function() end
+
+	local text = vgui.Create("DLabel", self.info)
+	text:SetContentAlignment(2)
+	text:SetFont("fr_FrameFont")
+	text:SetText(self.data.desc)
+	text:DockMargin(17, 10, 5, 5)
+	text:SetWrap(true)
+	text:SetAutoStretchVertical( true )
+	text:SetColor(color_black)	
+	scroll:AddItem(text)
+end
+
+function PNL:OnCursorEntered()
+	self.hover = true
+	surface.PlaySound("UI/buttonrollover.wav")
+end
+
+function PNL:OnCursorExited()
+	self.hover = false
+end
+
+function PNL:DoClick()
+	self:OnClick()
+	surface.PlaySound("weapons/pistol/pistol_empty.wav")
+end
+
+function PNL:Think()
+end
+vgui.Register("FeatherJobButton", PNL, "DButton")
+
+
+local PNL = {}
+
+function PNL:Init()
+end
+
+function PNL:SetData(tbl, index)
+	self.data = tbl
+	self.index = index
+end
+
+function PNL:Paint(w, h)
+	if self.hover then
+		surface.SetDrawColor(103, 128, 159)
+	else
+		surface.SetDrawColor(62, 83, 104)
+	end
+	surface.DrawRect(0, 0, w, h)
+end
+
+function PNL:OnCursorEntered()
+	self.hover = true
+	surface.PlaySound("UI/buttonrollover.wav")
+end
+
+function PNL:OnCursorExited()
+	self.hover = false
+end
+
+function PNL:DoClick()
+	self:OnClick()
+	surface.PlaySound("weapons/pistol/pistol_empty.wav")
+end
+
+function PNL:Think()
+end
+vgui.Register("FeatherStuffButton", PNL, "DButton")
+
+local PNL = {}
+
+function PNL:Init()
+	self.text = "Sample Text"
+end
+
+function PNL:SetText(str)
+	self.text = str
+end
+
+function PNL:Paint(w, h)
+	surface.SetDrawColor(150, 40, 27)
+	surface.DrawRect(0, 0, 5, h)
+
+	draw.SimpleText(self.text, "fr_MenuFont", 20, self:GetTall()/2, color_black, 0, 1)
+end
+vgui.Register("FeatherCategoryPanel", PNL, "DPanel")
+
 local PNL = {}
 local menubarsize = .25
 local menubartopsize = .12
@@ -122,6 +264,7 @@ function PNL:Init()
 	self:Center()
 	self:DockPadding(0, 0, 0, 0)
 	self:MakePopup()
+	self.NextClose = CurTime() + .5
 
 	self.menu = vgui.Create("DPanel", self)
 	self.menu:Dock(LEFT)
@@ -150,7 +293,6 @@ function PNL:Init()
 		surface.DrawTexturedRectRotated(w*.05/2 - 1, h/2, w*.05, h, 180)
 	end
 
-
 	self:AddButton("Job", function()
 		self:LoadJob()
 	end)
@@ -160,11 +302,11 @@ function PNL:Init()
 		self:LoadItems()
 	end)
 
+	hook.Run("OnMenuLoadButtons", self)
+
 	self:AddButton("Config", function()
 		self:LoadConfigs()
-	end)
-
-	hook.Run("OnMenuLoadButtons", self)
+	end)	
 
 	self:AddButton("Close", function()
 		self:Close()
@@ -175,7 +317,7 @@ function PNL:LoadJob()
 	self.content:Clear()
 
 	local notice = vgui.Create("FeatherNoticeBar", self.content)
-	notice:SetText("Hehe Nutscript feeling over the place.")
+	notice:SetText(GetLang("jobmenutip"))
 	notice:SetType(7)
 	self.content:AddItem(notice)
 
@@ -185,14 +327,18 @@ function PNL:LoadJob()
 			continue
 		end
 
-		local pnl = vgui.Create("Button", self.content)
+		local pnl = vgui.Create("FeatherJobButton", self.content)
 		pnl:SetTall(50)
 		pnl:SetText(team.GetName(k))
 		pnl:SetFont("fr_MenuFont")
-		if data then
-			pnl.DoClick = function()
-				LocalPlayer():ConCommand("say /job ".. ((string.lower(type(data.cmd)) == "table") and (table.Random(data.cmd)) or (data.cmd)))
-			end
+		pnl:SetColor(color_white)
+		pnl:SetData(data, k)
+
+		if data.desc then
+			pnl:SetTooltip(data.desc)
+		end
+		pnl.DoClick = function()
+			LocalPlayer():ConCommand("say /job ".. ((string.lower(type(data.cmd)) == "table") and (table.Random(data.cmd)) or (data.cmd)))
 		end
 		self.content:AddItem(pnl)
 	end
@@ -212,6 +358,7 @@ end
 	
 function PNL:LoadItems()
 	self.content:Clear()
+
 	local client = LocalPlayer()
 
 	local catlist = {}
@@ -221,19 +368,17 @@ function PNL:LoadItems()
 		end
 
 		if v.category and !catlist[v.category] then
-			local pnl = vgui.Create("DPanel", self.content)
-			pnl:SetTall(40)
-			pnl.Paint = function() end
-			self.content:AddItem(pnl)
-			catlist[v.category] = self:AddText(v.category or "", "fr_CategoryFont")
-			catlist[v.category]:SetParent(pnl)
-			catlist[v.category]:Dock(FILL)
+			catlist[v.category] = vgui.Create("FeatherCategoryPanel", self.content)
+			catlist[v.category]:SetTall(40)
+			catlist[v.category]:SetText(v.category)
+			self.content:AddItem(catlist[v.category])
 		end
 
-		local pnl = vgui.Create("DButton", self.content)
+		local pnl = vgui.Create("FeatherStuffButton", self.content)
 		pnl:SetTall(50)
-		pnl:SetText(v.name)
+		pnl:SetText(Format("%s (%s)", v.name, MoneyFormat(v.price)))
 		pnl:SetFont("fr_MenuFont")
+		pnl:SetColor(color_white)
 		pnl.DoClick = function()
 			client:ConCommand("say /buy ".. v.__key)
 		end
@@ -246,19 +391,17 @@ function PNL:LoadItems()
 		end
 
 		if v.category and !catlist[v.category] then
-			local pnl = vgui.Create("DPanel", self.content)
-			pnl:SetTall(40)
-			pnl.Paint = function() end
-			self.content:AddItem(pnl)
-			catlist[v.category] = self:AddText(v.category or "", "fr_CategoryFont")
-			catlist[v.category]:SetParent(pnl)
-			catlist[v.category]:Dock(FILL)
+			catlist[v.category] = vgui.Create("FeatherCategoryPanel", self.content)
+			catlist[v.category]:SetTall(40)
+			catlist[v.category]:SetText(v.category)
+			self.content:AddItem(catlist[v.category])
 		end
 
-		local pnl = vgui.Create("DButton", self.content)
+		local pnl = vgui.Create("FeatherStuffButton", self.content)
 		pnl:SetTall(50)
-		pnl:SetText(v.name)
+		pnl:SetText(Format("%s (%s)", v.name, MoneyFormat(v.price)))
 		pnl:SetFont("fr_MenuFont")
+		pnl:SetColor(color_white)
 		pnl.DoClick = function()
 			client:ConCommand("say /buy ".. v.__key)
 		end
@@ -271,19 +414,17 @@ function PNL:LoadItems()
 		end
 
 		if v.category and !catlist[v.category] then
-			local pnl = vgui.Create("DPanel", self.content)
-			pnl:SetTall(40)
-			pnl.Paint = function() end
-			self.content:AddItem(pnl)
-			catlist[v.category] = self:AddText(v.category or "", "fr_CategoryFont")
-			catlist[v.category]:SetParent(pnl)
-			catlist[v.category]:Dock(FILL)
+			catlist[v.category] = vgui.Create("FeatherCategoryPanel", self.content)
+			catlist[v.category]:SetTall(40)
+			catlist[v.category]:SetText(v.category)
+			self.content:AddItem(catlist[v.category])
 		end
 
-		local pnl = vgui.Create("DButton", self.content)
+		local pnl = vgui.Create("FeatherStuffButton", self.content)
 		pnl:SetTall(50)
-		pnl:SetText(v.name or 0)
+		pnl:SetText(Format("%s (%s)", v.name, MoneyFormat(v.price)))
 		pnl:SetFont("fr_MenuFont")
+		pnl:SetColor(color_white)
 		pnl.DoClick = function()
 			client:ConCommand("say /buy ".. v.__key)
 		end
@@ -314,7 +455,13 @@ function PNL:Paint()
 end
 
 function PNL:Think()
+	local ply = LocalPlayer()
+
+	if (self.NextClose < CurTime() and input.IsKeyDown(KEY_F4) == true) then
+		self:Close()
+	end
 end
+
 vgui.Register("FeatherMainMenu", PNL, "DFrame")
 
 local function ShowMenu()

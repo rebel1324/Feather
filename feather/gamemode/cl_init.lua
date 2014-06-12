@@ -84,11 +84,10 @@ surface.CreateFont("fr_HUDFont", {
 	antialias = true
 })
 
-surface.CreateFont("fr_HUDStatusFont", {
+surface.CreateFont("fr_MenuBigFont", {
 	font = "Calibri",
-	size = 25,
+	size = 35,
 	weight = 1000,
-	shadow = true,
 	antialias = true
 })
 
@@ -102,6 +101,13 @@ surface.CreateFont("fr_MenuFont", {
 surface.CreateFont("fr_CategoryFont", {
 	font = "Calibri",
 	size = 25,
+	weight = 1000,
+	antialias = true
+})
+
+surface.CreateFont("fr_FrameFont", {
+	font = "Calibri",
+	size = 20,
 	weight = 1000,
 	antialias = true
 })
