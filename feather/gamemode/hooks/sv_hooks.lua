@@ -95,8 +95,6 @@ function GM:PlayerLoadout(client)
 	local jobdata = self:GetJobData(index)
 
 	if jobdata and jobdata.loadout then
-		client:SetModel(table.Random(jobdata.model))
-
 		for k, v in pairs(jobdata.loadout) do
 			client:Give(v)
 		end
@@ -146,8 +144,11 @@ function GM:OnPlayerBecomeJob(client, data, teamindex)
 	local effectData = EffectData()
 	effectData:SetStart(client:GetPos())
 	util.Effect("FeatherJob", effectData)
-	
+
+	netstream.Start(client, "UpdateJobs")
 	hook.Run("PlayerLoadout", client)
+	
+	client:SetModel(table.Random(data.model))
 end
 
 function GM:BecomeJob(client, teamindex, voted)
@@ -187,7 +188,7 @@ function GM:BecomeJob(client, teamindex, voted)
 		client.onvote = true
 		self:StartVote(client, GetLang("wantstobe", client:Name(), name), 10
 		,function(cl) GAMEMODE:BecomeJob(cl, teamindex, true) client.onvote = false end
-		,function(cl) cl:notify(GetLang("jobvotefail", cl:Name(), name)) end)
+		,function(cl) cl:notify(GetLang("jobvotefail", cl:Name(), name)) client.onvote = false end)
 		return false
 	end
 
@@ -223,7 +224,7 @@ function GM:PlayerSpawnNPC(client)
 	return client:IsAdmin()
 end
 
-function GM:PlayerSpawnProp()
+function GM:PlayerSpawnProp(client, model)
 	return true
 end
 

@@ -3,7 +3,6 @@ DeriveGamemode("cn")
 GM.Name = "Feather"
 GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true
-
 -- Language.
 GM.Language = "english"
 
@@ -128,7 +127,7 @@ TEAM_COOK = GM:CreateJob("Cook", Color(240, 100, 250), {
 	max = 2,
 })
 
-TEAM_GUNDEALER = GM:CreateJob("Gun Dealer", Color(200, 0, 0), {
+TEAM_GUNDEALER = GM:CreateJob("Gun Dealer", Color(255, 204, 0), {
 	model = {
 		"models/player/monk.mdl",
 	},
@@ -138,7 +137,7 @@ TEAM_GUNDEALER = GM:CreateJob("Gun Dealer", Color(200, 0, 0), {
 	max = 2,
 })
 
-TEAM_MEDIC = GM:CreateJob("Medic", Color(0, 180, 0), {
+TEAM_MEDIC = GM:CreateJob("Medic", Color(0, 130, 0), {
 	model = {
 		"models/player/kleiner.mdl",
 	},
@@ -151,7 +150,7 @@ TEAM_MEDIC = GM:CreateJob("Medic", Color(0, 180, 0), {
 	max = 2,
 })
 
-TEAM_MAYOR = GM:CreateJob("Mayor", Color(0, 255, 0), {
+TEAM_MAYOR = GM:CreateJob("Mayor", Color(0, 80, 0), {
 	model = {
 		"models/player/breen.mdl",
 	},
@@ -231,7 +230,7 @@ TEAM_MOBSTER = GM:CreateJob("Mobster", Color(100, 100, 100), {
 	desc = GetLang("jobmobster"),
 })
 
-TEAM_HITMAN = GM:CreateJob("Hitman", Color(0, 230, 0), {
+TEAM_HITMAN = GM:CreateJob("Hitman", Color(100, 80, 255), {
 	model = {
 		"models/player/leet.mdl",
 	},

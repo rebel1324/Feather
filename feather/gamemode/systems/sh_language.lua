@@ -5,11 +5,17 @@ GM.Languages = {}
 function GetLang(name, ...)
 	GAMEMODE = GAMEMODE or GM -- get error and shit.
 
-	if GAMEMODE.Languages[GAMEMODE.Language] or GAMEMODE.Languages[GAMEMODE.Language][name] then
-		return string.format( GAMEMODE.Languages[GAMEMODE.Language][name], ... )
+	if GAMEMODE.Languages[GAMEMODE.Language] then
+		if GAMEMODE.Languages[GAMEMODE.Language][name] then
+			return string.format( GAMEMODE.Languages[GAMEMODE.Language][name], ... )
+		end
+
+		if GAMEMODE.Languages["english"][name] then
+			return string.format( GAMEMODE.Languages[GAMEMODE.Language][name], ... )
+		end
 	end
 
-	return "Failed to get language ".. name	
+	return "Failed to get language ".. name	or "<NO LANG!>"
 end
 
 local lang = "english"

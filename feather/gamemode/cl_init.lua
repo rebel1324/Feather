@@ -112,6 +112,13 @@ surface.CreateFont("fr_FrameFont", {
 	antialias = true
 })
 
+surface.CreateFont("fr_VoteFont", {
+	font = "Tahoma",
+	weight = 1000,
+	size = 13
+})
+
+
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts
        

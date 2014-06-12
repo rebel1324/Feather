@@ -72,6 +72,7 @@ else
 		self.yes:SetSize(69, 25)
 		self.yes:SetPos(5, 120)
 		self.yes:SetText(GetLang"yes")
+		self.yes:SetColor(color_black)
 		self.yes.DoClick = function()
 			netstream.Start("SendVote", {self.uid, true})
 			self:Close()
@@ -81,6 +82,7 @@ else
 		self.no:SetSize(69, 25)
 		self.no:SetPos(76, 120)
 		self.no:SetText(GetLang"no")
+		self.no:SetColor(color_black)
 		self.no.DoClick = function()
 			netstream.Start("SendVote", {self.uid, false})
 			self:Close()
@@ -93,22 +95,24 @@ else
 		self.time = CurTime() + t
 	end
 	
-	function PNL:SetText(str)
+	function PNL:SetVoteText(str)
 		self.label:SetText(str)
 		self.label:DockMargin(5, 5, 5, 5)
 		self.label:Dock(TOP)
 		self.label:SetWrap(true)
 		self.label:SetAutoStretchVertical( true )
+		self.label:SetFont("fr_VoteFont")
+		self.label:SetColor(color_black)
 	end
 
 	function PNL:Think()
-		self:SetTitle(GetLang("votetime", math.ceil(self.time - CurTime())))
+		self:SetText(GetLang("votetime", math.ceil(self.time - CurTime())))
 
 		if (self.time < CurTime()) then
 			self:Close()
 		end
 	end
-	vgui.Register("FeatherVote", PNL, "DFrame")
+	vgui.Register("FeatherVote", PNL, "FeatherFrame")
 
 	GM.VoteWindows = {}
 
@@ -127,7 +131,7 @@ else
 
 	netstream.Hook("SendVoteWindow", function(data)
 		local vote = vgui.Create("FeatherVote")
-		vote:SetText(data[3])
+		vote:SetVoteText(data[3])
 		vote:SetTime(data[4])
 		vote.uid = data[1]
 

@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Type = "anim"
 ENT.PrintName = "Weapon"
 ENT.Author = "Black Tea"
-ENT.Category = "NutScript"
+ENT.Category = "Feather"
 
 if (SERVER) then
 	function ENT:Initialize()

@@ -323,7 +323,7 @@ function PNL:LoadJob()
 
 	for k, v in ipairs(team.GetAllTeams()) do
 		local data = GAMEMODE:GetJobData(k)
-		if data.childjob and data.childjob != LocalPlayer():Team() then
+		if (data.childjob and data.childjob != LocalPlayer():Team() or k == LocalPlayer():Team()) then
 			continue
 		end
 
@@ -333,10 +333,6 @@ function PNL:LoadJob()
 		pnl:SetFont("fr_MenuFont")
 		pnl:SetColor(color_white)
 		pnl:SetData(data, k)
-
-		if data.desc then
-			pnl:SetTooltip(data.desc)
-		end
 		pnl.DoClick = function()
 			LocalPlayer():ConCommand("say /job ".. ((string.lower(type(data.cmd)) == "table") and (table.Random(data.cmd)) or (data.cmd)))
 		end
@@ -473,6 +469,13 @@ local function ShowMenu()
 	end
 	MENU = vgui.Create("FeatherMainMenu")
 end
+netstream.Hook("UpdateJobs", function()
+	if MENU and MENU.LoadJob then
+		timer.Simple(.1, function()
+			MENU:LoadJob()
+		end)
+	end
+end)
 
 CLICKER = CLICKER or false
 local function Clicker()
