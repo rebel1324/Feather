@@ -1,5 +1,0 @@
-"Gamemode"
-{
-	"base"			"cn"
-	"title"			"Feather"
-}
