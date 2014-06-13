@@ -1,1 +1,6 @@
-This is text document.
+Feather - rebel1324, Chessnut
+
+This gamemode is made for Light and Fast RP hosters/users.
+You can use this gamemode as the replacement of the DarkRP or you can actually start making your own RP gamemode with this gamemode. 
+
+This gamemode's code structure is pretty easy to see, learn, use. Easy to Install, Easy to Play, Easy to Develop. 
