@@ -38,8 +38,9 @@ if SERVER then
 			td.endpos = td.start + self.Owner:GetAimVector()*64
 			td.filter = self.Owner
 		local trace = util.TraceLine(td)
+		local target = trace.Entity
 
-		if trace.Entity:IsValid() and trace.Entity:IsPlayer() and !self.target then
+		if target:IsValid() and target:IsPlayer() and !self.target then
 			self:StartSearch(trace.Entity)	
 		end
 
@@ -50,6 +51,7 @@ if SERVER then
 		self.target = client
 		local searchtime = 1
 		netstream.Start(self.Owner, "FeatherProgressDisplay", {GetLang"hudsearchname", searchtime})
+		netstream.Start(self.target, "FeatherProgressDisplay", {GetLang"hudsearchvictimname", searchtime})
 
 		timer.Create(self:EntIndex() .. "_SEARCH", searchtime, 1, function()
 			if self:IsValid() and self.Owner:IsValid() and self.Owner:Alive() then

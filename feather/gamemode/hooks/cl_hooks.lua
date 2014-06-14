@@ -283,3 +283,9 @@ end
 
 function GM:ShowTeam()
 end
+
+function GM:GravGunPunt()
+	return false
+end
+
+concommand.Add( "dupe_arm", function( ply, cmd, arg )end, nil, "Arm a dupe", { FCVAR_DONTRECORD } )

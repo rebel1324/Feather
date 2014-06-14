@@ -246,8 +246,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Goverment Commands",
-	desc = "This command allows goverment to stop seek certain player for the prosecution.",
-	syntax = "<Target Player> <Reason> [time]",
+	desc = "This command allows admin to add ONE Jail Position where you're standing on.\nJail Position will be saved in to the server database.",
 	onRun = function(client, arguments)
 		local ply = arguments[1]
 
@@ -263,8 +262,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Goverment Commands",
-	desc = "This command allows goverment to stop seek certain player for the prosecution.",
-	syntax = "<Target Player> <Reason> [time]",
+	desc = "This command allows admin to reset ALL Jail Position and set ONE Jail Position where you're standing on.\nJail Position will be saved in to the server database.",
 	onRun = function(client, arguments)
 		local ply = arguments[1]
 
@@ -282,7 +280,7 @@ GM:RegisterCommand({
 }, "setjailpos")
 
 GM:RegisterCommand({
-	category = "Goverment",
+	category = "Goverment Commands",
 	desc = "This command allows goverment to get control of the city for temporaliy.",
 	syntax = "<Target Player> <Reason> [time]",
 	onRun = function(client, arguments)
@@ -312,13 +310,13 @@ GM:RegisterCommand({
 }, "lockdown")
 
 GM:RegisterCommand({
-	category = "Goverment",
-	desc = "This command allows mayor to add laws.",
-	syntax = "<Target Player> <Reason> [time]",
+	category = "Goverment Commands",
+	desc = "This command allows mayor to add laws.\nAdding Abusive/Offensive law will get you banned/kicked.",
+	syntax = "<Proper Text of Law>",
 	onRun = function(client, arguments)
 		local law = table.concat(arguments, " ")
 
-		if (!GAMEMODE:GetJobData(client:Team()).mayor) then
+		if (!GAMEMODE:GetJobData(client:Team()).mayor and !client:IsAdmin()) then
 			client:notify(GetLang"bemayor", 1)
 			return
 		end
@@ -328,25 +326,29 @@ GM:RegisterCommand({
 			return
 		end
 		
-		local laws = GAMEMODE.CustomLaws or {}
+		local laws = GAMEMODE.CustomLaws
 		if (#laws + #GAMEMODE.DefaultLaws >= 15) then
 			client:notify(GetLang"maxrows", 1)
 			return
 		end
 
 		table.insert(laws, law)
+		if !GAMEMODE.CustomLaws then
+			GAMEMODE.CustomLaws = law
+		end
+
 		netstream.Start(player.GetAll(), "SetLaws", laws)
 	end
 }, "addlaw")
 
 GM:RegisterCommand({
-	category = "Goverment",
-	desc = "This command allows mayor to add laws.",
-	syntax = "<Target Player> <Reason> [time]",
+	category = "Goverment Commands",
+	desc = "This command allows mayor to remove laws.",
+	syntax = "<The number of law>",
 	onRun = function(client, arguments)
 		local row = tonumber(arguments[1])
 
-		if !GAMEMODE:GetJobData(client:Team()).mayor then
+		if (!GAMEMODE:GetJobData(client:Team()).mayor and !client:IsAdmin()) then
 			client:notify(GetLang"bemayor", 1)
 			return
 		end
@@ -373,11 +375,10 @@ GM:RegisterCommand({
 
 
 GM:RegisterCommand({
-	category = "Goverment",
-	desc = "This command allows mayor to add laws.",
-	syntax = "<Target Player> <Reason> [time]",
+	category = "Goverment Commands",
+	desc = "This command will spawn the Lawboard on the ground where you're looking at.",
 	onRun = function(client, arguments)
-		if !GAMEMODE:GetJobData(client:Team()).mayor then
+		if (!GAMEMODE:GetJobData(client:Team()).mayor and !client:IsAdmin()) then
 			client:notify(GetLang"bemayor", 1)
 			return
 		end

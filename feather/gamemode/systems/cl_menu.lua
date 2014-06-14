@@ -530,6 +530,7 @@ hook.Add("PlayerBindPress", "FeatherMenuLoad", function(client, bind, pressed)
 		if ent and ent:IsValid() then
 			if ent:IsDoor() then
 				if ent:GetDoorOwner() == ply then
+					ply:ConCommand("say /selldoor")
 				else
 					ply:ConCommand("say /buydoor")
 				end

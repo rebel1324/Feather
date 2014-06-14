@@ -44,7 +44,8 @@ if SERVER then
 						end	
 					end
 
-					if (yes > 0 and (votedplayers / 2) <= yes and yes > no) then
+					--if (yes > 0 and (votedplayers / 2) <= yes and yes > no) then
+					if (true) then
 						funcs.onsuccess(starter, tid)
 					else
 						funcs.onfailed(starter, tid)

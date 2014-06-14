@@ -64,9 +64,9 @@ if SERVER then
 		if (ent and ent:IsValid()) then
 			if (ent:IsDoor()) then
 				local str = type(ent:GetDoorOwners()):lower()
-				if str then
+				if str == "string" then
 					local group = GAMEMODE.DoorGroup[ent:GetDoorOwners()]
-					if group.canuse(self.Owner) then
+					if group and group.canuse(self.Owner) then
 						self:Lock(ent)
 
 						netstream.Start(player.GetAll(), "FeatherAnimation", {self.Owner, GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GMOD_GESTURE_ITEM_PLACE, true})
@@ -101,9 +101,9 @@ if SERVER then
 		if (ent and ent:IsValid()) then
 			if (ent:IsDoor()) then
 				local str = type(ent:GetDoorOwners()):lower()
-				if str then
+				if str == "string" then
 					local group = GAMEMODE.DoorGroup[ent:GetDoorOwners()]
-					if group.canuse(self.Owner) then
+					if group and group.canuse(self.Owner) then
 						self:Unlock(ent)
 
 						netstream.Start(player.GetAll(), "FeatherAnimation", {self.Owner, GESTURE_SLOT_ATTACK_AND_RELOAD, ACT_GMOD_GESTURE_ITEM_PLACE, true})

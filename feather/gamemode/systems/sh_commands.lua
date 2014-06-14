@@ -306,6 +306,13 @@ end
 /* HERE IT GOES TONS OF CHATS */
 
 GM:RegisterChat("broadcast", {
+	canSay = function(speaker)
+		if speaker:Team() != TEAM_MAYOR then
+			return false
+		end
+
+		return true
+	end,
 	onChat = function(speaker, text)
 		chat.AddText(color_white, GetLang"broadcast" , Color(255, 0, 0), speaker:Name(), ": " .. text)
 	end,
@@ -396,6 +403,35 @@ GM:RegisterCommand({
 		client:notify(GetLang"invalidjob")
 	end
 }, "job")
+
+GM:RegisterCommand({
+	desc = "This commands allows you to make another player step down from his job.\nAbusing this command will get you banned/kicked.",
+	syntax = "<Target's name> <reason>",
+	onRun = function(client, arguments)
+		local target = arguments[1]
+
+		if !target or target == "" then
+			client:notify(GetLang"invalidtext")
+			return false
+		end
+
+		local targetplayer = FindPlayer(target)
+		table.remove(arguments, 1)
+		local reason = table.concat(arguments, " ")
+
+		if !targetplayer or !targetplayer:IsValid() then
+			client:notify(GetLang"invalidplayer")
+			return false
+		end
+
+		if !reason or reason == "" then
+			client:notify(GetLang"invalidreason")
+			return false
+		end
+
+		GAMEMODE:Demote(client, targetplayer, reason)
+	end
+}, "demote")
 
 GM:RegisterCommand({
 	desc = "This commands sets citizens/other job's spawnpoint at your foot.",

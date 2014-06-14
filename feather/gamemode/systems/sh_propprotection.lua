@@ -29,7 +29,6 @@ function GM:PlayerSpawnedSENT(client, entity)
 end
 
 function GM:PlayerSpawnedRagdoll(client, entity)
-	entity.Owner = client
 end
 
 function GM:PlayerSpawnedEffect(client, entity)
@@ -37,18 +36,24 @@ function GM:PlayerSpawnedEffect(client, entity)
 end
 
 function GM:PlayerSpawnedSWEP(client, entity)
-	entity.Owner = client
 end
 
 function GM:PlayerSpawnedVehicle(client, entity)
 	entity.Owner = client
 end
 
-function GM:PhysgunPickup(client, entity)
-	if (client:IsAdmin()) then
-		return true
+function GM:PhysgunDrop(client, entity)
+	if SERVER then
+		entity:SetCollisionGroup(entity.prevcol or 0)
 	end
-	
+end
+
+function GM:PhysgunPickup(client, entity)
+	if SERVER then
+		entity.prevcol = entity:GetCollisionGroup()
+		entity:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+	end
+
 	if (entity:IsNPC()) then
 		return (client:IsAdmin())
 	end
@@ -56,7 +61,7 @@ function GM:PhysgunPickup(client, entity)
 	if ((entity.Owner and entity.Owner == client) or entity:GetNetVar("owner") == client) then
 		local class = entity:GetClass():lower()
 		if (string.find(class, "feather_")) then
-			return entity.allowphys
+			return (client:IsAdmin()) or entity.allowphys
 		end
 
 		if SERVER then
@@ -66,7 +71,7 @@ function GM:PhysgunPickup(client, entity)
 					if (v == entity) then continue end
 
 					if (!v.Owner or v.Owner != client or entity:GetNetVar("owner") != client) then
-						return false
+						return (client:IsAdmin())
 					end
 				end
 			end
@@ -86,8 +91,26 @@ function GM:PhysgunPickup(client, entity)
 				end
 			end
 		end
+
+		if (client:IsAdmin()) then
+			return true
+		end
 		return false
 	end
 
 	return true
 end
+
+hook.Add("PlayerDisconnected", "DestroyDisonnceted", function(client)
+	if client:IsAdmin() then return end
+	
+	for k, v in ipairs(ents.GetAll()) do
+		if v.Owner == client then
+			v:Remove()
+		end
+	end
+end)
+
+hook.Add("HUDPaint", "PropProtectionHUD", function()
+
+end)

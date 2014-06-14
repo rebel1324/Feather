@@ -53,6 +53,7 @@ if (SERVER) then
 						self.Owner:notify(GetLang("toocheap", MoneyFormat(-profit)))
 					else
 						self.Owner:notify(GetLang("moneyearn", MoneyFormat(profit)))
+						self.Owner:GiveMoney(profit)
 					end
 				end
 			end

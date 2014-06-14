@@ -64,7 +64,7 @@ do
 					cn.db.query("INSERT INTO fr_players (_steamID, _money, _inventory) VALUES ("..self:SteamID64()..", 500, \"\")")
 				end
 
-				if data then
+				if data and data[1] then
 					data = data[1]
 					self:SetMoney(tonumber(data._money) or 500)
 

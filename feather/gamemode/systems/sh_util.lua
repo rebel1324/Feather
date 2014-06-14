@@ -124,6 +124,10 @@ function GetWeaponName(class)
 	end
 end
 
+function GetRandomEntity(class)
+	return table.Random(ents.FindByClass(class))
+end
+
 -- For overriding.
 -- Actually... For koreans.... 
 local function pluralizeString(str, quantity)
@@ -160,4 +164,17 @@ function string.NiceTime( seconds )
 
 	local t = math.floor( seconds / (60 * 60 * 24 * 7 * 52) )
 	return t .. pluralizeString(" year", t);
+end
+
+function FeatherError(str, nohalt)
+	if !str then
+		return
+	end
+
+	str = "Feather Internal Error: " .. str
+	if nohalt then
+		ErrorNoHalt(str)
+	else
+		Error(str)
+	end
 end

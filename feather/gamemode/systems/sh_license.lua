@@ -306,7 +306,7 @@ if SERVER then
 end
 
 GM:RegisterCommand({
-	category = "Goverment",
+	category = "Goverment Commands",
 	desc = "This command allows you to give license to facing/specific player if you're in goverment faction.",
 	syntax = "<License Name/UniqueID> [Target Player]",
 	onRun = function(client, arguments)
@@ -352,7 +352,7 @@ GM:RegisterCommand({
 }, "givelicense")
 
 GM:RegisterCommand({
-	category = "Goverment",
+	category = "Goverment Commands",
 	desc = "This command allows you to take license to facing/specific player if you're in goverment faction.",
 	syntax = "<License Name/UniqueID> [Target Player]",
 	onRun = function(client, arguments)

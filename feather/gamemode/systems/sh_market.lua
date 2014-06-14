@@ -221,6 +221,8 @@ if SERVER then
 end
 
 GM:RegisterCommand({
+	desc = "This command allows you to buy something.",
+	syntax = "<UniqueID of the Entity/Item>",
 	category = "Market and Money",
 	onRun = function(client, arguments)
 		local buy = table.concat(arguments, " ")
@@ -267,9 +269,9 @@ GM:RegisterCommand({
 }, "buy")
 
 GM:RegisterCommand({
+	desc = "This command allows you to set the selling price of the entity.",
+	syntax = "<Price of the product>",
 	category = "Market and Money",
-	desc = "This command allows you to take license to facing/specific player if you're in goverment faction.",
-	syntax = "<License Name/UniqueID> [Target Player]",
 	onRun = function(client, arguments)
 		local price = math.Clamp(tonumber(arguments[1]) or 0, 0, math.huge)
 
@@ -277,7 +279,12 @@ GM:RegisterCommand({
 		local target = trace.Entity
 
 		if (!target or !target:IsValid()) then
-			client:notify(GetLang"entinvalid", 4)
+			client:notify(GetLang"entinvalid", 1)
+			return
+		end
+
+		if (!target.Owner or target.Owner != client) then
+			client:notify(GetLang"notown", 1)
 			return
 		end
 
