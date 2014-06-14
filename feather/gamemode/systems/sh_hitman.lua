@@ -56,15 +56,17 @@ if SERVER then
 	end
 
 	function GM:OnHitFailed(client)
-		NotifyAll(GetLang("hitfailed", client:Name()))
+		if (client.target or client.request) and (client.target:IsValid() or client.request:IsValid()) then
+			NotifyAll(GetLang("hitfailed", client:Name()))
 
-		client.target.targeted = nil
-		client.request.requested = nil
+			client.target.targeted = nil
+			client.request.requested = nil
 
-		client.target = nil
-		client.request = nil
+			client.target = nil
+			client.request = nil
 
-		client:SetNetVar("onhit", nil)
+			client:SetNetVar("onhit", nil)
+		end
 	end
 
 	function GM:OnHitSuccess(client)
@@ -120,6 +122,8 @@ end
 
 GM:RegisterCommand({
 	category = "Hitman",
+	desc = "This command allows you to make a hit contract to certain/random hitman.\nYou can specify the hitman who will carry on your contracy by providing additional name after the target's name.",
+	syntax = "<Target ID> [Hitman's name]",
 	onRun = function(client, arguments)
 		local target = arguments[1]
 		local hitman = arguments[2]
@@ -143,3 +147,11 @@ GM:RegisterCommand({
 		client:RequestHit(contractor, hittarget, client)
 	end
 }, "requesthit")
+
+GM:RegisterCommand({
+	category = "Hitman",
+	desc = "This command allows hitman to cancel the hit contract what he's on.",
+	onRun = function(client, arguments)
+		hook.Run("OnHitFailed", client) 
+	end
+}, "cancelhit")

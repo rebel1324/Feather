@@ -20,6 +20,10 @@ function GM:PlayerInitialSpawn(client)
 	end)
 end
 
+function GM:PlayerCanHearPlayersVoice( listener, talker )
+	return true, true
+end
+
 function GM:CenterDisplay(text, time)
 	netstream.Start(player.GetAll(), "FeatherCenterDisplay", {text, time})
 end
@@ -30,6 +34,13 @@ end
 
 function GM:InitPostEntity()
 	self.EntLoaded = true
+
+	for k, v in ipairs(ents.GetAll()) do
+		local phys = v:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			phys:Sleep()
+		end
+	end
 end
 
 function GM:ShutDown()
@@ -115,9 +126,6 @@ function GM:PlayerSay(client, text, public)
 	return text
 end
 
-function GM:Demote(from, to, reason, voted)
-end
-
 function GM:MoneyEntityCreated(self)
 	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
 		if self:GetDTInt(0) <= 100 then
@@ -168,12 +176,81 @@ function GM:OnPlayerBecomeJob(client, data, teamindex, oldteam)
 	end
 end
 
-function GM:BecomeJob(client, oldjobindex, teamindex, voted)
+function GM:CanDemote(client, target)
+	if (!client or !target or !client:IsValid() or !target:IsValid()) then
+		return
+	end
+
+	if (client:IsArrested()) then
+		client:notify(GetLang"yourearrested")
+		return false
+	end
+
+	if (!client.nextDemote or client.nextDemote > CurTime()) then
+		client:notify(GetLang"toofast")
+		return false
+	end
+
+	if (target:Team() == TEAM_CITIZEN) then
+		client:notify(GetLang"cantdo")
+		return false
+	end
+end
+
+function GM:Demote(from, to, reason, voted)
+	if !voted then
+		if (hook.Run("CanDemote", from, to) != false) then
+			return false
+		end
+
+		from.nextDemote = CurTime() + 1
+		from.onvote = true
+		to.onvote = true
+		local funcs = {
+			onsuccess = function()
+				if (!from:IsValid() or !to:IsValid()) then
+					return 
+				end
+
+				GAMEMODE:BecomeJob(from, to, reason, true)
+				from.onvote = false
+				to.onvote = false
+			end,
+			onfailed = function()
+				if (!from:IsValid() or !to:IsValid()) then
+					return 
+				end
+				
+				from.onvote = false
+				to.onvote = false
+			end
+		}
+		self:StartVote(client, GetLang("demote", to:Name(), reason), 10, funcs)
+
+		return false
+	else
+		NotifyAll(GetLang("playerdemoted", to:Name()))
+		GAMEMODE:BecomeJob(to, to:Team(), TEAM_CITIZEN, true, false)
+
+		return true
+	end
+end
+
+function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
+	print(client, teamindex)
 	local data = self:GetJobData(teamindex)
 	local name = team.GetName(teamindex)
 
 	if !data then
 		client:notify(GetLang"invalidjob")
+
+		return false
+	end
+
+	if data.max then
+		if #team.GetPlayers(teamindex) >= data.max then
+			return
+		end	
 	end
 
 	if !voted and client.nextJob and client.nextJob > CurTime() then
@@ -204,7 +281,7 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted)
 		
 		client.onvote = true
 		local funcs = {
-			onsuccess = function(cl) if !cl:IsValid() then return end GAMEMODE:BecomeJob(cl, teamindex, true) client.onvote = false end,
+			onsuccess = function(cl) if !cl:IsValid() then return end GAMEMODE:BecomeJob(cl, cl:Team(), teamindex, true) client.onvote = false end,
 			onfailed = function(cl) if !cl:IsValid() then return end cl:notify(GetLang("jobvotefail", cl:Name(), name)) client.onvote = false end
 		}
 		self:StartVote(client, GetLang("wantstobe", client:Name(), name), 10, funcs)
@@ -216,7 +293,9 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted)
 	client:StripWeapons()
 
 	hook.Run("OnPlayerBecomeJob", client, data, teamindex, oldjobindex)
-	NotifyAll(GetLang("becamejob", client:Name(), name))
+	if !silent then
+		NotifyAll(GetLang("becamejob", client:Name(), name))
+	end
 end
 
 function GM:CanDrive(client)
@@ -244,6 +323,9 @@ function GM:PlayerSpawnNPC(client)
 end
 
 function GM:PlayerSpawnProp(client, model)
+	if table.HasValue(GAMEMODE.BlockedModels, model) then
+		return false
+	end
 	return true
 end
 
@@ -265,3 +347,24 @@ end
 
 function GM:ShowHelp()
 end
+
+function GM:GravGunPunt()
+	return false
+end
+
+function GM:PlayerShouldTakeDamage(client, dmg)
+	if (dmg:GetClass() == "prop_physics" and dmg.Owner) then
+		return false
+	end
+
+	return (client:GetMoveType() != MOVETYPE_NOCLIP)
+end
+
+function GM:CanDrive(client)
+	return (client:IsAdmin())
+end
+
+
+net.Receive( "ArmDupe", function() end )
+net.Receive( "CopiedDupe", function() end )
+net.Receive( "ReceiveDupe", function() end )

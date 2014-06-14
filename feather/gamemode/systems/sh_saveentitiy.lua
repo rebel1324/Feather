@@ -5,6 +5,7 @@ if SERVER then
 	GM.SaveEntity = {
 		"feather_arrestboard",
 		"feather_jobterminal",
+		"feather_job_pckdest",
 	}
 
 	local loadquery = "SELECT * FROM fr_entities WHERE _map = '%s'"

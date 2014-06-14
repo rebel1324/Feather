@@ -101,6 +101,10 @@ if SERVER then
 				if GetDoorOwner(v:GetDoorOwners()) == client then
 					v:FlushDoor()
 				end
+
+				if !GetDoorOwner(v:GetDoorOwners()):IsValid() then
+					v:FlushDoor()
+				end
 			end
 		end
 	end
@@ -141,19 +145,24 @@ else
 
 			local sx, sy = w/2, h/2
 
-			local text = (door:GetNetVar("title") or (door:GetNetVar("unownable") and "Unownable" or (door:GetNetVar("owners") and "Untitled" or "Unowned")))
+			local text = (door:GetNetVar("title") or (door:GetNetVar("unownable") and GetLang"unownable" or (door:GetNetVar("owners") and GetLang"untitled" or GetLang"unowned")))
 			surface.SetFont("fr_LicenseTitle")
 			local tx, ty = surface.GetTextSize(text)
 			draw.SimpleText(text, "fr_Arrested", sx - tx/2, sy - ty, color_white, 0, 0)
 
 			local owners = door:GetNetVar("owners")
 			if !door:GetNetVar("owners") then
-				text = "You can buy this door by pressing F2"
+				text = GetLang"doorhelp"
 				local tx, ty = surface.GetTextSize(text)
 				draw.SimpleText(text, "fr_Arrested", sx - tx/2, sy, color_white, 0, 0)
 			else
 				if string.lower(type(owners)) == "table" then
 					local owner = GetDoorOwner(owners)
+					
+					if !owner or !owner:IsValid() then
+						return
+					end
+
 					text = GetLang("doorowner", owner:Name())
 					local tx, ty = surface.GetTextSize(text)
 					draw.SimpleText(text, "fr_Arrested", sx - tx/2, sy, color_white, 0, 0)
@@ -235,7 +244,6 @@ GM:RegisterCommand({
 GM:RegisterCommand({
 	category = "Property",
 	desc = "This command allows you to buy the door you're looking at.",
-	syntax = "<Door Title>",
 	onRun = function(client, arguments)
 		local str = table.concat(arguments, " ")
 
@@ -268,7 +276,6 @@ GM:RegisterCommand({
 GM:RegisterCommand({
 	category = "Property",
 	desc = "This command allows you to sell the door you're looking at.",
-	syntax = "<Door Title>",
 	onRun = function(client, arguments)
 		local str = table.concat(arguments, " ")
 
@@ -297,8 +304,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Property",
-	desc = "This command allows you to change the door's title.",
-	syntax = "<Door Title>",
+	desc = "This command allows admin to change the door's ownable state to unownable.",
 	onRun = function(client, arguments)
 		local trace = client:GetEyeTraceNoCursor()
 		local target = trace.Entity
@@ -317,8 +323,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Property",
-	desc = "This command allows you to change the door's title.",
-	syntax = "<Door Title>",
+	desc = "This command allows admin to change the door's ownable state to unownable and make the door as certain faction exclusive.",
 	onRun = function(client, arguments)
 		local trace = client:GetEyeTraceNoCursor()
 		local target = trace.Entity
@@ -337,7 +342,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Property",
-	desc = "This command allows you to change the door's title.",
+	desc = "This command allows admin to change the door's hidden state.\nMaking door unhidden have same effect as making door ownable.",
 	syntax = "<Door Title>",
 	onRun = function(client, arguments)
 		local trace = client:GetEyeTraceNoCursor()
@@ -367,7 +372,7 @@ GM:RegisterCommand({
 
 GM:RegisterCommand({
 	category = "Property",
-	desc = "This command allows you to change the door's title.",
+	desc = "This command allows admin to change the door's ownable state to ownable and reset all door data.",
 	syntax = "<Door Title>",
 	onRun = function(client, arguments)
 		local trace = client:GetEyeTraceNoCursor()

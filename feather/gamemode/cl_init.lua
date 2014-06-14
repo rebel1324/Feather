@@ -54,7 +54,7 @@ surface.CreateFont("fr_LicenseTitle", {
 
 surface.CreateFont("fr_Arrested", {
 	font = "Trebuchet MS",
-	size = 25,
+	size = 24,
 	weight = 1000,
 	shadow = true,
 	antialias = true
@@ -118,6 +118,12 @@ surface.CreateFont("fr_VoteFont", {
 	size = 13
 })
 
+surface.CreateFont("fr_VoteFontShadow", {
+	font = "Tahoma",
+	weight = 1000,
+	size = 13,
+	blursize = 5
+})
 
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts

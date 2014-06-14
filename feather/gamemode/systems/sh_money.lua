@@ -52,6 +52,8 @@ function playerMeta:CanAfford(amt)
 end
 
 GM:RegisterCommand({
+	desc = "This command allows you to give money to someone.\nIf you write players name after the amount, you can give your money to specific player around you.",
+	syntax = "<Amount to give> [Target Player]",
 	category = "Market and Money",
 	onRun = function(client, arguments)
 		local ply = arguments[2]
@@ -93,6 +95,8 @@ GM:RegisterCommand({
 }, "give")
 
 GM:RegisterCommand({
+	desc = "This command allows you to drop money on the ground.\nIf you provide second number, you'll throw the money away.",
+	syntax = "<Amount to drop> [Force to Throw]",
 	category = "Market and Money",
 	onRun = function(client, arguments)
 		local amt = math.Clamp(tonumber(arguments[1]) or 0, 0, math.huge)

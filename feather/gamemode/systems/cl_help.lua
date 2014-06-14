@@ -55,7 +55,7 @@ function PNL:Init()
 	end)
 
 	self:LoadButton("Rules", function()
-
+		self:LoadRule()
 	end)
 
 	self.commands = {}
@@ -84,6 +84,33 @@ function PNL:LoadAbout()
 			text:SetText(bdy)
 		end
 	end)
+end
+
+function PNL:AddRuleText(num, str)
+	local text = vgui.Create("DLabel", self.content)
+	text:SetContentAlignment(2)
+	text:SetFont("fr_MenuFont")
+	text:SetText(num .. ". " .. str)
+	text:SetAutoStretchVertical( true )
+	text:SetWrap( true )
+	text:SetColor(color_black)	
+	self.content:AddItem(text)
+end
+
+function PNL:LoadRule()
+	self.content:Clear()
+
+	local text = vgui.Create("DLabel", self.content)
+	text:SetContentAlignment(5)
+	text:SetFont("fr_MenuBigFont")
+	text:SetText("SERVER RULES")
+	text:SetAutoStretchVertical( true )
+	text:SetColor(color_black)	
+	self.content:AddItem(text)
+
+	for k, v in pairs(GAMEMODE.Rules) do
+		self:AddRuleText(k, v)
+	end
 end
 
 function PNL:LoadButton(name, func)
@@ -120,6 +147,15 @@ end
 
 function PNL:LoadCommand(str)
 	self.content:Clear()
+
+	local text = vgui.Create("DLabel", self.content)
+	text:SetContentAlignment(1)
+	text:SetFont("fr_MenuFont")
+	text:SetText("The text in '[]' means it's the optional argument for the command. The commands will work unless you didn't provde all of '<>' arguments")
+	text:SetAutoStretchVertical( true )
+	text:SetWrap( true )
+	text:SetColor(color_black)	
+	self.content:AddItem(text)
 
 	for k, v in pairs(GAMEMODE.ChatCommands) do
 		if str == v.category then

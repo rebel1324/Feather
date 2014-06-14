@@ -35,6 +35,7 @@ if (SERVER) then
 	end
 
 	function ENT:Use(activator)
+		netstream.Start(activator, "FeahterJobMenu", GAMEMODE.AvailableMissions)
 	end
 else
 	function ENT:DrawTranslucent()

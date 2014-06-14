@@ -12,7 +12,6 @@ if (SERVER) then
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
-		self:SetNetVar("amount", 0)
 
 		local physObj = self:GetPhysicsObject()
 

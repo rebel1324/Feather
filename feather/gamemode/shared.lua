@@ -1,15 +1,18 @@
 feather = feather or {}
-
+f = feather
 DeriveGamemode("cn")
 
 GM.Name = "Feather"
 GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true
--- Language.
+
 GM.Language = "english"
 
 GM.Rules = {
-	""	
+	"Do not RDM(Random DeathMatch). Killing people without any valid/legit reason will get you kicked/banned by the admin.",
+	"Do not use any glitches and exploits to attack the server/get more profit.",
+	"Do not Random Arrest. Arresting people without any valid/legit reason will get you kicked/banned by the admin.",
+	"Do not disrespect admins/staffs. Always be nice to any people in the server.",
 }
 
 -- In-Character(Normal) Chat Range.
@@ -31,7 +34,7 @@ GM.DefaultArrestTime = 300
 GM.DefaultWantedTime = 300
 
 -- The time to print money with Money Printer. Default: 160 secs to 300 secs.
-GM.MoneyPrinterTime = {1.60, 3.00}
+GM.MoneyPrinterTime = {30, 60}
 
 -- The time to print money with Money Printer. Default: 160 secs to 300 secs.
 GM.MoneyPrinterExplodeRate = 10
@@ -49,7 +52,7 @@ GM.LockPickTime = 5
 GM.HungerMode = true
 
 -- The time (seconds) player can stand without eating food. Default: 200 seconds.
-GM.HungerTime = 300
+GM.HungerTime = 400
 
 -- The time server
 GM.HungerThinkRate = 2
@@ -74,6 +77,13 @@ GM.MoneyRemoveTime = 300
 
 -- Max ownable doors
 GM.MaxDoors = 10
+
+--
+GM.BlockedModels = {
+	
+}
+
+GM.MissionDelay = 10
 
 GM.Jobs = {}
 
@@ -102,23 +112,6 @@ cn.util.includeFolder("vgui", "feather")
 cn.util.includeFolder("systems", "feather")
 cn.util.includeFolder("meta", "feather")
 cn.util.includeFolder("hooks", "feather")
-
-GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", {}, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 250)
-GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", {TEAM_COOK}, "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 150)
-
-GM:AddShipment("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Firearms", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 1500)
-GM:AddShipment("smg", "weapon_smg1", 10, {TEAM_GUNDEALER}, "Sub Machinegun", "Firearms", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 3000)
-local data = GM:AddShipment("medickit", "feather_medickit", 10, {TEAM_MEDIC}, "Medic Kit", "Utility", "A Medic kit that heals the user", "models/Items/HealthKit.mdl", 800)
-data.entity = true
-
-GM:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
-GM:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)
-
-GM:AddFood("chinese", "Chinese Takeout", "models/props_junk/garbage_takeoutcarton001a.mdl", {TEAM_COOK}, GM.HungerTime, 10)
-GM:AddFood("watermelon", "Watermelon", "models/props_junk/watermelon01.mdl", {TEAM_COOK}, GM.HungerTime * .1, 20, true)
-GM:AddFood("fastfood", "Fast Food", "models/props_junk/garbage_bag001a.mdl", {TEAM_COOK}, GM.HungerTime * .3, 100, true)
-GM:AddFood("soda", "Soda", "models/props_junk/PopCan01a.mdl", {TEAM_COOK}, GM.HungerTime * .05, 10, true)
-
 
 TEAM_CITIZEN = GM:CreateJob("Citizen", Color(0, 230, 0), {
 	model = {
@@ -283,3 +276,90 @@ TEAM_MOBBOSS = GM:CreateJob("Mob Boss", Color(50, 50, 50), {
 	max = 1,
 })
 
+GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", {}, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 1000)
+GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", {TEAM_COOK}, "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 500)
+
+GM:AddShipment("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Firearms", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 1500)
+GM:AddShipment("smg", "weapon_smg1", 10, {TEAM_GUNDEALER}, "Sub Machinegun", "Firearms", "A Sub Machine Gun that fires bullets", "models/weapons/w_smg1.mdl", 3000)
+local data = GM:AddShipment("medickit", "feather_medickit", 10, {TEAM_MEDIC}, "Medic Kit", "Utility", "A Medic kit that heals the user", "models/Items/HealthKit.mdl", 800)
+data.entity = true
+
+GM:AddDefaultLicense("gun", "Gun License", "The license that allows you to carry firearms.", 500)
+GM:AddDefaultLicense("drive", "Drive License", "The license that allows you to drive vehicles.", 300)
+
+GM:AddFood("chinese", "Chinese Takeout", "models/props_junk/garbage_takeoutcarton001a.mdl", {TEAM_COOK}, GM.HungerTime, 10)
+GM:AddFood("watermelon", "Watermelon", "models/props_junk/watermelon01.mdl", {TEAM_COOK}, GM.HungerTime * .1, 20, true)
+GM:AddFood("fastfood", "Fast Food", "models/props_junk/garbage_bag001a.mdl", {TEAM_COOK}, GM.HungerTime * .3, 50, true)
+GM:AddFood("soda", "Soda", "models/props_junk/PopCan01a.mdl", {TEAM_COOK}, GM.HungerTime * .05, 10, true)
+
+local map = "rp_locality"
+GM:AddMapPos(map, "package", Vector(-2800.5080566406, -110.48152923584, -383.96875))
+GM:AddMapPos(map, "package", Vector(-3128.8796386719, -104.14462280273, -383.96875))
+GM:AddMapPos(map, "package", Vector(610.07916259766, -1274.1938476563, -271.96875))
+GM:AddMapPos(map, "package", Vector(-955.61157226563, 1258.4536132813, -215.96875))
+GM:AddMapPos(map, "package", Vector(-954.94006347656, 1109.4389648438, -215.96875))
+GM:AddMapPos(map, "package", Vector(-2375.1765136719, 1100.1162109375, -383.96875))
+GM:AddMapPos(map, "package", Vector(-2751.6884765625, -1393.1632080078, -315.96875))
+
+local JOB = {}
+JOB.uid = "package"
+JOB.names = {
+	"Package Delivery",
+	"Secret Delivery",
+	"Recycle Stuffs",
+	"Discard Evidance",
+	"No More Proofs",
+	"Delicate Stuffs",
+	"My Porn Magazines",
+	"Too lazy to dump",
+	"My son's XBox Games",
+}
+JOB.moneymin = 200
+JOB.moneymax = 400
+JOB.desc = "Deliver Package to the dumpster."
+JOB.canAccept = function(client)
+	return true
+end
+JOB.onAccept = function(client)
+	local dest = GetRandomEntity("feather_job_pckdest")
+	local pck = ents.Create("feather_job_pckobj")
+	local seconds = 45
+	pck:SetPos(GAMEMODE:GetMapPos("package") + Vector(0, 0, 40))
+	pck:Spawn()
+	pck.dest = dest
+	pck.owner = client
+	client:SetLocalVar("package", pck:EntIndex())
+	client:SetLocalVar("dest", dest:EntIndex())
+	client:notify(GetLang("deliverybreifing", seconds))
+
+	timer.Create(client:SteamID64() .. "_DELIVERY", seconds, 1, function()
+		if client:IsValid() then
+			client:ClearMission(true) -- failed.
+		end
+	end)
+end
+JOB.onEnded = function(client)
+	client:SetLocalVar("package", nil)
+	client:SetLocalVar("dest", nil)
+
+	for k, v in ipairs(ents.FindByClass("feather_job_pckobj")) do
+		if v.owner then 
+			if v.owner == client then
+				v:Remove()
+			elseif !v.owner:IsValid() then
+				v:Remove()
+			end
+		end
+	end
+	timer.Destroy(client:SteamID64() .. "_DELIVERY")
+end
+JOB.onFailed = function(client)
+	if !client:IsValid() then return false end
+
+	client:notify(GetLang"deliveryfailed")
+end
+JOB.onSuccess = function(client, info)
+	client:GiveMoney(info.price)
+	client:notify(GetLang("moneyearn", MoneyFormat(info.price)))
+end
+GM:AddMission(JOB)
