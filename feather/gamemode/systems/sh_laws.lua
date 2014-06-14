@@ -331,10 +331,9 @@ GM:RegisterCommand({
 			client:notify(GetLang"maxrows", 1)
 			return
 		end
-
 		table.insert(laws, law)
 		if !GAMEMODE.CustomLaws then
-			GAMEMODE.CustomLaws = law
+			GAMEMODE.CustomLaws = laws
 		end
 
 		netstream.Start(player.GetAll(), "SetLaws", laws)

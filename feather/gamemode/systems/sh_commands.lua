@@ -362,7 +362,7 @@ GM:RegisterChat("looc", {
 	onChat = function(speaker, text)
 		chat.AddText(color_white, GetLang"looc", team.GetColor(speaker:Team()), speaker:Name(), color_white, ": " .. text)
 	end,
-	prefix = {"[[", "]]", "/looc", "/l"},
+	prefix = {"[[", "]]", "/looc", "/l", ".//"},
 })
 
 GM:RegisterChat("ic", {

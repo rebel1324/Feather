@@ -21,6 +21,7 @@ function GM:HUDPaint()
 	self:ArrestTimer(w, h)
 	self:DrawDoorInfo(w, h)
 	self:ScreenFade(w, h)
+	self:ChatAssist(w, h)
 
 	local td = {}
 		td.start = LocalPlayer():GetShootPos()
@@ -42,6 +43,10 @@ end
 GM.FadeSpeed = 1
 GM.FadeAlpha = 0
 GM.FadeColor = color_white
+
+function GM:ChatAssist(w, h)
+
+end
 
 function GM:ScreenFade(w, h)
 	self.FadeAlpha = Lerp(FrameTimeC() * self.FadeSpeed, self.FadeAlpha, 0)

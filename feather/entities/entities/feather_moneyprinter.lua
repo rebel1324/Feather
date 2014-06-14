@@ -73,7 +73,7 @@ if (SERVER) then
 			GAMEMODE:CreateMoney(self:GetPos() + self:OBBCenter() + self:GetUp()*25, self:GetAngles(), 200)
 
 			local dice = math.Rand(0, 100)
-			if (dice < feather.config.get("printExplodeRate")) then
+			if (dice < feather.config.get("printerExplodeRate")) then
 				self:GoneWrong()
 			end
 

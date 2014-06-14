@@ -72,7 +72,7 @@ function SWEP:DrawHUD()
 				if trace.Entity:IsArrested() then
 					draw.SimpleText(GetLang("hudarresttargetback", trace.Entity:Name()), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 				else
-					draw.SimpleText(GetLang("hudarresttarget", trace.Entity:Name(), string.NiceTime(feather.config.get("arrestTime"))), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
+					draw.SimpleText(GetLang("hudarresttarget", trace.Entity:Name(), string.NiceTime(GAMEMODE.DefaultArrestTime)), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 				end
 			end
 		end

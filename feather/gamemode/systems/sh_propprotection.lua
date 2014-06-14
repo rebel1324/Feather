@@ -101,6 +101,10 @@ function GM:PhysgunPickup(client, entity)
 	return true
 end
 
+function GM:CanTool(client, entity, tool)
+	return (client:IsAdmin()) or (entity.Owner == entity)
+end
+
 hook.Add("PlayerDisconnected", "DestroyDisonnceted", function(client)
 	if client:IsAdmin() then return end
 	

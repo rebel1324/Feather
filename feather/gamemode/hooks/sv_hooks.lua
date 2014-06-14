@@ -127,7 +127,7 @@ function GM:PlayerSay(client, text, public)
 end
 
 function GM:MoneyEntityCreated(self)
-	if (string.lower(feather.config.get("moneyModel")) == "models/props/cs_assault/money.mdl") then
+	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
 		if self:GetDTInt(0) <= 100 then
 			self:SetModel("models/props/cs_assault/Dollar.mdl")
 		end
@@ -135,7 +135,7 @@ function GM:MoneyEntityCreated(self)
 end
 
 function GM:MoneyEntityChanged(self)
-	if (string.lower(feather.config.get("moneyModel")) == "models/props/cs_assault/money.mdl") then
+	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
 		if self:GetDTInt(0) <= 100 then
 			self:SetModel("models/props/cs_assault/Dollar.mdl")
 		end
@@ -288,7 +288,7 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 		return false
 	end
 
-	client.nextJob = CurTime() + feather.config.get("jobChangeDelay")
+	client.nextJob = CurTime() + feather.config.get("JobDelay", 5)
 	client:SetTeam(teamindex)
 	client:StripWeapons()
 
