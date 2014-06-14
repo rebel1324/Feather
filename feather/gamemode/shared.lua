@@ -6,9 +6,7 @@ GM.Name = "Feather"
 GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true
 
--- Language.
---GM.Language = "english"
-GM.Language = "korean"
+GM.Language = "english"
 
 GM.Rules = {
 	"Do not RDM(Random DeathMatch). Killing people without any valid/legit reason will get you kicked/banned by the admin.",
@@ -353,6 +351,7 @@ JOB.onEnded = function(client)
 			end
 		end
 	end
+	timer.Destroy(client:SteamID64() .. "_DELIVERY")
 end
 JOB.onFailed = function(client)
 	if !client:IsValid() then return false end
