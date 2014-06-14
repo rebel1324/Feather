@@ -1,3 +1,5 @@
+feather = feather or {}
+
 DeriveGamemode("cn")
 
 GM.Name = "Feather"
