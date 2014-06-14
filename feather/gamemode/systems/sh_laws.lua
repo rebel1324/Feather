@@ -167,7 +167,7 @@ GM:RegisterCommand({
 	onRun = function(client, arguments)
 		local ply = arguments[1]
 		local reason = arguments[2]
-		local time = tonumber(arguments[3]) or GAMEMODE.DefaultWantedTime
+		local time = tonumber(arguments[3]) or feather.config.get("wantedTime")
 
 		if !GAMEMODE:GetJobData(client:Team()).goverment then
 			client:notify(GetLang"begoverment", 4)
@@ -326,8 +326,8 @@ GM:RegisterCommand({
 			return
 		end
 		
-		local laws = GAMEMODE.CustomLaws
-		if (#laws + #GAMEMODE.DefaultLaws >= 15) then
+		local laws = GAMEMODE.CustomLaws or {}
+		if (#laws + #feather.config.get("defaultLaws") >= 15) then
 			client:notify(GetLang"maxrows", 1)
 			return
 		end
@@ -358,12 +358,12 @@ GM:RegisterCommand({
 			return
 		end
 
-		if (row <= #GAMEMODE.DefaultLaws) then
+		if (row <= #feather.config.get("defaultLaws")) then
 			client:notify(GetLang"defaultlaw", 1)
 			return
 		end
 		
-		local delrow = row - #GAMEMODE.DefaultLaws
+		local delrow = row - #feather.config.get("defaultLaws")
 		if (GAMEMODE.CustomLaws and GAMEMODE.CustomLaws[delrow]) then
 			table.remove(GAMEMODE.CustomLaws, delrow)
 			netstream.Start(player.GetAll(), "SetLaws", GAMEMODE.CustomLaws)

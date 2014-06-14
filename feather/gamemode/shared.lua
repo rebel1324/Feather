@@ -110,6 +110,7 @@ local p = FindMetaTable("Player")
 
 cn.util.includeFolder("vgui", "feather")
 cn.util.includeFolder("systems", "feather")
+cn.util.includeFolder("config", "feather")
 cn.util.includeFolder("meta", "feather")
 cn.util.includeFolder("hooks", "feather")
 

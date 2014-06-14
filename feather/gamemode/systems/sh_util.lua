@@ -55,7 +55,7 @@ function IsEntityClose(pos, range, class)
 end
 
 function MoneyFormat(num)
-	return GAMEMODE.Currency .. string.Comma(num)
+	return feather.config.get("currency") .. string.Comma(num)
 end
 
 function NameToJobIndex(name)

@@ -7,7 +7,7 @@ ENT.Category = "Feather"
 
 if (SERVER) then
 	function ENT:Initialize()
-		self:SetModel(GAMEMODE.MoneyModel)
+		self:SetModel(feather.config.get("moneyModel"))
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)

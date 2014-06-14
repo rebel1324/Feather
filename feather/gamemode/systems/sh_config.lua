@@ -5,7 +5,7 @@ feather.config.vars = feather.config.vars or {}
 feather.config.default = {}
 
 function feather.config.create(key, value, desc, nonShared)
-	feather.config.default[key] = {value = value, desc = desc, nonShared = nonShared}
+	feather.config.default[key] = {value = value, desc = desc or "No description available.", nonShared = nonShared}
 end
 
 function feather.config.set(key, value, receiver)

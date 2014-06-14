@@ -2,7 +2,7 @@ local playerMeta = FindMetaTable("Player")
 
 if SERVER then
 	function GM:CanRequestHit(client, target, price)
-		price = price or GAMEMODE.HitCost
+		price = price or feather.config.get("hitCost")
 
 		if (client:IsArrested()) then
 			client:Notify("yourearrested")

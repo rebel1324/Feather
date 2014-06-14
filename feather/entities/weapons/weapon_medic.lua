@@ -119,7 +119,7 @@ function SWEP:DrawHUD()
 		if trace.Entity:IsValid() then
 			if trace.Entity:IsPlayer() then
 				posy = posy + 25
-				draw.SimpleText(GetLang("hudhealtarget", trace.Entity:Name(), string.NiceTime(GAMEMODE.DefaultArrestTime)), "fr_Arrested", posx, posy, Color(46, 204, 113), 1, 1)
+				draw.SimpleText(GetLang("hudhealtarget", trace.Entity:Name(), string.NiceTime(feather.config.get("arrestTime"))), "fr_Arrested", posx, posy, Color(46, 204, 113), 1, 1)
 			end
 		end
 	end

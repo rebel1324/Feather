@@ -260,7 +260,7 @@ GM:RegisterCommand({
 			return
 		end
 
-		if !client:PayMoney(GAMEMODE.DoorPrice) then
+		if !client:PayMoney(feather.config.get("doorPrice")) then
 			return
 		end
 
@@ -269,7 +269,7 @@ GM:RegisterCommand({
 		end
 
 		target:SetDoorOwner(client)
-		client:notify(GetLang("doorpurchase", MoneyFormat(GAMEMODE.DoorPrice)))
+		client:notify(GetLang("doorpurchase", MoneyFormat(feather.config.get("doorPrice"))))
 	end
 }, "buydoor")
 

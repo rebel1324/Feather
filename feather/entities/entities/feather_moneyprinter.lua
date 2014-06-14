@@ -22,7 +22,7 @@ if (SERVER) then
 			physObj:Wake()
 		end
 
-		local time = GAMEMODE.MoneyPrinterTime
+		local time = feather.config.get("printerTime")
 		timer.Simple(math.Rand(time[1], time[2]), function()
 			if (self:IsValid()) then
 				self:PrintMoney()
@@ -69,11 +69,11 @@ if (SERVER) then
 			end
 			self:SetDTBool(0, false)
 			
-			local time = GAMEMODE.MoneyPrinterTime
+			local time = feather.config.get("printerTime")
 			GAMEMODE:CreateMoney(self:GetPos() + self:OBBCenter() + self:GetUp()*25, self:GetAngles(), 200)
 
 			local dice = math.Rand(0, 100)
-			if (dice < GAMEMODE.MoneyPrinterExplodeRate) then
+			if (dice < feather.config.get("printExplodeRate")) then
 				self:GoneWrong()
 			end
 

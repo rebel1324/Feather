@@ -72,7 +72,7 @@ else
 				for k, v in SortedPairsByMemberValue(arst, 2) do
 					local h = 60
 					local time = v[1]:GetNetVar("arrested", 0)
-					local timeArrested = time - GAMEMODE.DefaultArrestTime
+					local timeArrested = time - feather.config.get("arrestTime")
 					local timeLeft = math.ceil(v[2] - CurTime())
 					local color = color_white
 					local fraction = 1 - math.TimeFraction(timeArrested, time, CurTime())

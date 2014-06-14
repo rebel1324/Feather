@@ -5,9 +5,11 @@ GM.Languages = {}
 function GetLang(name, ...)
 	GAMEMODE = GAMEMODE or GM -- get error and shit.
 
-	if GAMEMODE.Languages[GAMEMODE.Language] then
-		if GAMEMODE.Languages[GAMEMODE.Language][name] then
-			return string.format( GAMEMODE.Languages[GAMEMODE.Language][name], ... )
+	local index = feather.config.get("language")
+	
+	if GAMEMODE.Languages[index] then
+		if GAMEMODE.Languages[index][name] then
+			return string.format( GAMEMODE.Languages[index][name], ... )
 		end
 
 		if GAMEMODE.Languages["english"][name] then

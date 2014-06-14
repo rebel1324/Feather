@@ -7,7 +7,7 @@ function playerMeta:GetHunger()
 end
 
 function playerMeta:GetHungerPercent()
-	return math.Clamp(((self:GetHunger() - CurTime()) / GAMEMODE.HungerTime), 0 ,1)
+	return math.Clamp(((self:GetHunger() - CurTime()) / feather.config.get("hungerTime")), 0 ,1)
 end
 
 function GM:AddFood(uniqueID, name, model, job, hunger, price, buyable)
@@ -35,7 +35,7 @@ if SERVER then
 
 	function playerMeta:AddHunger(amt)
 		local n = self:GetHunger() - CurTime()
-		self:SetHunger(math.Clamp(( (n < 0) and (amt) or (n + amt) ), 0, GAMEMODE.HungerTime))
+		self:SetHunger(math.Clamp(( (n < 0) and (amt) or (n + amt) ), 0, feather.config.get("hungerTime")))
 	end
 
 	function GM:OnPlayerHunger(client)
@@ -48,15 +48,16 @@ if SERVER then
 
 	function GM:HungerThink()
 		local cur = CurTime()
+		local rate = feather.config.get("hungerRate")
 
-		if GAMEMODE.HungerMode then
+		if (feather.config.get("hunger")) then
 			for k, v in ipairs(player.GetAll()) do
 				if !v.nextHunger or v.nextHunger < cur and v:Alive() then
 					if v:GetHunger() < cur then
 						hook.Run("OnPlayerHunger", v)
 					end
 
-					v.nextHunger = cur + GAMEMODE.HungerThinkRate
+					v.nextHunger = cur + rate
 				end
 			end
 		end

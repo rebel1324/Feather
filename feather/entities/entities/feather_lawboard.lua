@@ -72,7 +72,7 @@ else
 				tx = -lw/2
 				ty = ty - 40
 				local i = 0
-				for k, v in ipairs(GAMEMODE.DefaultLaws) do
+				for k, v in ipairs(feather.config.get("defaultLaws")) do
 					ty = ty + 60
 					i = i + 1
 					draw.SimpleText(i .. ". " .. v, "fr_3d2dTextContext", tx, ty, Color(255 ,255, 255), 0, 0)
