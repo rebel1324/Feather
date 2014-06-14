@@ -42,6 +42,10 @@ if (SERVER) then
 			buffer[k] = v.value
 		end
 
+		if (table.Count(saved) > 0) then
+			feather.config.delta = saved
+		end
+
 		feather.config.vars = table.Merge(buffer, saved)
 	end
 
@@ -60,7 +64,9 @@ if (SERVER) then
 	end
 
 	function feather.config.send(client)
-		netstream.Start(client, "fr_ConfigInit", feather.config.vars)
+		if (feather.config.delta) then
+			netstream.Start(client, "fr_ConfigInit", feather.config.delta)
+		end
 	end
 
 	hook.Add("Initialize", "fr_ConfigLoader", feather.config.load)
@@ -72,6 +78,14 @@ else
 	end)
 
 	netstream.Hook("fr_ConfigInit", function(data)
-		feather.config.vars = data
+		if (data) then
+			local buffer = {}
+			
+			for k, v in pairs(feather.config.default) do
+				buffer[k] = v.value
+			end
+
+			feather.config.vars = table.Merge(buffer, data)
+		end
 	end)
 end
