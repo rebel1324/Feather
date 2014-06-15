@@ -23,7 +23,7 @@ function feather.config.get(key, default)
 
 	if (default == nil) then
 		local config = feather.config.default[key]
-		default = config and config.default
+		default = config and config.value
 	end
 
 	return default
