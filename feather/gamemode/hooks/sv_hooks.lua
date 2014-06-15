@@ -234,9 +234,7 @@ function GM:Demote(from, to, reason, voted)
 end
 
 function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
-	print(client, teamindex)
 	local data = self:GetJobData(teamindex)
-	PrintTable(data)
 	local name = team.GetName(teamindex)
 
 	if !data then
