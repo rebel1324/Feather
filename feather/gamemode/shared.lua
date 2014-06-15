@@ -114,6 +114,8 @@ cn.util.includeFolder("config", "feather")
 cn.util.includeFolder("meta", "feather")
 cn.util.includeFolder("hooks", "feather")
 
+feather.item.load()
+
 TEAM_CITIZEN = GM:CreateJob("Citizen", Color(0, 230, 0), {
 	model = {
 		"models/player/group01/female_01.mdl",
