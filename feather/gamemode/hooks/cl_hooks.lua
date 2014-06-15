@@ -4,6 +4,10 @@ local deltaMoney = 500
 local OFFSET_CROUCH = Vector(0, 0, -16)
 local OFFSET_NORMAL = Vector(0, 0, 16)
 
+GM.FadeSpeed = 1
+GM.FadeAlpha = 0
+GM.FadeColor = color_white
+
 function FrameTimeC()
 	return math.Clamp(FrameTime(), 1/60, 2)
 end
@@ -40,12 +44,50 @@ function GM:HUDPaint()
 	end
 end
 
-GM.FadeSpeed = 1
-GM.FadeAlpha = 0
-GM.FadeColor = color_white
+GM.IsChatOpen = false
 
+function GM:StartChat()
+	self.IsChatOpen = true
+end
+
+function GM:FinishChat()
+	self.IsChatOpen = false
+end
+
+local chattype = "ic"
 function GM:ChatAssist(w, h)
+	if self.IsChatOpen then
+		local x, y = chat.GetChatBoxPos()
+		local curchat = GAMEMODE.ChatTypes[chattype]
+		local range = 512
+		local hears = {}
+		local i = 0
+		local cut = 5
+		y = y - 20
+		for k, v in ipairs(player.GetAll()) do
+			local dist = v:GetPos():Distance(LocalPlayer():GetPos())
+			if (dist < range and LocalPlayer() != v) then
+				if i >= cut then
+				else
+					table.insert(hears, v)
+				end
+				i = i + 1
+			end
+		end
 
+		if i >= cut then
+			local tx, ty = draw.SimpleText(Format("and %s more..", i - cut), "fr_Arrested", x, y, color_white, 0, 1)
+			y = y - ty
+		end
+
+		for k, v in ipairs(hears) do
+			local tx, ty = draw.SimpleText(v:Name(), "fr_Arrested", x, y, color_white, 0, 1)
+			y = y - ty
+		end
+
+		x, y = x, y
+		draw.SimpleText("People can hear you.", "fr_Arrested", x, y, Color(214, 69, 65), 0, 1)
+	end
 end
 
 function GM:ScreenFade(w, h)
