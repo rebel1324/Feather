@@ -19,7 +19,7 @@ local function InventoryPanelInit(self)
 end
 
 local function MainMenuAdd(panel)
-	panel:AddButton("Inventory", function()
+	panel:AddButton(GetLang"menuinventory", function()
 		InventoryPanelInit(panel)
 	end)
 end

@@ -26,6 +26,7 @@ function GM:HUDPaint()
 	self:DrawDoorInfo(w, h)
 	self:ScreenFade(w, h)
 	self:ChatAssist(w, h)
+	self:DrawMarker(w, h)
 
 	local td = {}
 		td.start = LocalPlayer():GetShootPos()
@@ -128,14 +129,11 @@ end
 local tagw = 6
 local function DrawHUDBar(x, y, w, h, col, p)
 	p = p or 1
-	surface.SetDrawColor(44, 62, 80, col.a)
-	surface.DrawRect(x, y, tagw, h)
-
 	surface.SetDrawColor(22, 34, 52, col.a)
-	surface.DrawRect(x + tagw, y, w, h)
+	surface.DrawRect(x, y, w, h)
 
 	surface.SetDrawColor(col.r, col.g, col.b, col.a)
-	surface.DrawRect(x + tagw, y, math.Round(w * p), h)
+	surface.DrawRect(x, y, math.Round(w * p), h)
 end
 
 
@@ -168,12 +166,12 @@ function GM:LocalPlayerInfo(w, h)
 	DrawHUDBar( posx, posy, 200 * math.Clamp(LocalPlayer():Armor() / 100, 0, 1), sy, Color(250, 250, 250, 15 + math.sin(RealTime() * 3)*10), curhpp)
 
 	-- draw health amount on the health bar.
-	draw.SimpleText(math.Clamp(LocalPlayer():Health(), 0, math.huge), "fr_HUDFont", margin + tagw + 10, posy + sy/2, color_white, 0, 1)
+	draw.SimpleText(math.Clamp(LocalPlayer():Health(), 0, math.huge), "fr_HUDFont", margin + 10, posy + sy/2, color_white, 0, 1)
 
 	-- this helps to get smooth money count.
 	curmoney = Lerp(FrameTimeC() * 2, curmoney, LocalPlayer():GetMoney())
 
-	posx, posy = posx + tagw , posy - 25
+	posx, posy = posx , posy - 25
 	-- Get job data from current team index.
 	local data = self:GetJobData(teamID) 
 	local tx, ty = draw.SimpleText(MoneyFormat(math.Round(curmoney)), "fr_HUDFont", posx, posy, color_white, 0, 1)
@@ -217,6 +215,57 @@ function GM:PlayerInfo(w, h)
 		end
 	end
 end
+
+GM.Markers = {}
+GM.Icons = {
+	[1] = surface.GetTextureID("vgui/notices/error"),
+	[2] = surface.GetTextureID("vgui/notices/generic"),
+	[3] = surface.GetTextureID("vgui/notices/hint"),
+	[4] = surface.GetTextureID("vgui/notices/undo"),
+	[5] = surface.GetTextureID("vgui/notices/cleanup"),
+}
+local iconsize = 16*2
+function GM:DrawMarker(w, h)
+	for k, v in ipairs(self.Markers) do
+		if (v.time < CurTime()) then
+			v.alpha = Lerp(FrameTimeC(), v.alpha, 0)	
+
+			if (math.floor(v.alpha) < 1) then
+				table.remove(self.Markers, k)
+			end
+		else
+			v.alpha = Lerp(FrameTimeC(), v.alpha, 255)	
+		end
+
+		local sc = v.pos:ToScreen()
+		local sx, sy, visible = sc.x, sc.y, sc.visible
+		sx = math.Clamp(sx, h*.1, w - h*.1)
+		sy = math.Clamp(sy, h*.1, h - h*.1)
+
+		local text = v.text
+		local tx, ty = draw.SimpleText(text, "fr_VoteFontShadow", sx, sy, Color(0, 0, 0, math.ceil(v.alpha)), 1, 1)
+		draw.SimpleText(text, "fr_VoteFont", sx, sy, Color(255, 255, 255, math.ceil(v.alpha)), 1, 1)
+
+		surface.SetDrawColor(255, 255, 255, math.ceil(v.alpha))
+		surface.SetTexture(v.icon)
+		surface.DrawTexturedRect(math.Round(sx-iconsize/2), math.Round(sy-iconsize/2) - ty - 10, iconsize, iconsize)
+	end
+end
+
+function GM:AddMarker(pos, icon, text, time)
+	table.insert(self.Markers, {pos = pos, icon = self.Icons[math.Clamp(icon, 0, #self.Icons)], text = text, time = CurTime() + time, alpha = 0})
+end
+
+netstream.Hook("FeatherMarker", function(data)
+	if data.sound then
+		surface.PlaySound(data.sound)
+	end
+
+	if (data.pos and data.icon and data.text) then
+		data.time = data.time or 5
+		GAMEMODE:AddMarker(data.pos, data.icon, data.text, data.time)
+	end
+end)
 
 function GM:ArrestTimer(w, h)
 	if LocalPlayer():GetNetVar("arrested") then

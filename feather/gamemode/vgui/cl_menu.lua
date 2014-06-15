@@ -324,23 +324,23 @@ function PNL:Init()
 		surface.DrawRect(0, 0, w, h)
 	end
 
-	local d = self:AddButton("Job", function()
+	local d = self:AddButton(GetLang"menujob", function()
 		self:LoadJob()
 	end)
 	self:LoadJob()
 	d:Activate()
 
-	self:AddButton("Shop", function()
+	self:AddButton(GetLang"menushop", function()
 		self:LoadItems()
 	end)
 
 	hook.Run("OnMenuLoadButtons", self)
 
-	self:AddButton("Config", function()
+	self:AddButton(GetLang"menuconfig", function()
 		self:LoadConfigs()
 	end)	
 
-	self:AddButton("Close", function()
+	self:AddButton(GetLang"menuclose", function()
 		self:Close()
 	end)
 end

@@ -135,7 +135,7 @@ surface.CreateFont("fr_ScoreboardTitle", {
 
 surface.CreateFont("fr_ScoreboardTitleSub", {
 	font = "Trebuchet MS",
-	size = 25,
+	size = 26,
 	weight = 500,
 	shadow = true,
 	antialias = true

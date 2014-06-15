@@ -295,6 +295,15 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 	end
 end
 
+function GM:AddMarker(client, pos, icon, text, time)
+	netstream.Start(client, "FeatherMarker", {
+		pos = pos,
+		icon = icon,
+		text = text,
+		time = time,
+	})
+end
+
 function GM:CanDrive(client)
 	return client:IsAdmin()
 end

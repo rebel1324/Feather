@@ -160,6 +160,38 @@ function GM:CanWantedPlayer(client, target)
 	end
 end
 
+function GM:OnCitizenRequest(speaker, text)
+	for k, v in ipairs(player.GetAll()) do
+		local job = self:GetJobData(v:Team())
+		if (job and job.goverment) then
+			GAMEMODE:AddMarker(v, speaker:GetPos() + Vector(0, 0, 10), 3, GetLang"request", 5)
+		end
+	end
+end
+
+GM:RegisterChat("cr", {
+	canSay = function(speaker)
+		return (!speaker:IsArrested() and speaker:Alive())
+	end,
+	canHear = function(speaker, listener)
+		local job = GAMEMODE:GetJobData(listener:Team())
+
+		if ((job and job.goverment) or (speaker == listener)) then
+			if SERVER then
+				hook.Run("OnCitizenRequest", speaker, listener)
+			end
+
+			return true
+		end
+
+		return false 
+	end,
+	onChat = function(speaker, text)
+		chat.AddText(color_white, GetLang"cr", Color(255, 150, 150), GetLang"cranon", ": " .. text)
+	end,
+	prefix = {"/cr", "/119", "/911"},
+})
+
 GM:RegisterCommand({
 	category = "Goverment Commands",
 	desc = "This command allows goverment to seek certain player for the prosecution.",

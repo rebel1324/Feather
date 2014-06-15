@@ -80,7 +80,7 @@ function PNL:Init()
 
 	local text = vgui.Create("DLabel", p)
 	text:SetFont("fr_ScoreboardTitleSub")
-	text:SetText("A Simple Roleplay Script by Black Tea Za rebel1324, Chessnut.")
+	text:SetText(GetLang"scoreboardcredit")
 	text:Dock(TOP)
 	text:DockMargin(5, 0, 5, 0)
 	text:SetAutoStretchVertical( true )
@@ -88,7 +88,7 @@ function PNL:Init()
 
 	local text = vgui.Create("DLabel", p)
 	text:SetFont("fr_ScoreboardTitleInfo")
-	text:SetText("Right Click to player's name to bring player interaction menu.")
+	text:SetText(GetLang"scoreboardinfo")
 	text:Dock(TOP)
 	text:DockMargin(5, 0, 5, 10)
 	text:SetAutoStretchVertical( true )
@@ -132,7 +132,7 @@ end
 function PNL:Think()
 	-- If player count is different, refresh.
 	local plys = #player.GetAll()
-	
+
 	if plys != self.playercount then
 		timer.Simple(0, function()
 			self:RefreshPlayers()
