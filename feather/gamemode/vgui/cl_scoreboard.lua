@@ -49,7 +49,7 @@ function PNL:SetPlayer(ply)
 end
 
 function PNL:Paint(w, h)
-	if self.player then
+	if self.player and self.player:IsValid() then
 		draw.SimpleText(self.player:Name(), "fr_MenuFont", 5, self:GetTall()/2, color_white, 0, 1)
 		draw.SimpleText(self.player:Ping(), "fr_MenuFont", w - 5, self:GetTall()/2, color_white, 2, 1)
 	end
@@ -103,14 +103,7 @@ function PNL:Init()
 	self.content.Paint = function() end
 
 	self:RefreshPlayers()
-end
-
-function PNL:OnOpen()
-	self:Init()
-end
-
-function PNL:OnClose()
-	self:Init()
+	self.playercount = #player.GetAll()
 end
 
 function PNL:RefreshPlayers()
@@ -138,6 +131,15 @@ end
 
 function PNL:Think()
 	-- If player count is different, refresh.
+	local plys = #player.GetAll()
+	
+	if plys != self.playercount then
+		timer.Simple(0, function()
+			self:RefreshPlayers()
+		end)
+	end
+
+	self.playercount = plys
 end
 
 function PNL:Paint(w, h)
