@@ -125,6 +125,30 @@ surface.CreateFont("fr_VoteFontShadow", {
 	blursize = 5
 })
 
+surface.CreateFont("fr_ScoreboardTitle", {
+	font = "Trebuchet MS",
+	size = 90,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_ScoreboardTitleSub", {
+	font = "Trebuchet MS",
+	size = 25,
+	weight = 500,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_ScoreboardTitleInfo", {
+	font = "Trebuchet MS",
+	size = 20,
+	weight = 500,
+	shadow = true,
+	antialias = true
+})
+
 concommand.Add("fonts_sourcescheme_view",function()
 	local fonts = util.KeyValuesToTable(file.Read("resource/clientscheme.res",'GAME')).fonts
        

@@ -108,7 +108,7 @@ function PNL:LoadRule()
 	text:SetColor(color_black)	
 	self.content:AddItem(text)
 
-	for k, v in pairs(GAMEMODE.Rules) do
+	for k, v in pairs(feather.config.get("rules", {})) do
 		self:AddRuleText(k, v)
 	end
 end
@@ -165,14 +165,3 @@ function PNL:LoadCommand(str)
 end
 
 vgui.Register("FeatherHelp", PNL, "FeatherFrame")
-
-function GM:ShowHelp()
-	if HELP then
-		if HELP.Close then
-			HELP:Close()
-		end
-		HELP = nil
-		return
-	end
-	HELP = vgui.Create("FeatherHelp")
-end

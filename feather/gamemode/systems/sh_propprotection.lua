@@ -50,8 +50,10 @@ end
 
 function GM:PhysgunPickup(client, entity)
 	if SERVER then
-		entity.prevcol = entity:GetCollisionGroup()
-		entity:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		if !entity:IsDoor() then -- don't fuck it up.
+			entity.prevcol = entity:GetCollisionGroup()
+			entity:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		end
 	end
 
 	if (entity:IsNPC()) then
@@ -101,8 +103,17 @@ function GM:PhysgunPickup(client, entity)
 	return true
 end
 
+function GM:GravGunPickupAllowed(client, entity)
+	return (!entity.noGrab)
+end
+
 function GM:CanTool(client, entity, tool)
-	return (client:IsAdmin()) or (entity.Owner == entity)
+	entity = entity.Entity
+	if entity and entity:IsValid() then
+		return (client:IsAdmin()) or (entity.Owner == client)
+	end
+
+	return true
 end
 
 hook.Add("PlayerDisconnected", "DestroyDisonnceted", function(client)
@@ -113,8 +124,4 @@ hook.Add("PlayerDisconnected", "DestroyDisonnceted", function(client)
 			v:Remove()
 		end
 	end
-end)
-
-hook.Add("HUDPaint", "PropProtectionHUD", function()
-
 end)

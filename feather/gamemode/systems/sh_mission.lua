@@ -217,7 +217,7 @@ function GM:OnAcceptMission(client, index)
 	index = tonumber(index)
 	local info = self.AvailableMissions[index]
 	if info then
-		client.nextMission = CurTime() + self.MissionDelay
+		client.nextMission = CurTime() + feather.config.get("missionDelay")
 
 		self.AvailableMissions[index].taken = client
 		client.missioninfo = info
@@ -273,24 +273,34 @@ function playerMeta:ClearMission(failed)
 end
 
 function GM:RefreshJobs()
-	self.AvailableMissions = {}
-	for i = 1, 10 do
-		local mission = table.Random(self.Missions)
-		if mission then
-			table.insert(self.AvailableMissions, {
-				name = table.Random(mission.names),
-				price = math.random(mission.moneymin, mission.moneymax),
-				mission = mission.uid,
-				taken = false,
-			})	
+	if SERVER then
+		GAMEMODE.AvailableMissions = {}
+		for i = 1, 10 do
+			local mission = table.Random(GAMEMODE.Missions)
+			if mission then
+				table.insert(GAMEMODE.AvailableMissions, {
+					name = table.Random(mission.names),
+					price = math.random(mission.moneymin, mission.moneymax),
+					mission = mission.uid,
+					taken = false,
+				})	
+			end
 		end
-	end
 
-	timer.Simple(100, function()
-		GAMEMODE:RefreshJobs()
-	end)
+		NotifyAll(GetLang"newmissions")
+		
+		timer.Create("FEATHER_MISSIONS", feather.config.get("missionRefreshTime", 100), 1, function()
+			GAMEMODE:RefreshJobs()
+		end)
+	end
 end
-GM:RefreshJobs()
+hook.Add("InitPostEntity", "FeatherMissionAdd", GM.RefreshJobs)
+
+hook.Add("PlayerDeath", "FeatherMissionFail", function(client)
+	if client:GetMission() then
+		client:ClearMission(true)
+	end
+end)
 
 GM:RegisterCommand({
 	desc = "This command allows you to get some mission to earn some money.",

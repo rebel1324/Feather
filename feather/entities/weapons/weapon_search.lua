@@ -17,6 +17,7 @@ SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = ""
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
+SWEP.cantDrop = true
 
 SWEP.Category = "Feather"
 SWEP.HoldType = "normal"

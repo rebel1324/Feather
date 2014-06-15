@@ -84,13 +84,9 @@ function GM:FadeScreen(client, color, dur)
 end
 
 function GM:GetBaseLoadout(client)
-	client:Give("weapon_physgun")
-	client:Give("weapon_physcannon")
-	client:Give("gmod_tool")
-	client:Give("gmod_camera")
-
-	client:Give("weapon_fists")
-	client:Give("weapon_key")
+	for k, v in ipairs(feather.config.get("defaultLoadout", {})) do
+		client:Give(v)
+	end
 end
 
 function GM:CanPlayerLoadout(client)
@@ -127,7 +123,7 @@ function GM:PlayerSay(client, text, public)
 end
 
 function GM:MoneyEntityCreated(self)
-	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
+	if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
 		if self:GetDTInt(0) <= 100 then
 			self:SetModel("models/props/cs_assault/Dollar.mdl")
 		end
@@ -135,7 +131,7 @@ function GM:MoneyEntityCreated(self)
 end
 
 function GM:MoneyEntityChanged(self)
-	if (string.lower(GAMEMODE.MoneyModel) == "models/props/cs_assault/money.mdl") then
+	if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
 		if self:GetDTInt(0) <= 100 then
 			self:SetModel("models/props/cs_assault/Dollar.mdl")
 		end
@@ -178,6 +174,7 @@ end
 
 function GM:CanDemote(client, target)
 	if (!client or !target or !client:IsValid() or !target:IsValid()) then
+		client:notify(GetLang"invalidplayer")
 		return
 	end
 
@@ -212,7 +209,7 @@ function GM:Demote(from, to, reason, voted)
 					return 
 				end
 
-				GAMEMODE:BecomeJob(from, to, reason, true)
+				GAMEMODE:Demote(from, to, reason, true)
 				from.onvote = false
 				to.onvote = false
 			end,
@@ -239,6 +236,7 @@ end
 function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 	print(client, teamindex)
 	local data = self:GetJobData(teamindex)
+	PrintTable(data)
 	local name = team.GetName(teamindex)
 
 	if !data then
@@ -249,6 +247,7 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 
 	if data.max then
 		if #team.GetPlayers(teamindex) >= data.max then
+			client:notify(GetLang"jobfull")
 			return
 		end	
 	end
@@ -323,7 +322,7 @@ function GM:PlayerSpawnNPC(client)
 end
 
 function GM:PlayerSpawnProp(client, model)
-	if table.HasValue(GAMEMODE.BlockedModels, model) then
+	if table.HasValue(feather.config.get("blockedModels", {}), model) then
 		return false
 	end
 	return true

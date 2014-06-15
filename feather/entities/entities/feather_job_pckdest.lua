@@ -37,8 +37,9 @@ if (SERVER) then
 
 	function ENT:StartTouch(entity)
 		if (entity:GetClass() == "feather_job_pckobj") then
-			local client = entity.Owner
-			if client and client:IsValid() then
+			local client = entity.owner
+			local dest = entity.dest
+			if client and client:IsValid() and dest == self then
 				if client:GetMission() == "package" then
 					GAMEMODE:OnMissionComplete(client, "package")
 				end
@@ -50,6 +51,7 @@ if (SERVER) then
 		return TRANSMIT_ALWAYS // To not get blocked
 	end
 else
+	local icon = surface.GetTextureID("vgui/notices/generic")
 	function ENT:DrawScreen(w, h)
 		local pck = LocalPlayer():GetLocalVar("dest")
 		if pck and pck == self:EntIndex() then
@@ -63,7 +65,7 @@ else
 			draw.SimpleText(text, "fr_VoteFont", sx, sy, Color(255, 255, 255, alpha), 1, 1)
 
 			surface.SetDrawColor(255, 255, 255, 255)
-			surface.SetTexture(surface.GetTextureID("vgui/notices/generic"))
+			surface.SetTexture(icon)
 			local size = 16*1.5
 			surface.DrawTexturedRect(math.Round(sx-size/2), math.Round(sy-size/2) - ty - 10, size, size)
 		end

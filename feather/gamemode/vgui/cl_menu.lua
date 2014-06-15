@@ -491,60 +491,10 @@ end
 
 vgui.Register("FeatherMainMenu", PNL, "DFrame")
 
-local function ShowMenu()
-	if MENU then
-		if MENU.Close then
-			MENU:Close()
-		end
-		MENU = nil
-		return
-	end
-	MENU = vgui.Create("FeatherMainMenu")
-	surface.PlaySound("buttons/lightswitch2.wav")
-end
-
 netstream.Hook("UpdateJobs", function()
 	if MENU and MENU.LoadJob then
 		timer.Simple(.1, function()
 			MENU:LoadJob()
 		end)
-	end
-end)
-
-CLICKER = CLICKER or false
-local function Clicker()
-	CLICKER = !CLICKER
-	gui.EnableScreenClicker(CLICKER)
-end
-
-hook.Add("PlayerBindPress", "FeatherMenuLoad", function(client, bind, pressed)
-	if bind == "gm_showteam" then
-		local ply = LocalPlayer()
-		local data = {}
-			data.start = ply:GetShootPos()
-			data.endpos = data.start + ply:GetAimVector()*96
-			data.filter = ply
-		local trace = util.TraceLine(data)
-		local ent = trace.Entity
-
-		if ent and ent:IsValid() then
-			if ent:IsDoor() then
-				if ent:GetDoorOwner() == ply then
-					ply:ConCommand("say /selldoor")
-				else
-					ply:ConCommand("say /buydoor")
-				end
-			end
-		end
-		return false
-	elseif bind == "gm_showspare1" then
-		Clicker()
-		return false
-	elseif bind == "gm_showspare2" then
-		ShowMenu()
-		return false
-	elseif bind == "gm_showhelp" then
-		GAMEMODE.ShowHelp()
-		return false
 	end
 end)

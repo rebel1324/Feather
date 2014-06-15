@@ -1,15 +1,16 @@
 local playerMeta = FindMetaTable("Player")
 
-function playerMeta:GiveItem()
-
+function playerMeta:GiveItem(item, amount, data)
+	
 end
 
-function playerMeta:GetItem()
-
+function playerMeta:GetItem(item)
+	local inv = self:GetItems()
+	return inv[item]
 end
 
 function playerMeta:GetItems()
-
+	return self:GetLocalVar("inv")
 end
 
 local function InventoryPanelInit(self)

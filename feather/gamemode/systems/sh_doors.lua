@@ -111,7 +111,7 @@ if SERVER then
 	hook.Add("PlayerDisconnect", "FeatherDoorFlush", GM.FlushPlayerDoor)
 
 	function GM:CanBuyDoor(client, door)
-		if self:GetDoorCount(client) >= self.MaxDoors then
+		if self:GetDoorCount(client) >= feather.config.get("maxDoors") then
 			client:notify("2muchdoor")
 			return false
 		end

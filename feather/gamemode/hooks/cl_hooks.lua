@@ -45,6 +45,11 @@ function GM:HUDPaint()
 end
 
 GM.IsChatOpen = false
+GM.CurChat = ""
+
+function GM:ChatTextChanged(text)
+	self.CurChat = text
+end
 
 function GM:StartChat()
 	self.IsChatOpen = true
@@ -58,7 +63,18 @@ local chattype = "ic"
 function GM:ChatAssist(w, h)
 	if self.IsChatOpen then
 		local x, y = chat.GetChatBoxPos()
-		local curchat = GAMEMODE.ChatTypes[chattype]
+
+		local curchat = GAMEMODE.ChatTypes["ic"]
+		for k, v in pairs(self.ChatTypes) do
+			if v.prefix then
+				for _, t in ipairs(v.prefix) do
+					if string.find(self.CurChat, t, 0, true) then
+						curchat = GAMEMODE.ChatTypes[k]
+					end
+				end
+			end
+		end
+
 		local range = 512
 		local hears = {}
 		local i = 0
@@ -66,7 +82,7 @@ function GM:ChatAssist(w, h)
 		y = y - 20
 		for k, v in ipairs(player.GetAll()) do
 			local dist = v:GetPos():Distance(LocalPlayer():GetPos())
-			if (dist < range and LocalPlayer() != v) then
+			if (curchat.canHear(LocalPlayer(), v) and LocalPlayer() != v) then
 				if i >= cut then
 				else
 					table.insert(hears, v)
@@ -76,7 +92,7 @@ function GM:ChatAssist(w, h)
 		end
 
 		if i >= cut then
-			local tx, ty = draw.SimpleText(Format("and %s more..", i - cut), "fr_Arrested", x, y, color_white, 0, 1)
+			local tx, ty = draw.SimpleText(GetLang("andmore", i - cut + 1), "fr_Arrested", x, y, color_white, 0, 1)
 			y = y - ty
 		end
 
@@ -86,7 +102,7 @@ function GM:ChatAssist(w, h)
 		end
 
 		x, y = x, y
-		draw.SimpleText("People can hear you.", "fr_Arrested", x, y, Color(214, 69, 65), 0, 1)
+		draw.SimpleText(GetLang"canhear", "fr_Arrested", x, y, Color(214, 69, 65), 0, 1)
 	end
 end
 
@@ -101,8 +117,7 @@ function GM:HUDShouldDraw(name)
 	if (
 		name == "CHudHealth" or
 		name == "CHudBattery" or
-		name == "CHudSecondaryAmmo" or
-		name == "CHudAmmo"
+		name == "CHudSecondaryAmmo"
 	) then
 		return false
 	end
@@ -137,7 +152,7 @@ function GM:LocalPlayerInfo(w, h)
 
 	local posx, posy = margin, h - margin 
 	
-	if self.HungerMode then
+	if feather.config.get("hunger") then -- If Hunger Mod is active, draw hunger bar in bottom of the health bar.
 		posy = posy - 5
 		curhupp = Lerp(FrameTimeC(), curhupp, math.Clamp(LocalPlayer():GetHungerPercent(), 0, 1))
 		DrawHUDBar( posx, posy, sx, 5, Color(58, 83, 155), curhupp)
@@ -145,20 +160,30 @@ function GM:LocalPlayerInfo(w, h)
 	
 	posx, posy = posx, posy - sy
 	curhpp = Lerp(FrameTimeC(), curhpp, math.Clamp(LocalPlayer():Health()/100, 0, 1))
+
+	-- draw a bar with Color(150, 40, 27) and hp fraction.
 	DrawHUDBar( posx, posy, sx, sy, Color(150, 40, 27), curhpp)
+
+	-- draw an armor overlay.
 	DrawHUDBar( posx, posy, 200 * math.Clamp(LocalPlayer():Armor() / 100, 0, 1), sy, Color(250, 250, 250, 15 + math.sin(RealTime() * 3)*10), curhpp)
+
+	-- draw health amount on the health bar.
 	draw.SimpleText(math.Clamp(LocalPlayer():Health(), 0, math.huge), "fr_HUDFont", margin + tagw + 10, posy + sy/2, color_white, 0, 1)
 
+	-- this helps to get smooth money count.
 	curmoney = Lerp(FrameTimeC() * 2, curmoney, LocalPlayer():GetMoney())
 
 	posx, posy = posx + tagw , posy - 25
+	-- Get job data from current team index.
 	local data = self:GetJobData(teamID) 
 	local tx, ty = draw.SimpleText(MoneyFormat(math.Round(curmoney)), "fr_HUDFont", posx, posy, color_white, 0, 1)
-	if data then
+
+	if data then -- if job data is valid, draw salary.
 		draw.SimpleText("+" .. MoneyFormat(data.salary) or 0, "fr_HUDFont", posx + tx + 6, posy, salaryColor, 0, 1)
 	end
 
 	posy = posy - ty - 0
+	-- draw team name.
 	local tx, ty = draw.SimpleText(team.GetName(teamID), "fr_HUDFont", posx, posy, color_white, 0, 1)
 end
 
@@ -197,11 +222,9 @@ function GM:ArrestTimer(w, h)
 	if LocalPlayer():GetNetVar("arrested") then
 		local text = "You're arrested."
 		surface.SetFont("fr_LicenseTitle")
-		local tx, ty = surface.GetTextSize(text)
-		draw.SimpleText(text, "fr_Arrested", w/2 - tx/2, h/5*4, color_white, 0, 0)
+		local tx, ty = draw.SimpleText(text, "fr_Arrested", w/2, h/5*4, color_white, 1, 1)
 		text = "Your arrest will be lifted in " .. string.NiceTime(math.ceil(LocalPlayer():GetNetVar("arrested") - CurTime())) .. "."
-		local tx, ty = surface.GetTextSize(text)
-		draw.SimpleText(text, "fr_Arrested", w/2 - tx/2, h/5*4 + ty, color_white, 0, 0)
+		draw.SimpleText(text, "fr_Arrested", w/2, h/5*4 + ty, color_white, 1, 1)
 	end
 end
 
@@ -335,4 +358,87 @@ function GM:GravGunPunt()
 	return false
 end
 
-concommand.Add( "dupe_arm", function( ply, cmd, arg )end, nil, "Arm a dupe", { FCVAR_DONTRECORD } )
+function GM:ScoreboardShow()
+	if SCOREBOARD then
+		if SCOREBOARD.Close then
+			SCOREBOARD:Close()
+		end
+		SCOREBOARD = nil
+	end
+		
+	SCOREBOARD = vgui.Create("FeatherScoreboard")
+	SCOREBOARD:MakePopup()
+end
+
+function GM:ScoreboardHide()
+	if SCOREBOARD then
+		SCOREBOARD:Remove()
+	end
+end
+
+local function ShowMenu()
+	if MENU then
+		if MENU.Close then
+			MENU:Close()
+		else
+			MENU = nil
+			MENU = vgui.Create("FeatherMainMenu")
+			surface.PlaySound("buttons/lightswitch2.wav")
+		end
+		return
+	end
+	MENU = vgui.Create("FeatherMainMenu")
+	surface.PlaySound("buttons/lightswitch2.wav")
+end
+
+function GM:ShowHelp()
+	if HELP then
+		if HELP.Close then
+			HELP:Close()
+			HELP = nil
+		else
+			HELP = nil
+			HELP = vgui.Create("FeatherHelp")
+		end
+		return
+	end
+	HELP = vgui.Create("FeatherHelp")
+end
+
+CLICKER = CLICKER or false
+local function Clicker()
+	CLICKER = !CLICKER
+	gui.EnableScreenClicker(CLICKER)
+end
+
+hook.Add("PlayerBindPress", "FeatherMenuLoad", function(client, bind, pressed)
+	if bind == "gm_showteam" then
+		local ply = LocalPlayer()
+		local data = {}
+			data.start = ply:GetShootPos()
+			data.endpos = data.start + ply:GetAimVector()*96
+			data.filter = ply
+		local trace = util.TraceLine(data)
+		local ent = trace.Entity
+
+		if ent and ent:IsValid() then
+			if ent:IsDoor() then
+				if ent:GetDoorOwner() == ply then
+					ply:ConCommand("say /selldoor")
+				else
+					ply:ConCommand("say /buydoor")
+				end
+			end
+		end
+		return false
+	elseif bind == "gm_showspare1" then
+		Clicker()
+		return false
+	elseif bind == "gm_showspare2" then
+		ShowMenu()
+		return false
+	elseif bind == "gm_showhelp" then
+		GAMEMODE.ShowHelp()
+		return false
+	end
+end)

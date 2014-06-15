@@ -36,7 +36,7 @@ if SERVER then
 	end
 
 	function GM:OnPlayerArrested()
-		return self.DefaultArrestTime, "Arrested"
+		return feather.config.get("arrestTime", 1), "Arrested"
 	end
 
 	hook.Add("PlayerSpawn", "FeatherJailSpawn", function(client)
@@ -245,6 +245,7 @@ GM:RegisterCommand({
 }, "unwanted")
 
 GM:RegisterCommand({
+	adminOnly = true,
 	category = "Goverment Commands",
 	desc = "This command allows admin to add ONE Jail Position where you're standing on.\nJail Position will be saved in to the server database.",
 	onRun = function(client, arguments)
@@ -261,6 +262,7 @@ GM:RegisterCommand({
 }, "addjailpos")
 
 GM:RegisterCommand({
+	adminOnly = true,
 	category = "Goverment Commands",
 	desc = "This command allows admin to reset ALL Jail Position and set ONE Jail Position where you're standing on.\nJail Position will be saved in to the server database.",
 	onRun = function(client, arguments)

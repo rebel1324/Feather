@@ -65,7 +65,7 @@ if SERVER then
 	hook.Add("Think", "FeatherHungerThink", GM.HungerThink)
 
 	function GM:PlayerHungerInit(client)
-		client:SetHunger(self.HungerTime)
+		client:SetHunger(feather.config.get("hungerTime"))
 	end
 	hook.Add("PlayerAuthed", "FeatherHungerInit", function(client)
 		GAMEMODE:PlayerHungerInit(client)

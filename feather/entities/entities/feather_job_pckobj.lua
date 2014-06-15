@@ -33,6 +33,7 @@ if (SERVER) then
 		return TRANSMIT_ALWAYS // To not get blocked
 	end
 else
+	local icon = surface.GetTextureID("vgui/notices/hint")
 	function ENT:DrawScreen(w, h)
 		local pck = LocalPlayer():GetLocalVar("package")
 		if pck and pck == self:EntIndex() then
@@ -46,7 +47,7 @@ else
 			draw.SimpleText(text, "fr_VoteFont", sx, sy, Color(255, 255, 255, alpha), 1, 1)
 
 			surface.SetDrawColor(255, 255, 255, 255)
-			surface.SetTexture(surface.GetTextureID("vgui/notices/hint"))
+			surface.SetTexture(icon)
 			local size = 16*1.5
 			surface.DrawTexturedRect(math.Round(sx-size/2), math.Round(sy-size/2) - ty - 10, size, size)
 		end

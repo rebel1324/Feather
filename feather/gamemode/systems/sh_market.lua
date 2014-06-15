@@ -141,6 +141,10 @@ function GM:CanBuyFood(client, uniqueid, data)
 		return false
 	end
 
+	if (!feather.config.get("hunger")) then
+		return false
+	end
+
 	if (client:IsArrested()) then
 		if (!menu) then
 			client:notify(GetLang"yourearrested")

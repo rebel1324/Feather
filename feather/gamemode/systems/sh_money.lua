@@ -34,7 +34,7 @@ if (SERVER) then
 		money:SetAngles(angles or Angle(0, 0, 0))
 		money:Spawn()
 
-		timer.Simple(self.MoneyRemoveTime, function()
+		timer.Simple(feather.config.get("moneyRemoveTime", 300), function()
 			if money:IsValid() then
 				money:Remove()
 			end

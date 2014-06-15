@@ -320,6 +320,7 @@ GM:RegisterChat("broadcast", {
 })
 
 GM:RegisterChat("ooc", {
+	deadCanTalk = true,
 	onChat = function(speaker, text)
 		chat.AddText(color_white, GetLang"ooc", team.GetColor(speaker:Team()), speaker:Name(), color_white, ": " .. text)
 	end,
@@ -334,7 +335,7 @@ GM:RegisterChat("advert", {
 })
 
 GM:RegisterChat("yell", {
-	canHear = GM.ChatRange * 2,
+	canHear = feather.config.get("chatRange", 512) * 2,
 	onChat = function(speaker, text)
 		chat.AddText(color_white, GetLang"yell", team.GetColor(speaker:Team()), speaker:Name(), color_white, ": " .. text)
 	end,
@@ -342,7 +343,7 @@ GM:RegisterChat("yell", {
 })
 
 GM:RegisterChat("it", {
-	canHear = GM.ChatRange,
+	canHear = feather.config.get("chatRange", 512),
 	onChat = function(speaker, text)
 		chat.AddText(color_white, "** "..text)
 	end,
@@ -350,7 +351,7 @@ GM:RegisterChat("it", {
 })
 
 GM:RegisterChat("me", {
-	canHear = GM.ChatRange,
+	canHear = feather.config.get("chatRange", 512),
 	onChat = function(speaker, text)
 		chat.AddText(color_white, "**"..speaker:Name().." "..text)
 	end,
@@ -358,7 +359,8 @@ GM:RegisterChat("me", {
 })
 
 GM:RegisterChat("looc", {
-	canHear = GM.ChatRange,
+	deadCanTalk = true,
+	canHear = feather.config.get("chatRange", 512),
 	onChat = function(speaker, text)
 		chat.AddText(color_white, GetLang"looc", team.GetColor(speaker:Team()), speaker:Name(), color_white, ": " .. text)
 	end,
@@ -366,7 +368,7 @@ GM:RegisterChat("looc", {
 })
 
 GM:RegisterChat("ic", {
-	canHear = GM.ChatRange,
+	canHear = feather.config.get("chatRange", 512),
 	onChat = function(speaker, text)
 		chat.AddText(team.GetColor(speaker:Team()), speaker:Name(), color_white, ": " .. text)
 	end
@@ -434,6 +436,7 @@ GM:RegisterCommand({
 }, "demote")
 
 GM:RegisterCommand({
+	adminOnly = true,
 	desc = "This commands sets citizens/other job's spawnpoint at your foot.",
 	syntax = "[job name/uniqueID]",
 	onRun = function(client, arguments)
@@ -442,6 +445,7 @@ GM:RegisterCommand({
 }, "setspawn")
 
 GM:RegisterCommand({
+	adminOnly = true,
 	desc = "This commands removes citizens/other job's spawnpoint in certain range from your foot.",
 	syntax = "[range]",
 	onRun = function(client, arguments)
@@ -450,9 +454,33 @@ GM:RegisterCommand({
 }, "removespawn")
 
 GM:RegisterCommand({
+	adminOnly = true,
 	desc = "This commands gets nearby spawnpoints and display them with particles.",
 	syntax = "[range]",
 	onRun = function(client, arguments)
 		local range = arguments[1]
 	end
 }, "getspawn")
+
+GM:RegisterCommand({
+	desc = "This commands allows you to drop the weapon on your hands.",
+	onRun = function(client, arguments)
+		local data = {}
+			data.start = client:GetShootPos()
+			data.endpos = data.start + client:GetAimVector()*64
+			data.filter = client
+		local trace = util.TraceLine(data)
+		local position = trace.HitPos
+
+		local wep = client:GetActiveWeapon()
+		local class = wep:GetClass()
+
+		if table.HasValue(feather.config.get("defaultLoadout"), class) or wep.cantDrop then
+			client:notify(GetLang("cantdo"))
+			return false
+		end
+
+		client:StripWeapon(class)
+		local weapon = GAMEMODE:SpawnWeapon(position, Angle(0, 0, 0), class)
+	end
+}, "drop")

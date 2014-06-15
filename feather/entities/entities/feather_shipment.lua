@@ -46,7 +46,7 @@ if (SERVER) then
 		if (self.health < 0) then
 			local data = GAMEMODE.WeaponList[self:GetContent()]
 			for i = 1, math.Clamp(self:GetAmount(), 0, 5) do
-				SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40 + VectorRand()*10, Angle(0, 0, 0), data.classname)
+				GAMEMODE:SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40 + VectorRand()*10, Angle(0, 0, 0), data.classname)
 				self:GibBreakServer(VectorRand()*100)
 				self:Remove()
 			end
@@ -57,7 +57,7 @@ if (SERVER) then
 		local data = GAMEMODE.WeaponList[self:GetContent()]
 
 		if !data.entity then
-			SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40, Angle(0, 0, 0), data.classname)
+			GAMEMODE:SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40, Angle(0, 0, 0), data.classname)
 		else
 			ent = ents.Create(data.classname)
 			ent:SetPos(self:GetPos() + self:OBBCenter() + self:GetUp()*40)

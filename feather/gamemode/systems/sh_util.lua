@@ -80,7 +80,7 @@ local hl2conv = {
 	["weapon_physcannon"] = "models/weapons/w_physics.mdl",
 }
 
-function SpawnWeapon(position, angles, class)
+function GM:SpawnWeapon(position, angles, class)
 	if (!class or (!wepdat and !hl2conv[class])) then
 		return
 	end

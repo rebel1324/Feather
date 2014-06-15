@@ -17,6 +17,7 @@ SWEP.Primary.ClipSize = 1
 SWEP.Primary.Ammo = ""
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
+SWEP.cantDrop = true
 
 SWEP.Category = "Feather"
 SWEP.HoldType = "normal"
@@ -48,7 +49,7 @@ if SERVER then
 
 	function SWEP:StartPick(target)
 		self.target = target
-		local picktime = feather.config.get("LockPickTime")
+		local picktime = feather.config.get("lockPickTime")
 		netstream.Start(self.Owner, "FeatherProgressDisplay", {GetLang"hudpickname", picktime})
 
 		timer.Create(self:EntIndex() .. "_PICK", picktime, 1, function()
@@ -94,6 +95,10 @@ else
 	end)
 end
 
+function SWEP:SecondaryAttack()
+	
+end
+
 function SWEP:DrawHUD()
 	local w, h = ScrW(), ScrH()
 
@@ -107,7 +112,7 @@ function SWEP:DrawHUD()
 		draw.SimpleText(GetLang"hudpick", "fr_Arrested", w/2, h/2 + 35, color_white, 1, 1)
 		if (trace.Entity:IsValid()) then
 			if trace.Entity:IsDoor() then
-				draw.SimpleText(GetLang("hudpicktarget", string.NiceTime(feather.config.get("LockPickTime"))), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
+				draw.SimpleText(GetLang("hudpicktarget", string.NiceTime(feather.config.get("lockPickTime"))), "fr_Arrested", w/2, h/2 + 60, Color(255, 122, 122), 1, 1)
 			end
 		end
 	end

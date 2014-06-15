@@ -118,6 +118,12 @@ if SERVER then
 	function playerMeta:CancelHit(name)
 		hook.Run("OnHitFailed", self) 
 	end
+
+	hook.Add("OnPlayerBecomeJob", "FeatherHitFailed", function(client, data, teamindex, oldteam)
+		if (oldteam == TEAM_HITMAN) then
+			hook.Run("OnHitFailed", client) 
+		end
+	end)
 end
 
 GM:RegisterCommand({
