@@ -436,3 +436,5 @@ GM:RegisterCommand({
 		return entity
 	end
 }, "spawnlaw")
+
+cn.util.include("sh_hooks.lua")

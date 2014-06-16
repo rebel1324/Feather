@@ -19,3 +19,5 @@ function GetLang(name, ...)
 
 	return "Failed to get language ".. name	or "<NO LANG!>"
 end
+
+cn.util.includeFolder("languages", "feather/data", true)

@@ -8,17 +8,19 @@ function cn.util.include(name)
 
 		include(name)
 	elseif (name:find("cl_")) then
-		if (SERVER) then
-			AddCSLuaFile(name)
-		else
+		if (CLIENT) then
 			include(name)
+		else
+			AddCSLuaFile(name)
 		end
 	end
 end
 
-function cn.util.includeFolder(folder, baseFolder)
-	for k, v in pairs(file.Find((baseFolder or engine.ActiveGamemode()).."/gamemode/"..folder.."/*.lua", "LUA")) do
-		cn.util.include(folder.."/"..v)
+function cn.util.includeFolder(folder, baseFolder, noGamemode)
+	baseFolder = baseFolder or "cn"
+
+	for k, v in pairs(file.Find(baseFolder..(noGamemode and "/" or "/gamemode/")..folder.."/*.lua", "LUA")) do
+		cn.util.include((noGamemode and baseFolder.."/" or "")..folder.."/"..v)
 	end
 end
 

@@ -51,9 +51,6 @@ function GM:ShutDown()
 end
 
 function GM:PlayerReceivePay(client, amount)
-	if client:IsArrested() then
-		amount = 0
-	end
 	client:GiveMoney(amount)
 	client:notify(GetLang("payday", MoneyFormat(amount)))
 end
@@ -90,7 +87,6 @@ function GM:GetBaseLoadout(client)
 end
 
 function GM:CanPlayerLoadout(client)
-	return (!client:IsArrested())
 end
 
 function GM:PlayerLoadout(client)
@@ -137,10 +133,6 @@ function GM:MoneyEntityChanged(self)
 end
 
 function GM:CanBecomeJob(client, data, teamindex)
-	if (client:IsArrested()) then
-		client:notify(GetLang"yourearrested")
-	end
-
 	if (client.banned) then
 		client:notify(GetLang"cantdo")
 	end
@@ -174,11 +166,6 @@ function GM:CanDemote(client, target)
 	if (!client or !target or !client:IsValid() or !target:IsValid()) then
 		client:notify(GetLang"invalidplayer")
 		return
-	end
-
-	if (client:IsArrested()) then
-		client:notify(GetLang"yourearrested")
-		return false
 	end
 
 	if (!client.nextDemote or client.nextDemote > CurTime()) then
@@ -254,8 +241,10 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 		return false
 	end
 
-	if hook.Run("CanBecomeJob", client, data, teamindex) == false then
-		client:notify(GetLang"cantbecomejob")
+	local result, fault = hook.Run("CanBecomeJob", client, data, teamindex)
+
+	if result == false then
+		client:notify(fault or GetLang"cantbecomejob")
 	end
 
 	if teamindex == client:Team() then

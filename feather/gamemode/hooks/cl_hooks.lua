@@ -56,7 +56,6 @@ function GM:HUDPaint()
 	self:ProgressPaint(w, h)
 	self:CenterDisplayPaint(w, h)
 	self:Lockdown(w, h)
-	self:ArrestTimer(w, h)
 	self:DrawDoorInfo(w, h)
 	self:ScreenFade(w, h)
 	self:ChatAssist(w, h)
@@ -197,6 +196,21 @@ function GM:PlayerInfo(w, h)
 	local position = LocalPlayer():GetPos()
 	local shootPos = LocalPlayer():GetShootPos()
 	local aimVector = LocalPlayer():GetAimVector()
+	local info = {}
+
+	function info:draw(text, color, color2)
+		local alpha = info.alpha
+		color.a = alpha
+		color2 = color2 or Color(0, 0, 0)
+		color2.alpha = alpha
+
+		local w, h = draw.SimpleText(text, "fr_BigTargetShadow", info.x, info.y, color2, 1, 1)
+		draw.SimpleText(text, "fr_BigTarget", info.x, info.y, color, 1, 1)
+
+		info.y = info.y - h
+
+		return w, h
+	end
 
 	for k, v in ipairs(player.GetAll()) do
 		if ((v != LocalPlayer() or v:ShouldDrawLocalPlayer()) and v:Alive()) then
@@ -220,25 +234,17 @@ function GM:PlayerInfo(w, h)
 				local job = team.GetName(v:Team())
 				color.a = alpha
 
-				if (v:IsWanted()) then
-					tx, ty = draw.SimpleText("Wanted by Police", "fr_BigTargetShadow", px, py, Color(242, 38, 19, alpha), 1, 1)
-					draw.SimpleText("Wanted by Police", "fr_BigTarget", px, py, Color(239, 72, 54, alpha), 1, 1)
-					py = py - ty 
-				end
+				info.x = px
+				info.y = py
+				info.alpha = alpha
 
-				if (v:IsArrested()) then
-					tx, ty = draw.SimpleText("Arrested", "fr_BigTargetShadow", px, py, Color(242, 38, 19, alpha), 1, 1)
-					draw.SimpleText("Arrested", "fr_BigTarget", px, py, Color(239, 72, 54, alpha), 1, 1)
-					py = py - ty 
-				end
+				hook.Run("DrawPlayerInfo", v, info)
 				
-				local shadowcolor = Color(color.r * .6, color.g * .6, color.b * .6)
-				tx, ty = draw.SimpleText(job, "fr_BigTargetShadow", px, py, shadowcolor, 1, 1)
-				draw.SimpleText(job, "fr_BigTarget", px, py, color, 1, 1)
-				py = py - ty 
+				local shadowColor = Color(color.r * .6, color.g * .6, color.b * .6)
+				info:draw(job, color, shadowColor)
 
-				tx, ty = draw.SimpleText(v:Name(), "fr_BigTargetShadow", px, py, Color(100, 100, 100, alpha), 1, 1)
-				draw.SimpleText(v:Name(), "fr_BigTarget", px, py, Color(255, 255, 255, alpha), 1, 1)
+				draw.SimpleText(v:Name(), "fr_BigTargetShadow", info.x, info.y, Color(0, 0, 0, alpha), 1, 1)
+				draw.SimpleText(v:Name(), "fr_BigTarget", info.x, info.y, Color(255, 255, 255, alpha), 1, 1)
 			end
 		end
 	end
@@ -268,16 +274,6 @@ function GM:DrawMarker(w, h)
 		surface.SetDrawColor(255, 255, 255, math.ceil(v.alpha))
 		surface.SetTexture(v.icon)
 		surface.DrawTexturedRect(math.Round(sx-iconsize/2), math.Round(sy-iconsize/2) - ty - 10, iconsize, iconsize)
-	end
-end
-
-function GM:ArrestTimer(w, h)
-	if LocalPlayer():GetNetVar("arrested") then
-		local text = "You're arrested."
-		surface.SetFont("fr_LicenseTitle")
-		local tx, ty = draw.SimpleText(text, "fr_Arrested", w/2, h/5*4, color_white, 1, 1)
-		text = "Your arrest will be lifted in " .. string.NiceTime(math.ceil(LocalPlayer():GetNetVar("arrested") - CurTime())) .. "."
-		draw.SimpleText(text, "fr_Arrested", w/2, h/5*4 + ty, color_white, 1, 1)
 	end
 end
 

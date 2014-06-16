@@ -58,14 +58,6 @@ surface.CreateFont("fr_LicenseTitle", {
 	antialias = true
 })
 
-surface.CreateFont("fr_Arrested", {
-	font = "Trebuchet MS",
-	size = 24,
-	weight = 1000,
-	shadow = true,
-	antialias = true
-})
-
 surface.CreateFont("fr_ChatAssist", {
 	font = "Trebuchet MS",
 	size = 22,

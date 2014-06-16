@@ -304,3 +304,6 @@ GM:RegisterCommand({
 		end
 	end
 }, "setprice")
+
+cn.util.include("sh_license.lua")
+cn.util.include("sh_market.lua")

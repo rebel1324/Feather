@@ -172,3 +172,5 @@ GM:RegisterCommand({
 		return true
 	end
 }, "requestmission")
+
+cn.util.include("sh_missions.lua")

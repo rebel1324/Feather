@@ -32,22 +32,24 @@ do
 	feather.itemBases = feather.itemBases or {}
 
 	function feather.item.load(directory)
-		for k, v in ipairs(file.Find((directory or "feather/gamemode/items/base").."/*.lua", "LUA")) do
+		directory = directory or "feather/data/items"
+
+		for k, v in ipairs(file.Find(directory.."/base/*.lua", "LUA")) do
 			local name = string.StripExtension(v)
 
 			BASE = feather.itemBases[name] or {}
 				BASE.key = name
 
 				if (SERVER) then
-					AddCSLuaFile("items/base/"..v)
+					AddCSLuaFile(directory.."/base/"..v)
 				end
 
-				include("items/base/"..v)
+				include(directory.."/base/"..v)
 				feather.itemBases[name] = ITEM				
 			BASE = nil
 		end
 
-		for k, v in ipairs(file.Find((directory or "feather/gamemode/items").."/*.lua", "LUA")) do
+		for k, v in ipairs(file.Find(directory.."/*.lua", "LUA")) do
 			local name = string.StripExtension(v)
 
 			ITEM = feather.items[name] or {}
@@ -69,10 +71,10 @@ do
 				end
 
 				if (SERVER) then
-					AddCSLuaFile("items/"..v)
+					AddCSLuaFile(directory.."/"..v)
 				end
 
-				include("items/"..v)
+				include(directory.."/"..v)
 
 				if (ITEM.base) then
 					if (feather.itemBases[ITEM.base]) then
