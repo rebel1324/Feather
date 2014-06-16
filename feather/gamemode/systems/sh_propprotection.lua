@@ -20,8 +20,43 @@ function duplicator.Allow(classname)
 	return !table.HasValue(GAMEMODE.PreventDupe, classname:lower())
 end
 
+function GM:PlayerSpawnProp(client, model)
+	if table.HasValue(feather.config.get("blockedModels"), model) then
+		client:notify(GetLang"propbanned")
+		return false
+	end
+	
+	return true
+end
+
 function GM:PlayerSpawnedProp(client, model, entity)
-	entity.Owner = client
+	if entity:IsValid() then
+		local phys = entity:GetPhysicsObject()
+		if phys and phys:IsValid() then
+			local min, max = phys:GetAABB( )
+			local size = min:Distance(max)
+			print(size)
+
+			if (size >= feather.config.get("tooBigProp")) then
+				client:notify(GetLang"toobigprop")
+				entity:Remove()
+				return
+			end
+
+			if (size >= feather.config.get("bigProp")) then
+				if (client.nextBigProp and client.nextBigProp > CurTime()) then
+					client.nextBigProp = client.nextBigProp + 1
+					client:notify(GetLang("bigpropwait", math.ceil(client.nextBigProp - CurTime())))
+					entity:Remove()
+					return	
+				end
+
+				client.nextBigProp = CurTime() + feather.config.get("bigPropWait")
+			end
+		end
+
+		entity.Owner = client
+	end
 end
 
 function GM:PlayerSpawnedSENT(client, entity)

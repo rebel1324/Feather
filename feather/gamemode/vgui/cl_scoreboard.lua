@@ -72,7 +72,7 @@ function PNL:Init()
 	local p = self.panel
 	local text = vgui.Create("DLabel", p)
 	text:SetFont("fr_ScoreboardTitle")
-	text:SetText("Feather")
+	text:SetText(GetHostName())
 	text:Dock(TOP)
 	text:DockMargin(5, 0, 5, 0)
 	text:SetAutoStretchVertical( true )
@@ -143,9 +143,9 @@ function PNL:Think()
 end
 
 function PNL:Paint(w, h)
-	self.alpha = Lerp(FrameTimeC()*.5, self.alpha, 255)
-	DrawBlur(self, 2, self.alpha) -- Shamelessy stolen from NutScript.
-	surface.SetDrawColor(0, 0, 0, self.alpha*.5)
+	self.alpha = Lerp(FrameTimeC()*2, self.alpha, 255)
+	DrawBlur(self, 3, self.alpha) -- Shamelessy stolen from NutScript.
+	surface.SetDrawColor(0, 0, 0, self.alpha*.8)
 	surface.DrawRect(0, 0, w, h)
 end
 

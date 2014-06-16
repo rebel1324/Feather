@@ -394,7 +394,7 @@ function PNL:LoadItems()
 	local client = LocalPlayer()
 
 	local catlist = {}
-	for k, v in SortedPairsByMemberValue(GAMEMODE.EntityList) do
+	for k, v in SortedPairsByMemberValue(GAMEMODE.EntityList, "category") do
 		if hook.Run("CanBuyEntity", client, v.__key, v, true) == false then
 			continue
 		end
@@ -417,7 +417,7 @@ function PNL:LoadItems()
 		self.content:AddItem(pnl)
 	end
 
-	for k, v in SortedPairsByMemberValue(GAMEMODE.WeaponList) do
+	for k, v in SortedPairsByMemberValue(GAMEMODE.WeaponList, "category") do
 		if hook.Run("CanBuyWeapon", client, v.__key, v, true) == false then
 			continue
 		end
@@ -440,7 +440,7 @@ function PNL:LoadItems()
 		self.content:AddItem(pnl)
 	end
 	
-	for k, v in SortedPairsByMemberValue(GAMEMODE.FoodList) do
+	for k, v in SortedPairsByMemberValue(GAMEMODE.FoodList, "category") do
 		if hook.Run("CanBuyFood", client, v.__key, v, true) == false then
 			continue
 		end

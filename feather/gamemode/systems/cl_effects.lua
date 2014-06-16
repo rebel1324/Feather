@@ -52,7 +52,7 @@ function EFFECT:Init( data )
 		smoke:SetEndSize(math.random(22,44))
 		smoke:SetRoll(math.Rand(180,480))
 		smoke:SetRollDelta(math.Rand(-3,3))
-		smoke:SetColor(120,80,0)
+		smoke:SetColor(80, 60, 0)
 		smoke:SetGravity( Vector( 0, 0, 20 ) )
 		smoke:SetAirResistance(250)
 	end

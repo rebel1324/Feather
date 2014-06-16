@@ -56,10 +56,6 @@ if (SERVER) then
 		end
 
 		if self.dev then
-			local e = EffectData()
-			e:SetStart(self:GetPos() + self:OBBCenter())
-			util.Effect( "FeatherDestroy", e )
-			self:EmitSound(Format("physics/wood/wood_crate_break%s.wav", math.random(1, 5)))
 			self:Remove()
 			return
 		end
@@ -85,10 +81,6 @@ if (SERVER) then
 					client:SetLocalVar("garbages", grb)
 				end
 
-				local e = EffectData()
-				e:SetStart(self:GetPos() + self:OBBCenter())
-				util.Effect( "FeatherDestroy", e )
-				self:EmitSound(Format("physics/wood/wood_crate_break%s.wav", math.random(1, 5)))
 				self:Remove()
 			end
 		end
@@ -98,6 +90,13 @@ if (SERVER) then
 		return TRANSMIT_ALWAYS // To not get blocked
 	end
 else
+	function ENT:OnRemove()
+		local e = EffectData()
+		e:SetStart(self:GetPos() + self:OBBCenter())
+		util.Effect( "FeatherDestroy", e )
+		self:EmitSound(Format("physics/wood/wood_crate_break%s.wav", math.random(1, 5)))
+	end
+	
 	local icon = surface.GetTextureID("vgui/notices/cleanup")
 	function ENT:DrawScreen(w, h)
 		local grb = LocalPlayer():GetLocalVar("garbages")

@@ -99,16 +99,14 @@ function GM:PlayerLoadout(client)
 	end
 
 	hook.Run("GetBaseLoadout", client)
+end
 
+function GM:PlayerSetModel(client)
 	local index = client:Team()
 	local jobdata = self:GetJobData(index)
 
-	if jobdata and jobdata.loadout then
+	if jobdata and jobdata.model then
 		client:SetModel(table.Random(jobdata.model))
-
-		for k, v in pairs(jobdata.loadout) do
-			client:Give(v)
-		end
 	end
 end
 
@@ -326,13 +324,6 @@ end
 
 function GM:PlayerSpawnNPC(client)
 	return client:IsAdmin()
-end
-
-function GM:PlayerSpawnProp(client, model)
-	if table.HasValue(feather.config.get("blockedModels", {}), model) then
-		return false
-	end
-	return true
 end
 
 function GM:PlayerSpawnSENT(client)

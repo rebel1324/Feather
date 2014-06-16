@@ -81,9 +81,9 @@ if (SERVER) then
 		entity:SetPos(pos)
 		entity:SetAngles(AngleRand())
 		entity:Spawn()
+		entity:SetFood(self.FoodStock)
 		entity:Activate()
 
-		entity:SetFood(self.FoodStock)
 
 		timer.Simple(feather.config.get("foodDisappear", 100), function()
 			if entity and entity:IsValid() then

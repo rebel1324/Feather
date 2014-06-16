@@ -7,7 +7,7 @@ ENT.Category = "Feather"
 
 if (SERVER) then
 	function ENT:Initialize()
-		self:SetModel("models/props_junk/plasticbucket001a.mdl")
+		self:SetModel("models/hunter/blocks/cube025x025x025.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)

@@ -127,6 +127,9 @@ function GM:BuyEntity(client, uniqueid, data)
 	end
 
 	if (ent and ent:IsValid()) then
+		if data.postPurchase then
+			data.postPurchase(ent, client, uniqueid, data)
+		end
 		hook.Run("OnPurchasedEntity", client, uniqueid, data, ent)
 	end
 	

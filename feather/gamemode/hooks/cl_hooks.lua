@@ -4,9 +4,43 @@ local deltaMoney = 500
 local OFFSET_CROUCH = Vector(0, 0, -16)
 local OFFSET_NORMAL = Vector(0, 0, 16)
 
+local chattype = "ic"
+
+local tagw = 6
+
+local dcol = Color(150, 250, 150)
+
+local margin = 20
+local sx, sy = 200, 45
+local curhpp = 0
+local curhupp = 0
+local textmargin = 15
+local curmoney = 0
+local salaryColor = Color(46, 204, 133)
+
+local iconsize = 16*2
+
 GM.FadeSpeed = 1
 GM.FadeAlpha = 0
-GM.FadeColor = color_white
+GM.FadeColor = color_whit
+GM.IsChatOpen = false
+GM.CurChat = ""
+GM.DisplayText = "Display"
+GM.DisplayMaxTime = 0
+GM.DisplayTime = 0
+GM.DisplayAlpha = 0
+GM.DisplayColor = Color(150, 250, 150)
+GM.CenterDisplayText = "Display"
+GM.CenterDisplayTime = 0
+GM.CenterDisplayAlpha = 0
+GM.Markers = {}
+GM.Icons = {
+	[1] = surface.GetTextureID("vgui/notices/error"),
+	[2] = surface.GetTextureID("vgui/notices/generic"),
+	[3] = surface.GetTextureID("vgui/notices/hint"),
+	[4] = surface.GetTextureID("vgui/notices/undo"),
+	[5] = surface.GetTextureID("vgui/notices/cleanup"),
+}
 
 function FrameTimeC()
 	return math.Clamp(FrameTime(), 1/60, 2)
@@ -45,22 +79,6 @@ function GM:HUDPaint()
 	end
 end
 
-GM.IsChatOpen = false
-GM.CurChat = ""
-
-function GM:ChatTextChanged(text)
-	self.CurChat = text
-end
-
-function GM:StartChat()
-	self.IsChatOpen = true
-end
-
-function GM:FinishChat()
-	self.IsChatOpen = false
-end
-
-local chattype = "ic"
 function GM:ChatAssist(w, h)
 	if self.IsChatOpen then
 		local x, y = chat.GetChatBoxPos()
@@ -93,17 +111,17 @@ function GM:ChatAssist(w, h)
 		end
 
 		if i >= cut then
-			local tx, ty = draw.SimpleText(GetLang("andmore", i - cut + 1), "fr_Arrested", x, y, color_white, 0, 1)
+			local tx, ty = draw.SimpleText(GetLang("andmore", i - cut + 1), "fr_ChatAssist", x, y, color_white, 0, 1)
 			y = y - ty
 		end
 
 		for k, v in ipairs(hears) do
-			local tx, ty = draw.SimpleText(v:Name(), "fr_Arrested", x, y, color_white, 0, 1)
+			local tx, ty = draw.SimpleText(v:Name(), "fr_ChatAssist", x, y, color_white, 0, 1)
 			y = y - ty
 		end
 
 		x, y = x, y
-		draw.SimpleText(GetLang"canhear", "fr_Arrested", x, y, Color(214, 69, 65), 0, 1)
+		draw.SimpleText(GetLang"canhear", "fr_ChatAssist", x, y, Color(214, 69, 65), 0, 1)
 	end
 end
 
@@ -126,7 +144,6 @@ function GM:HUDShouldDraw(name)
 	return true
 end
 
-local tagw = 6
 local function DrawHUDBar(x, y, w, h, col, p)
 	p = p or 1
 	surface.SetDrawColor(22, 34, 52, col.a)
@@ -135,15 +152,6 @@ local function DrawHUDBar(x, y, w, h, col, p)
 	surface.SetDrawColor(col.r, col.g, col.b, col.a)
 	surface.DrawRect(x, y, math.Round(w * p), h)
 end
-
-
-local margin = 20
-local sx, sy = 200, 45
-local curhpp = 0
-local curhupp = 0
-local textmargin = 15
-local curmoney = 0
-local salaryColor = Color(46, 204, 133)
 
 function GM:LocalPlayerInfo(w, h)
 	local teamID = LocalPlayer():Team()
@@ -191,7 +199,7 @@ function GM:PlayerInfo(w, h)
 	local aimVector = LocalPlayer():GetAimVector()
 
 	for k, v in ipairs(player.GetAll()) do
-		if (v != LocalPlayer() and v:Alive()) then
+		if ((v != LocalPlayer() or v:ShouldDrawLocalPlayer()) and v:Alive()) then
 			local bi = v:LookupBone("ValveBiped.Bip01_Head1")
 			local bonepos = v:GetBonePosition(bi)
 			local origin = (bi != 0) and (bonepos + Vector(0, 0, 11)) or (v:GetShootPos() + (v:Crouching() and OFFSET_CROUCH or OFFSET_NORMAL)) 
@@ -206,25 +214,36 @@ function GM:PlayerInfo(w, h)
 				if (trace.Hit and trace.Entity != v) then continue end
 
 				local position = origin:ToScreen()
+				local px, py = position.x, position.y
+				local tx, ty = 0, 0
 				local color = team.GetColor(v:Team())
+				local job = team.GetName(v:Team())
 				color.a = alpha
 
-				draw.SimpleText(v:Name(), "fr_BigTargetShadow", position.x, position.y, Color(0, 0, 0, alpha), 1, 1)
-				draw.SimpleText(v:Name(), "fr_BigTarget", position.x, position.y, color, 1, 1)
+				if (v:IsWanted()) then
+					tx, ty = draw.SimpleText("Wanted by Police", "fr_BigTargetShadow", px, py, Color(242, 38, 19, alpha), 1, 1)
+					draw.SimpleText("Wanted by Police", "fr_BigTarget", px, py, Color(239, 72, 54, alpha), 1, 1)
+					py = py - ty 
+				end
+
+				if (v:IsArrested()) then
+					tx, ty = draw.SimpleText("Arrested", "fr_BigTargetShadow", px, py, Color(242, 38, 19, alpha), 1, 1)
+					draw.SimpleText("Arrested", "fr_BigTarget", px, py, Color(239, 72, 54, alpha), 1, 1)
+					py = py - ty 
+				end
+				
+				local shadowcolor = Color(color.r * .6, color.g * .6, color.b * .6)
+				tx, ty = draw.SimpleText(job, "fr_BigTargetShadow", px, py, shadowcolor, 1, 1)
+				draw.SimpleText(job, "fr_BigTarget", px, py, color, 1, 1)
+				py = py - ty 
+
+				tx, ty = draw.SimpleText(v:Name(), "fr_BigTargetShadow", px, py, Color(100, 100, 100, alpha), 1, 1)
+				draw.SimpleText(v:Name(), "fr_BigTarget", px, py, Color(255, 255, 255, alpha), 1, 1)
 			end
 		end
 	end
 end
 
-GM.Markers = {}
-GM.Icons = {
-	[1] = surface.GetTextureID("vgui/notices/error"),
-	[2] = surface.GetTextureID("vgui/notices/generic"),
-	[3] = surface.GetTextureID("vgui/notices/hint"),
-	[4] = surface.GetTextureID("vgui/notices/undo"),
-	[5] = surface.GetTextureID("vgui/notices/cleanup"),
-}
-local iconsize = 16*2
 function GM:DrawMarker(w, h)
 	for k, v in ipairs(self.Markers) do
 		if (v.time < CurTime()) then
@@ -251,21 +270,6 @@ function GM:DrawMarker(w, h)
 		surface.DrawTexturedRect(math.Round(sx-iconsize/2), math.Round(sy-iconsize/2) - ty - 10, iconsize, iconsize)
 	end
 end
-
-function GM:AddMarker(pos, icon, text, time)
-	table.insert(self.Markers, {pos = pos, icon = self.Icons[math.Clamp(icon, 0, #self.Icons)], text = text, time = CurTime() + time, alpha = 0})
-end
-
-netstream.Hook("FeatherMarker", function(data)
-	if data.sound then
-		surface.PlaySound(data.sound)
-	end
-
-	if (data.pos and data.icon and data.text) then
-		data.time = data.time or 5
-		GAMEMODE:AddMarker(data.pos, data.icon, data.text, data.time)
-	end
-end)
 
 function GM:ArrestTimer(w, h)
 	if LocalPlayer():GetNetVar("arrested") then
@@ -323,13 +327,6 @@ function GM:CenterDisplayPaint(w, h)
 	end
 end
 
-GM.DisplayText = "Display"
-GM.DisplayMaxTime = 0
-GM.DisplayTime = 0
-GM.DisplayAlpha = 0
-GM.DisplayColor = Color(150, 250, 150)
-
-local dcol = Color(150, 250, 150)
 function GM:DisplayProgress(text, time, col)
 	self.DisplayText = text
 	self.DisplayMaxTime = time
@@ -341,13 +338,6 @@ function GM:DisplayProgress(text, time, col)
 		self.DisplayColor = dcol
 	end
 end
-netstream.Hook("FeatherProgressDisplay", function(data)
-	GAMEMODE:DisplayProgress(data[1], data[2], data[3])
-end)
-
-GM.CenterDisplayText = "Display"
-GM.CenterDisplayTime = 0
-GM.CenterDisplayAlpha = 0
 
 function GM:CenterDisplay(text, time)
 	surface.PlaySound("buttons/lightswitch2.wav")
@@ -358,9 +348,6 @@ function GM:CenterDisplay(text, time)
 	self.CenterDisplayTime = CurTime() + time
 	self.CenterDisplayAlpha = 0
 end
-netstream.Hook("FeatherCenterDisplay", function(data)
-	GAMEMODE:CenterDisplay(data[1], data[2])
-end)
 
 function GM:Notify(message, class)
 	self:AddNotify(message, class, 5)
@@ -380,19 +367,17 @@ function GM:CanDrawWeaponHUD()
 	return !(self.DrawDoor or self.DisplayTime > CurTime() or math.floor(self.DisplayAlpha) > 0)
 end
 
-netstream.Hook("FeatherNotify", function(message, class)
-	GAMEMODE:Notify(message, class)
-end)
+function GM:ChatTextChanged(text)
+	self.CurChat = text
+end
 
-netstream.Hook("FeatherFade", function(data)
-	GAMEMODE.FadeSpeed = data[2]
-	GAMEMODE.FadeAlpha = data[1].a
-	GAMEMODE.FadeColor = data[1]
-end)
+function GM:StartChat()
+	self.IsChatOpen = true
+end
 
-netstream.Hook("PlaySound", function(data)
-	surface.PlaySound(data)
-end)
+function GM:FinishChat()
+	self.IsChatOpen = false
+end
 
 function GM:ShowSpare1()
 end
@@ -460,6 +445,10 @@ local function Clicker()
 	gui.EnableScreenClicker(CLICKER)
 end
 
+function GM:AddMarker(pos, icon, text, time)
+	table.insert(self.Markers, {pos = pos, icon = self.Icons[math.Clamp(icon, 0, #self.Icons)], text = text, time = CurTime() + time, alpha = 0})
+end
+
 hook.Add("PlayerBindPress", "FeatherMenuLoad", function(client, bind, pressed)
 	if bind == "gm_showteam" then
 		local ply = LocalPlayer()
@@ -490,4 +479,37 @@ hook.Add("PlayerBindPress", "FeatherMenuLoad", function(client, bind, pressed)
 		GAMEMODE.ShowHelp()
 		return false
 	end
+end)
+
+netstream.Hook("FeatherProgressDisplay", function(data)
+	GAMEMODE:DisplayProgress(data[1], data[2], data[3])
+end)
+
+netstream.Hook("FeatherCenterDisplay", function(data)
+	GAMEMODE:CenterDisplay(data[1], data[2])
+end)
+
+netstream.Hook("FeatherMarker", function(data)
+	if data.sound then
+		surface.PlaySound(data.sound)
+	end
+
+	if (data.pos and data.icon and data.text) then
+		data.time = data.time or 5
+		GAMEMODE:AddMarker(data.pos, data.icon, data.text, data.time)
+	end
+end)
+
+netstream.Hook("FeatherNotify", function(message, class)
+	GAMEMODE:Notify(message, class)
+end)
+
+netstream.Hook("FeatherFade", function(data)
+	GAMEMODE.FadeSpeed = data[2]
+	GAMEMODE.FadeAlpha = data[1].a
+	GAMEMODE.FadeColor = data[1]
+end)
+
+netstream.Hook("PlaySound", function(data)
+	surface.PlaySound(data)
 end)

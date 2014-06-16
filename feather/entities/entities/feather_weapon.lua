@@ -7,7 +7,6 @@ ENT.Category = "Feather"
 
 if (SERVER) then
 	function ENT:Initialize()
-		self:SetModel("models/weapons/w_smg1.mdl")
 		self:PhysicsInit(SOLID_VPHYSICS)
 		self:SetSolid(SOLID_VPHYSICS)
 		self:SetMoveType(MOVETYPE_VPHYSICS)

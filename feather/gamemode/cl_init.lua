@@ -15,11 +15,17 @@ surface.CreateFont("fr_BigTargetShadow", {
 	blursize = 5
 })
 
-surface.CreateFont("fr_HUDNumber", {
-	name = "halflife2",
+surface.CreateFont("fr_BigTargetSub", {
+	font = font,
 	weight = 1000,
-	additive = true,
-	size = ScreenScale(16)
+	size = 18
+})
+
+surface.CreateFont("fr_BigTargetSubShadow", {
+	font = font,
+	weight = 1000,
+	size = 20,
+	blursize = 15
 })
 
 surface.CreateFont("fr_Progress", {
@@ -55,6 +61,14 @@ surface.CreateFont("fr_LicenseTitle", {
 surface.CreateFont("fr_Arrested", {
 	font = "Trebuchet MS",
 	size = 24,
+	weight = 1000,
+	shadow = true,
+	antialias = true
+})
+
+surface.CreateFont("fr_ChatAssist", {
+	font = "Trebuchet MS",
+	size = 22,
 	weight = 1000,
 	shadow = true,
 	antialias = true
@@ -127,7 +141,7 @@ surface.CreateFont("fr_VoteFontShadow", {
 
 surface.CreateFont("fr_ScoreboardTitle", {
 	font = "Trebuchet MS",
-	size = 90,
+	size = 50,
 	weight = 1000,
 	shadow = true,
 	antialias = true

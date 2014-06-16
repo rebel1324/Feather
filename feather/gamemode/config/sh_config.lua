@@ -40,7 +40,20 @@ feather.config.create("rules", {
 	"Do not Random Arrest. Arresting people without any valid/legit reason will get you kicked/banned by the admin.",
 	"Do not disrespect admins/staffs. Always be nice to any people in the server.",
 })
-feather.config.create("blockedModels", {})
+feather.config.create("bigProp", 256)
+feather.config.create("tooBigProp", 512)
+feather.config.create("bigPropWait", 10)
+feather.config.create("blockedModels", {
+	"models/props_c17/oildrum001_explosive.mdl",
+	"models/Cranes/crane_frame.mdl",
+	"models/props_junk/propane_tank001a.mdl",
+	"models/props_phx/oildrum001_explosive.mdl",
+	"models/props_phx/cannonball.mdl",
+	"models/props_phx/cannonball_solid.mdl",
+	"models/props_phx/mk-82.mdl",
+	"models/props_phx/torpedo.mdl",
+	"models/props_phx/ww2bomb.mdl",
+})
 feather.config.create("hitCost", 500)
 feather.config.create("moneyTime", 300)
 feather.config.create("maxDoors", 10)
