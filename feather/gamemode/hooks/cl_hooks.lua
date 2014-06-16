@@ -22,7 +22,7 @@ local iconsize = 16*2
 
 GM.FadeSpeed = 1
 GM.FadeAlpha = 0
-GM.FadeColor = color_whit
+GM.FadeColor = color_white
 GM.IsChatOpen = false
 GM.CurChat = ""
 GM.DisplayText = "Display"
