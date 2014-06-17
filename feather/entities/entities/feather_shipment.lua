@@ -42,14 +42,24 @@ if (SERVER) then
 	function ENT:OnTakeDamage(dmginfo)
 		local damage = dmginfo:GetDamage()
 		self.health = self.health - damage
+		self:EmitSound(Format("physics/wood/wood_plank_break%s.wav", math.random(1,3)))
 
 		if (self.health < 0) then
 			local data = GAMEMODE.WeaponList[self:GetContent()]
 			for i = 1, math.Clamp(self:GetAmount(), 0, 5) do
 				GAMEMODE:SpawnWeapon(self:GetPos() + self:OBBCenter() + self:GetUp()*40 + VectorRand()*10, Angle(0, 0, 0), data.classname)
-				self:GibBreakServer(VectorRand()*100)
+				self.onbreak = true
 				self:Remove()
 			end
+		end
+	end
+
+	function ENT:OnRemove()
+		if self.onbreak then
+			local e = EffectData()
+			e:SetStart(self:GetPos() + self:OBBCenter())
+			util.Effect( "FeatherDestroy", e )
+			self:EmitSound(Format("physics/wood/wood_crate_break%s.wav", math.random(1, 5)))
 		end
 	end
 

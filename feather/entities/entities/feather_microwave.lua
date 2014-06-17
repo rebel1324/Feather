@@ -83,13 +83,6 @@ if (SERVER) then
 		entity:Spawn()
 		entity:SetFood(self.FoodStock)
 		entity:Activate()
-
-
-		timer.Simple(feather.config.get("foodDisappear", 100), function()
-			if entity and entity:IsValid() then
-				entity:Remove()
-			end
-		end)
 	end
 
 	function ENT:OnRemove()

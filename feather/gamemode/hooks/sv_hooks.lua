@@ -7,17 +7,25 @@ function GM:PlayerInitialSpawn(client)
 
 	timer.Create(uniqueID, 30, 0, function()
 		if (!IsValid(client)) then return timer.Remove(uniqueID) end
-		
-		if (hook.Run("PlayerCanReceivePay", client) != false) then
-			local amount, reason = hook.Run("PlayerGetPayAmount", client)
 
-			if (!amount or amount == 0) then
-				return client:notify(reason or GetLang"nopay")
-			end
-
-			hook.Run("PlayerReceivePay", client, amount)
-		end
+		self:PayDay(client)
 	end)
+end
+
+function GM:PayDay(client)
+	if (hook.Run("PlayerCanReceivePay", client) != false) then
+		local amount, reason = hook.Run("PlayerGetPayAmount", client)
+
+		if (!amount or amount == 0) then
+			return client:notify(reason or GetLang"nopay")
+		end
+
+		hook.Run("PlayerReceivePay", client, amount)
+	end
+end
+
+function GM:PostLoadPlayerData(client)
+	self:PayDay(client)
 end
 
 function GM:PlayerCanHearPlayersVoice( listener, talker )
@@ -116,24 +124,8 @@ function GM:PlayerSay(client, text, public)
 	return text
 end
 
-function GM:MoneyEntityCreated(self)
-	if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
-		if self:GetDTInt(0) <= 100 then
-			self:SetModel("models/props/cs_assault/Dollar.mdl")
-		end
-	end
-end
-
-function GM:MoneyEntityChanged(self)
-	if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
-		if self:GetDTInt(0) <= 100 then
-			self:SetModel("models/props/cs_assault/Dollar.mdl")
-		end
-	end
-end
-
 function GM:CanBecomeJob(client, data, teamindex)
-	if (client.banned) then
+	if (client.bannedJobs and client.bannedJobs[teamindex] and client.bannedJobs[teamindex] < CurTime()) then
 		client:notify(GetLang"cantdo")
 	end
 end
@@ -211,6 +203,9 @@ function GM:Demote(from, to, reason, voted)
 
 		return false
 	else
+		client.bannedJobs[to:Team()] = CurTime() + feather.config.get("jobBanTime")
+		client:notify(GetLang("jobbanned", string.ToMinutesSeconds(feather.config.get("jobBanTime"))))
+
 		NotifyAll(GetLang("playerdemoted", to:Name()))
 		GAMEMODE:BecomeJob(to, to:Team(), TEAM_CITIZEN, true, false)
 

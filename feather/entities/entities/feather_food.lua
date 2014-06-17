@@ -20,6 +20,12 @@ if (SERVER) then
 		end
 
 		hook.Run("OnFoodCreated", self)
+
+		timer.Simple(feather.config.get("entityRemoveTime"), function()
+			if self:IsValid() then
+				self:Remove()
+			end
+		end)
 	end
 
 	function ENT:SetFood(uniqueID)

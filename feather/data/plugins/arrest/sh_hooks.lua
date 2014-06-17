@@ -21,7 +21,9 @@ if (SERVER) then
 	end)
 
 	hook.Add("PlayerGetPayAmount", "fr_ArrestPay", function(client)
-		return false, GetLang("zerosalary")
+		if client:IsArrested() then
+			return false, GetLang("arrestedpay")
+		end
 	end)
 else
 	surface.CreateFont("fr_Arrested", {

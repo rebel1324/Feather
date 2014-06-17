@@ -1,21 +1,93 @@
 local playerMeta = FindMetaTable("Player")
+-- ITEM STRUCTURE
+/*
+	['uniqueid'] = {
+		name = 'SHIPMENT'
 
-function playerMeta:GiveItem(item, amount, data)
+		price = 100,
+		--desc = 'A Shipment that contains items' '** generic string decs.
+
+		desc = function(data)
+			return Format("A Shipment that contains %s of %s", data.amount, data.class)
+		end,
+
+		data = {
+			entity = true,
+			amount = 10,
+			class = 'item_healthkit',
+			price = 1000, -- data price overrides default price.
+		},
+
+		funcs = {
+			onUse = {
+			name = GetLang"use",
+			cond = true, -- it could be function.
+			func = function() 
+				-- Shipment use func
+				return true
+			end},
+
+			onDrop = {
+			name = GetLang"drop",
+			cond = true,
+			func = function()
+				-- Don't drop item.
+				return true, false -- first arg is consume item, second arg is drop item.
+			end},
+
+			-- can add more.
+		}
+	}
+*/
+-- Inventory Structure
+/*
+	local tbl = player:GetNetVar("inv")
+
+	>> tbl = {
+		['uniqueid '] = {
+			[1] = {
+				amount = 1,
+				data = {
+					--stuffs
+				},
+			},
+			[2] = {
+				amount = 3
+				data = {
+					--stuffs
+				},
+			}
+		}
+	}
+*/
+
+function playerMeta:GiveItem(item, amount, data, forced)
 	
 end
 
 function playerMeta:GetItem(item)
-	local inv = self:GetItems()
-	return inv[item]
+	local inv = self:GetInventory()
+	return inv[item] or {}
 end
 
-function playerMeta:GetItems()
+function playerMeta:GetItemSpec(item, conditions)
+	-- get specific
+end
+
+function playerMeta:HasItem(item)
+
+end
+
+function playerMeta:GetItemCount()
+
+end
+
+function playerMeta:GetInventory()
 	return self:GetLocalVar("inv")
 end
 
 local function InventoryPanelInit(self)
 	self.content:Clear()
-
 end
 
 local function MainMenuAdd(panel)

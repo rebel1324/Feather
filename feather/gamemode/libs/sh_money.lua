@@ -33,13 +33,23 @@ if (SERVER) then
 		money:SetPos(position or Vector(0, 0, 0))
 		money:SetAngles(angles or Angle(0, 0, 0))
 		money:Spawn()
-
-		timer.Simple(feather.config.get("moneyRemoveTime", 300), function()
-			if money:IsValid() then
-				money:Remove()
-			end
-		end)
 		return money
+	end
+
+	function GM:MoneyEntityCreated(self)
+		if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
+			if self:GetDTInt(0) <= 100 then
+				self:SetModel("models/props/cs_assault/Dollar.mdl")
+			end
+		end
+	end
+
+	function GM:MoneyEntityChanged(self)
+		if (feather.config.get("moneyModel"):lower() == "models/props/cs_assault/money.mdl") then
+			if self:GetDTInt(0) <= 100 then
+				self:SetModel("models/props/cs_assault/Dollar.mdl")
+			end
+		end
 	end
 end
 

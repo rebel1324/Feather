@@ -83,6 +83,11 @@ if SERVER then
 			if dist >= 64*1.5 then
 				self:StopSearch()	
 			end
+
+			if (!self.nextPing or self.nextPing < CurTime()) then
+				self.Owner:EmitSound(Format("npc/fast_zombie/foot%d.wav", math.random(1, 4)))
+				self.nextPing = CurTime() + .4
+			end
 		end
 	end
 else

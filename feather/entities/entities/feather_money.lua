@@ -20,6 +20,12 @@ if (SERVER) then
 		end
 
 		hook.Run("MoneyEntityCreated", self)
+
+		timer.Simple(feather.config.get("moneyRemoveTime"), function()
+			if self:IsValid() then
+				self:Remove()
+			end
+		end)
 	end
 
 	function ENT:SetMoney(amount)

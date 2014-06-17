@@ -70,6 +70,8 @@ do
 
 					MsgN("Loaded data for "..self:Name()..".")
 				end
+
+				hook.Call("PostLoadPlayerData", self)
 			end
 		end)
 	end

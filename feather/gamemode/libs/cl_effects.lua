@@ -76,7 +76,7 @@ function EFFECT:Init( data )
 			p:AddAngleVelocity(VectorRand()*500)
 		end
 
-		timer.Simple(1, function()
+		timer.Simple(2, function()
 			if debris:IsValid() then
 				debris:Remove()
 			end

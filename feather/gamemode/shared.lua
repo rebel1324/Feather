@@ -7,6 +7,7 @@ GM.Name = "Feather"
 GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true
 GM.Jobs = {}
+GM.CreateTeams = function() end
 
 cn.util.include("sh_config.lua")
 cn.util.include("sh_language.lua")

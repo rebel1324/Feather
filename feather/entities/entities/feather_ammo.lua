@@ -18,6 +18,12 @@ if (SERVER) then
 		if (IsValid(physObj)) then
 			physObj:Wake()
 		end
+
+		timer.Simple(feather.config.get("entityRemoveTime"), function()
+			if self:IsValid() then
+				self:Remove()
+			end
+		end)
 	end
 
 	function ENT:SetAmmo(class, amount)

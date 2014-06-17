@@ -54,7 +54,8 @@ if SERVER then
 
 		timer.Create(self:EntIndex() .. "_PICK", picktime, 1, function()
 			if self:IsValid() and self.Owner:IsValid() and self.Owner:Alive() and self.target:IsValid() then
-				self.target:EmitSound("doors/vent_open1.wav", 30, 90)
+				self.target:EmitSound("weapons/357/357_spin1.wav")
+				self.target:EmitSound("doors/door_latch1.wav")
 				self.target:Fire("unlock")
 
 				self.target = nil
@@ -83,6 +84,11 @@ if SERVER then
 
 			if trace.Entity != self.target then
 				self:StopPick()	
+			end
+
+			if (!self.nextPing or self.nextPing < CurTime()) then
+				self.Owner:EmitSound(Format("weapons/357/357_reload%d.wav", table.Random({1, 3, 4})))
+				self.nextPing = CurTime() + .6
 			end
 		end
 	end
