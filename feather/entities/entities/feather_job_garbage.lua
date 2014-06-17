@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Type = "anim"
-ENT.PrintName = "The Packagea"
+ENT.PrintName = "The Garbage"
 ENT.Author = "Black Tea"
 ENT.Category = "Feather"
 ENT.Spawnable = true

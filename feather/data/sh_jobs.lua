@@ -118,6 +118,7 @@ TEAM_POLICE = GM:CreateJob("Police", Color(0, 100, 200), {
 		"weapon_unarrest",
 		"weapon_search",
 	},
+	gang = true,
 	desc = GetLang("jobpolice"),
 	max = 4,
 })
@@ -133,6 +134,7 @@ TEAM_MOBBOSS = GM:CreateJob("Mob Boss", Color(50, 50, 50), {
 	loadout = {
 		"weapon_lockpick",
 	},
+	gang = true,
 	desc = GetLang("jobmobsterboss"),
 	max = 1,
 })

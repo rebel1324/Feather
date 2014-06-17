@@ -1,5 +1,4 @@
 local playerMeta = FindMetaTable("Player")
-
 GM.FoodList = {}
 
 function playerMeta:GetHunger()
@@ -11,7 +10,7 @@ function playerMeta:GetHungerPercent()
 end
 
 function GM:AddFood(uniqueID, name, model, job, hunger, price, buyable)
-	GM.FoodList[uniqueID] = {
+	self.FoodList[uniqueID] = {
 		name = name,
 		model = model,
 		job = job,
@@ -74,3 +73,5 @@ if SERVER then
 		GAMEMODE:PlayerHungerInit(client)
 	end)
 end
+
+cn.util.include("sh_foods.lua")

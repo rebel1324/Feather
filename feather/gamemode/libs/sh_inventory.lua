@@ -61,25 +61,90 @@ local playerMeta = FindMetaTable("Player")
 	}
 */
 
-function playerMeta:GiveItem(item, amount, data, forced)
-	
+-- If partially matches, call this function.
+local function CheckDataEqual(data1, data2)
+	for k, v in pairs(data1) do
+		if (v != data2.k) then
+			return false
+		end
+	end
+
+	return true
 end
 
-function playerMeta:GetItem(item)
+-- If completely matches, call this function.
+local function CheckDataCompleteEqual(data1, data2)
+	for k, v in pairs(data1) do
+		if (v != data2.k) then
+			return false
+		end
+	end
+
+	for k, v in pairs(data2) do
+		if (v != data1.k) then
+			return false
+		end
+	end
+
+	return true
+end
+
+
+function playerMeta:GiveItem(item, amount, data, forced)
+	local item = self:GetItem(item)
+	local inv = self:GetInventory()
+	local itemdata = feather.item.get(item)
+	data = data or {}
+
+	if (itemdata) then
+		if (item) then
+			for k, v in pairs(item) do
+				if (CheckDataCompleteEqual(v.data, data)) then
+					v.amount = v.amount + amount
+
+					return
+				end
+			end
+		end
+
+		data = table.Merge(data, itemdata.data)
+		table.insert(inv, {amount = amount, data = data})
+		self:SetNetVar("inv", inv) -- god, forsake me. I made whole table sync!!!!!!!!!!!!!! NOOOOOOOOOOOOO
+	end
+end
+
+function playerMeta:GetItem(item) -- yes, get item.
 	local inv = self:GetInventory()
 	return inv[item] or {}
 end
 
 function playerMeta:GetItemSpec(item, conditions)
-	-- get specific
+	local item = self:GetItem(item)
+	for k, v in pairs(item) do
+		if (CheckDataEqual(conditions, v.data)) then
+			return item.k
+		end
+	end
+
+	return
 end
 
-function playerMeta:HasItem(item)
+function playerMeta:HasItem(item, amount)
+	local amt = self:GetItemCount(item)
 
+	return (amt >= amount)
 end
 
-function playerMeta:GetItemCount()
+function playerMeta:GetItemCount(item)
+	local tbl = self:GetItem(item)
+	local amt = 0
+	for k, v in ipairs(tbl) do
+		if (v and v.amount )then
+			amt = amt + v.amount
+		end
+	end
 
+	return (amt or 0)
 end
 
 function playerMeta:GetInventory()
@@ -102,6 +167,10 @@ do
 	feather.item = feather.item or {}
 	feather.items = feather.items or {}
 	feather.itemBases = feather.itemBases or {}
+
+	function feather.item.get(class)
+		return feather.items[class]
+	end
 
 	function feather.item.load(directory)
 		directory = directory or "feather/data/items"

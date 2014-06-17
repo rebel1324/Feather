@@ -85,8 +85,23 @@ if (SERVER) then
 		entity:Activate()
 	end
 
+	function ENT:OnTakeDamage(dmginfo)
+		local damage = dmginfo:GetDamage()
+		self.health = self.health - damage
+		self:EmitSound(Format("physics/wood/wood_plank_break%s.wav", math.random(1,3)))
+
+		if (self.health < 0) then
+			self.onbreak = true
+			self:Remove()
+			hook.Run("OnPlayerDestory", entity, dmginfo)
+		end
+	end
+
 	function ENT:OnRemove()
 		self.GenerateSound:Stop()
+		if self.onbreak then
+			
+		end
 	end
 else
 	local glowMaterial = Material("sprites/glow04_noz")

@@ -35,12 +35,20 @@ if (SERVER) then
 		self.health = self.health - damage
 
 		if (self.health < 0) then
+			self.onbreak = true
+			self:Remove()
+			hook.Run("OnPlayerDestory", entity, dmginfo)
+		end
+	end
+
+	function ENT:OnRemove()
+		if (self.onbreak) then
 			local effectData = EffectData()
 			effectData:SetStart(self:GetPos())
 			effectData:SetOrigin(self:GetPos())
 				
 			util.Effect("Explosion", effectData, true, true)
-			self:Remove()
+			util.BlastDamage( self, self.Owner or self, self:GetPos() + Vector( 0, 0, 1 ), 256, 120 )
 		end
 	end
 
@@ -50,12 +58,6 @@ if (SERVER) then
 
 		timer.Simple(3, function() 
 			if (!self:IsValid()) then return end
-			local effectData = EffectData()
-			effectData:SetStart(self:GetPos())
-			effectData:SetOrigin(self:GetPos())
-				
-			util.Effect("Explosion", effectData, true, true)
-			util.BlastDamage( self, self.Owner or self, self:GetPos() + Vector( 0, 0, 1 ), 256, 120 )
 			self:Remove()
 		end)
 	end
@@ -85,6 +87,20 @@ if (SERVER) then
 				self:PrintMoney()
 			end)
 		end)
+	end
+
+	function ENT:ConnectPower()
+
+	end
+	
+	function ENT:DisconnectPower()
+
+	end
+
+	function ENT:OnPlayerDestory(entity, attacker, inflictor, data)
+		if data.goverment then
+			attacker:notify("Good job, folk.")
+		end
 	end
 
 	function ENT:Use(activator)

@@ -6,6 +6,7 @@ if SERVER then
 		"feather_arrestboard",
 		"feather_jobterminal",
 		"feather_job_pckdest",
+		"feather_socket",
 	}
 
 	local loadquery = "SELECT * FROM fr_entities WHERE _map = '%s'"
@@ -76,10 +77,15 @@ if SERVER then
 		end
 	end)
 
-	function GM:OnSaveEntityData(entity, encoded)
+	function GM:OnSaveEntityData(entity)
+		if (entity and entity:IsValid() and entity.OnDataSave) then
+			return entity:OnDataSave() -- returns serialized version of data.
+		end
 	end
 	
-	function GM:OnLoadEntityData(entity)
-		--return encoded
+	function GM:OnLoadEntityData(entity, encoded)
+		if (entity and entity:IsValid() and entity.OnDataLoad) then
+			entity:OnDataLoad(encoded) -- runs the loading code with encoded data.
+		end
 	end
 end

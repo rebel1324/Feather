@@ -22,6 +22,9 @@ GM:AddMapPos(map, "garbage", Vector(-2451.3549804688, 1350.2510986328, -383.9687
 GM:AddMapPos(map, "garbage", Vector(-1469.0399169922, -1081.1253662109, -9.4270668029785))
 GM:AddMapPos(map, "garbage", Vector(-1983.6811523438, -989.18499755859, -20.190910339355))
 
+-- MISSION PACKAGE
+-- Bring entity A to entity B.
+
 local JOB = {}
 JOB.uid = "package"
 JOB.names = {
@@ -90,6 +93,8 @@ JOB.onSuccess = function(client, info)
 end
 GM:AddMission(JOB)
 
+-- MISSION JUNKDESTROY
+-- Destroy all junks.
 
 local JOB = {}
 JOB.uid = "junkdestroy"

@@ -286,6 +286,17 @@ function GM:AddMarker(client, pos, icon, text, time)
 	})
 end
 
+function GM:OnPlayerDestory(entity, dmginfo)
+	local attacker = dmginfo:GetAttacker()
+	if (attacker and attacker:IsValid() and attacker:IsPlayer()) then
+		local data = self:GetJobData(attacker:Team())
+		local inflictor = dmginfo:GetInflictor()
+		if entity.OnPlayerDestory then
+			entity:OnPlayerDestory(entity, attacker, inflictor, data)
+		end
+	end
+end
+
 function GM:CanDrive(client)
 	return client:IsAdmin()
 end
