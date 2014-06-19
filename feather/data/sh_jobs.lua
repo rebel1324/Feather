@@ -85,24 +85,6 @@ TEAM_MAYOR = GM:CreateJob("Mayor", Color(80, 0, 0), {
 	max = 1,
 })
 
-TEAM_POLICECHIEF = GM:CreateJob("Police Chief", Color(0, 50, 200), {
-	model = {
-		"models/player/combine_soldier.mdl",
-	},
-	salary = math.Round(feather.config.get("salary", 50) * 3),
-	goverment = true,
-	childjob = TEAM_POLICE,
-	cmd = "chief",
-	loadout = {
-		"weapon_pistol",
-		"weapon_arrest",
-		"weapon_unarrest",
-		"weapon_search",
-	},
-	desc = GetLang("jobpolicechief"),
-	max = 1,
-})
-
 TEAM_POLICE = GM:CreateJob("Police", Color(0, 100, 200), {
 	model = {
 		"models/player/police.mdl",
@@ -123,19 +105,21 @@ TEAM_POLICE = GM:CreateJob("Police", Color(0, 100, 200), {
 	max = 4,
 })
 
-TEAM_MOBBOSS = GM:CreateJob("Mob Boss", Color(50, 50, 50), {
+TEAM_POLICECHIEF = GM:CreateJob("Police Chief", Color(0, 50, 200), {
 	model = {
-		"models/player/GMan_high.mdl",
+		"models/player/combine_soldier.mdl",
 	},
-	salary = math.Round(feather.config.get("salary", 50) * 2),
-	convicts = true,
-	childjob = TEAM_MOBSTER,
-	cmd = "mobboss",
+	salary = math.Round(feather.config.get("salary", 50) * 3),
+	goverment = true,
+	childjob = TEAM_POLICE,
+	cmd = "chief",
 	loadout = {
-		"weapon_lockpick",
+		"weapon_pistol",
+		"weapon_arrest",
+		"weapon_unarrest",
+		"weapon_search",
 	},
-	gang = true,
-	desc = GetLang("jobmobsterboss"),
+	desc = GetLang("jobpolicechief"),
 	max = 1,
 })
 
@@ -161,4 +145,20 @@ TEAM_MOBSTER = GM:CreateJob("Mobster", Color(100, 100, 100), {
 	convicts = true,
 	cmd = "mob",
 	desc = GetLang("jobmobster"),
+})
+
+TEAM_MOBBOSS = GM:CreateJob("Mob Boss", Color(50, 50, 50), {
+	model = {
+		"models/player/GMan_high.mdl",
+	},
+	salary = math.Round(feather.config.get("salary", 50) * 2),
+	convicts = true,
+	childjob = TEAM_MOBSTER,
+	cmd = "mobboss",
+	loadout = {
+		"weapon_lockpick",
+	},
+	gang = true,
+	desc = GetLang("jobmobsterboss"),
+	max = 1,
 })

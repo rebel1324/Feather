@@ -160,6 +160,9 @@ l.hudheal = "Press <PRIMARY> to heal the player."
 l.hudhealsec = "Press <SECONDARY> to heal yourself."
 l.hudhealtarget = "Heal %s."
 
+l.hudslamdoor = "Press <PRIMARY> to slam door open."
+l.hudslamdoortarget = "Slam this door open."
+
 l.jobcitizen = [[This is citizen who lives in the city.]]
 l.jobcook = [[You can get some profit by selling some foods to hungry players on the city.
 You can buy 'Microwave' in the Shop Category and can set it's price with '/setprice <amount>' command.]]

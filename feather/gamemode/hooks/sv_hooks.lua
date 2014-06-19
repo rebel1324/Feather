@@ -291,7 +291,7 @@ function GM:OnPlayerDestory(entity, dmginfo)
 	if (attacker and attacker:IsValid() and attacker:IsPlayer()) then
 		local data = self:GetJobData(attacker:Team())
 		local inflictor = dmginfo:GetInflictor()
-		if entity.OnPlayerDestory then
+		if (entity and entity:IsValid() and entity.OnPlayerDestory) then
 			entity:OnPlayerDestory(entity, attacker, inflictor, data)
 		end
 	end

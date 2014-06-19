@@ -98,17 +98,25 @@ if SERVER then
 	function GM:FlushPlayerDoor(client)
 		for k, v in ipairs(ents.GetAll()) do
 			if v:IsDoor() then
-				if GetDoorOwner(v:GetDoorOwners()) == client then
-					v:FlushDoor()
-				end
+				local data = v:GetDoorOwners()
 
-				if !GetDoorOwner(v:GetDoorOwners()):IsValid() then
-					v:FlushDoor()
+				if type(data):lower() == "table" then
+					local owner = GetDoorOwner(data)
+					
+					if owner == client then
+						v:FlushDoor()
+					end
+
+					if !owner:IsValid() then
+						v:FlushDoor()
+					end
 				end
 			end
 		end
 	end
-	hook.Add("PlayerDisconnect", "FeatherDoorFlush", GM.FlushPlayerDoor)
+	hook.Add("PlayerDisconnected", "FeatherDoorFlush", function(client)
+		GAMEMODE:FlushPlayerDoor(client) -- ??
+	end)
 
 	function GM:CanBuyDoor(client, door)
 		if self:GetDoorCount(client) >= feather.config.get("maxDoors") then
@@ -207,7 +215,8 @@ function GetDoorOwner(table)
 	if type(table):lower() != "table" then return end
 	
 	for k, v in pairs(table) do
-		if v then
+		if (v == true) then
+			print('true', k, v)
 			return k
 		end
 	end

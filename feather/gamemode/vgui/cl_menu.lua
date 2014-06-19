@@ -144,8 +144,6 @@ function PNL:Think()
 end
 vgui.Register("FeatherMainMenuButton", PNL, "DButton")
 
-
-
 local PNL = {}
 
 function PNL:Init()
@@ -359,6 +357,7 @@ function PNL:LoadJob()
 
 	for k, v in ipairs(team.GetAllTeams()) do
 		local data = GAMEMODE:GetJobData(k)
+		PrintTable(data)
 		if (data.childjob and data.childjob != LocalPlayer():Team() or k == LocalPlayer():Team()) then
 			continue
 		end

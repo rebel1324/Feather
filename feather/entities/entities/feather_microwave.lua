@@ -17,6 +17,7 @@ if (SERVER) then
 		self:SetMoveType(MOVETYPE_VPHYSICS)
 		self:SetUseType(SIMPLE_USE)
 		self.foodprice = 20
+		self.health = 100	
 		self:SetNetVar("price", 200)
 
 		local physObj = self:GetPhysicsObject()
@@ -88,7 +89,7 @@ if (SERVER) then
 	function ENT:OnTakeDamage(dmginfo)
 		local damage = dmginfo:GetDamage()
 		self.health = self.health - damage
-		self:EmitSound(Format("physics/wood/wood_plank_break%s.wav", math.random(1,3)))
+		self:EmitSound(Format("ambient/levels/labs/electric_explosion%s.wav", math.random(1,2)), 100, math.random(200, 300))
 
 		if (self.health < 0) then
 			self.onbreak = true
@@ -100,7 +101,11 @@ if (SERVER) then
 	function ENT:OnRemove()
 		self.GenerateSound:Stop()
 		if self.onbreak then
-			
+			self:EmitSound("ambient/explosions/explode_1.wav", 120, 200)
+			local e = EffectData()
+			e:SetStart(self:GetPos() + self:OBBCenter())
+			e:SetScale(1.5)
+			util.Effect( "FeatherExplosion", e )
 		end
 	end
 else

@@ -22,17 +22,32 @@ SWEP.cantDrop = true
 SWEP.Category = "Feather"
 SWEP.HoldType = "normal"
 
-SWEP.WorldModel = "models/weapons/w_pistol.mdl"
-SWEP.ViewModel = "models/weapons/c_pistol.mdl"
+SWEP.WorldModel = "models/weapons/w_stunbaton.mdl"
+SWEP.ViewModel = "models/weapons/v_stunbaton.mdl"
 SWEP.IconLetter = ""
+
+function SWEP:Initialize()
+	self:SetWeaponHoldType("melee")
+end
 
 function SWEP:GetViewModelPosition(pos, ang)
 	-- die
-	pos.z = 35575
+	pos = pos + self:GetRight()*-2
 	return pos, ang
 end
 
 function SWEP:Reload()
+end
+
+local glowMaterial = Material("sprites/glow04_noz")
+function SWEP:DrawWorldModel()
+	self:DrawModel()
+
+	local at = self:GetAttachment(1)
+	local pos = at.Pos
+
+	render.SetMaterial(glowMaterial)
+	render.DrawSprite(pos, math.Rand(8, 16), math.Rand(8, 16), Color( 255, 44, 44, alpha ) )
 end
 
 function SWEP:PrimaryAttack()
@@ -49,6 +64,10 @@ function SWEP:PrimaryAttack()
 			ply:Arrest(self.Owner)
 		end
 	end
+
+	self:EmitSound("Weapon_Crowbar.Single")
+    self.Owner:SetAnimation(PLAYER_ATTACK1)
+    self:SendWeaponAnim(ACT_VM_MISSCENTER)
 
 	self:SetNextPrimaryFire(CurTime() + .5)
 end
