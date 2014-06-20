@@ -6,87 +6,6 @@ local function MenuShadow(w, h)
 	surface.DrawTexturedRect(w - w*.1, 0, w*.1, h)
 end
 
-surface.CreateFont("fr_NotiFont", {
-	font = "Myriad Pro",
-	size = 16,
-	weight = 500,
-	antialias = true
-})
-
-local PNL = {}
-PNL.pnlTypes = {
-	[1] = { -- NOT ALLOWED
-		col = Color( 200, 60, 60 ),
-		icon = "icon16/exclamation.png"
-	},
-	[2] = { -- COULD BE CANCELED
-		col = Color( 255, 100, 100 ),
-		icon = "icon16/cross.png"
-	},
-	[3] = { -- WILL BE CANCELED
-		col = Color( 255, 100, 100 ),
-		icon = "icon16/cancel.png"
-	},
-	[4] = { -- TUTORIAL/GUIDE
-		col = Color( 100, 185, 255 ),
-		icon = "icon16/book.png"
-	},
-	[5] = { -- ERROR
-		col = Color( 255, 255, 100 ),
-		icon = "icon16/error.png"
-	},
-	[6] = { -- YES
-		col = Color( 140, 255, 165 ),
-		icon = "icon16/accept.png"
-	},
-	[7] = { -- TUTORIAL/GUIDE
-		col = Color( 100, 185, 255 ),
-		icon = "icon16/information.png"
-	},
-}
-
-function PNL:Init()
-	self.type = 1
-	self.text = self:Add( "DLabel" )
-	self.text:SetFont( "fr_NotiFont" )
-	self.text:SetContentAlignment(5)
-	self.text:SetTextColor( color_white )
-	self.text:SizeToContents()
-	self.text:Dock( FILL )
-	self.text:DockMargin(2, 2, 2, 2)
-	self.text:SetExpensiveShadow(1, Color(25, 25, 25, 120))
-	self:SetTall(28)
-end
-
-function PNL:SetType( num )
-	self.type = num
-	return 
-end
-
-function PNL:SetText( str )
-	self.text:SetText( str )
-end
-
-function PNL:SetFont( str )
-	self.text:SetFont( str )
-end
-
-function PNL:Paint()
-	self.material = self.material or Material( self.pnlTypes[ self.type ].icon )
-	local col = self.pnlTypes[ self.type ].col
-	local mat = self.material
-	local size = self:GetTall()*.6
-	local marg = 3
-	draw.RoundedBox( 4, 0, 0, self:GetWide(), self:GetTall(), col )	
-	if mat then
-		surface.SetDrawColor( color_white )
-		surface.SetMaterial( mat )
-		surface.DrawTexturedRect( size/2, self:GetTall()/2-size/2 + 1, size, size )
-	end
-end
-
-vgui.Register("FeatherNoticeBar", PNL, "DPanel")
-
 local PNL = {}
 
 function PNL:Init()
@@ -289,7 +208,7 @@ local menubarsize = .25
 local menubartopsize = .12
 
 function PNL:Init()
-	self:SetSize(640, 480)
+	self:SetSize(math.Clamp(ScrW()/2, 640, math.huge), math.Clamp(ScrH()/2, 480, math.huge))
 	self:Center()
 	self:DockPadding(0, 0, 0, 0)
 	self:MakePopup()
@@ -334,10 +253,6 @@ function PNL:Init()
 
 	hook.Run("OnMenuLoadButtons", self)
 
-	self:AddButton(GetLang"menuconfig", function()
-		self:LoadConfigs()
-	end)	
-
 	self:AddButton(GetLang"menuclose", function()
 		self:Close()
 	end)
@@ -357,7 +272,6 @@ function PNL:LoadJob()
 
 	for k, v in ipairs(team.GetAllTeams()) do
 		local data = GAMEMODE:GetJobData(k)
-		PrintTable(data)
 		if (data.childjob and data.childjob != LocalPlayer():Team() or k == LocalPlayer():Team()) then
 			continue
 		end
@@ -478,7 +392,10 @@ function PNL:AddButton(str, func)
 	btn:SetColor(color_white)
 	btn:SetTall(45)
 	if func then
-		btn.OnClick = func
+		btn.OnClick = function()
+			self:SetKeyboardInputEnabled(false)
+			func()
+		end
 	end
 
 	table.insert(self.menu.buttons, btn)

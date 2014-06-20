@@ -135,7 +135,9 @@ function PNL:Think()
 
 	if plys != self.playercount then
 		timer.Simple(0, function()
-			self:RefreshPlayers()
+			if self.RefreshPlayers then
+				self:RefreshPlayers()
+			end
 		end)
 	end
 

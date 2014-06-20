@@ -70,7 +70,12 @@ else
 	end
 
 	hook.Add("CanDrawDoorInfo", "FeatherBatteringRam", function()
-		return !(LocalPlayer():GetActiveWeapon():IsValid() and LocalPlayer():GetActiveWeapon():GetClass() == "weapon_batteringram")
+		local wep = LocalPlayer():GetActiveWeapon()
+		if (wep and wep:IsValid()) then
+			if (wep:GetClass() == "weapon_batteringram") then
+				return false
+			end
+		end
 	end)
 end
 

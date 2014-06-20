@@ -188,8 +188,12 @@ l.jobmobster = [[This is citizen who lives in the city.]]
 l.jobmobsterboss = [[This is citizen who lives in the city.]]
 l.jobhitman = [[This is citizen who lives in the city.]]
 
+l.configchanged = "%s changed %s to %s."
+
 l.jobmenutip = "You can see job's info by right clicking the button."
 l.jobboardtip = "You can see job's info by right clicking the button."
+l.configtip = "You can edit server's config in this tab."
+l.configauthtip = "Only authorized person can edit server config."
 
 l.deliverybreifing = "You have to deliver the package to the destination in %d seconds."
 l.deliveryfailed = "You failed to deliver the package in time."

@@ -3,18 +3,22 @@ local playerMeta = FindMetaTable("Player")
 
 if (SERVER) then
 	function playerMeta:GiveMoney(amount)
+		amount = tonumber(amount)
 		self:SetLocalVar("money", self:GetLocalVar("money", 0) + tonumber(amount or 0))
 	end
 
 	function playerMeta:TakeMoney(amount)
+		amount = tonumber(amount)
 		self:GiveMoney(-amount)
 	end
 
 	function playerMeta:SetMoney(amount)
+		amount = tonumber(amount)
 		self:SetLocalVar("money", amount)
 	end
 
 	function playerMeta:PayMoney(amount, fail, succ)
+		amount = tonumber(amount)
 		if self:GetMoney() >= amount then
 			self:TakeMoney(amount)
 			if succ then

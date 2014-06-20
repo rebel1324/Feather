@@ -155,8 +155,8 @@ l.hudheal = "<공격> 키로 플레이어를 치료합니다."
 l.hudhealsec = "<보조 공격> 키로 자신을 치료합니다."
 l.hudhealtarget = "%s 치료."
 
-l.jobcitizen = [[This is citizen who lives in the city.]]
-l.jobcook = [[You can get some profit by selling some foods to hungry players on the city.
+l.jobcitizen = [[이 도시를 살아가는 시민입니다.]]
+l.jobcook = [[당신은 요리사로써 도시를 살아가는 사람들의 배를 음식을 만들어 주거나 팔아서 채워줄 수 있습니다.
 You can buy 'Microwave' in the Shop Category and can set it's price with '/setprice <amount>' command.]]
 l.jobgundealer = [[You can get some profit by selling some guns to players on the city.
 Mostly you're not allowed to kill other with your own guns.
@@ -181,6 +181,9 @@ l.jobmobsterboss = [[This is citizen who lives in the city.]]
 l.jobhitman = [[This is citizen who lives in the city.]]
 
 l.jobmenutip = "오른쪽 클릭으로 직업 정보를 알 수 있습니다."
+l.jobboardtip = "임무 정보를 오른쪽 클릭으로 볼 수 있습니다."
+l.configtip = "서버 설정을 이 곳에서 바꿀 수 있습니다."
+l.configauthtip = "오직 인가된 사람만이 서버 설정을 바꿀 수 있습니다."
 
 l.deliverybreifing = "당신은 물건을 대상 지점까지 %d초 이내에 배달해야 합니다."
 l.deliveryfailed = "당신은 물건을 제 시간에 배달하는것에 실패했습니다."

@@ -4,6 +4,7 @@ feather.config.default = {}
 
 function feather.config.create(key, value, desc, nonShared)
 	feather.config.default[key] = {value = value, desc = desc or "No description available.", nonShared = nonShared}
+	return feather.config.default[key]
 end
 
 function feather.config.set(key, value, receiver)
@@ -29,6 +30,10 @@ end
 
 function feather.config.getType(key)
 	return feather.config.default[key] and type(feather.config.default[key].value)
+end
+
+function feather.config.getAll()
+	return feather.config.default, feather.config.vars
 end
 
 if (SERVER) then
@@ -64,6 +69,11 @@ if (SERVER) then
 	hook.Add("Initialize", "fr_ConfigLoader", feather.config.load)
 	hook.Add("ShutDown", "fr_ConfigSaver", feather.config.save)
 	hook.Add("PlayerInitialSpawn", "fr_SendConfig", feather.config.send)
+
+	netstream.Hook("fr_SetConfig", function(client, key, value)
+		feather.config.set(key, value)
+		NotifyAll(GetLang("configchanged", client:Name(), key, tostring(value)))
+	end)
 else
 	netstream.Hook("fr_Config", function(key, value)
 		feather.config.vars[key] = value

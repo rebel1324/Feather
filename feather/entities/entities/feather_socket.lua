@@ -10,7 +10,7 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 if (SERVER) then
 	function ENT:SpawnFunction(client, trace, class)
 		local entity = ents.Create(class)
-		entity:SetPos(trace.HitPos - trace.HitNormal * 10)
+		entity:SetPos(trace.HitPos - trace.HitNormal * -2)
 		entity:SetAngles(trace.HitNormal:Angle())
 		entity:Spawn()
 		entity:Activate()
@@ -36,7 +36,7 @@ if (SERVER) then
 	function ENT:Use(activator)
 	end
 else
-	function ENT:DrawScreen()
+	function ENT:DrawTarget()
 		local origin = self:GetPos() + self:GetForward() * 26 + Vector(0, 0, 40)
 		local pos = (origin):ToScreen()
 		local alpha = math.Clamp((1 - origin:DistToSqr(EyePos()) / 512^2) * 255, 0, 255)

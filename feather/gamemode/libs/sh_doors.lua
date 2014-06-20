@@ -102,7 +102,7 @@ if SERVER then
 
 				if type(data):lower() == "table" then
 					local owner = GetDoorOwner(data)
-					
+
 					if owner == client then
 						v:FlushDoor()
 					end
@@ -216,7 +216,6 @@ function GetDoorOwner(table)
 	
 	for k, v in pairs(table) do
 		if (v == true) then
-			print('true', k, v)
 			return k
 		end
 	end

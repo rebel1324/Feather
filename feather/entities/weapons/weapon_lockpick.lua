@@ -97,7 +97,12 @@ else
 	end
 
 	hook.Add("CanDrawDoorInfo", "FeatherLockpick", function()
-		return !(LocalPlayer():GetActiveWeapon():IsValid() and LocalPlayer():GetActiveWeapon():GetClass() == "weapon_lockpick")
+		local wep = LocalPlayer():GetActiveWeapon()
+		if (wep and wep:IsValid()) then
+			if (wep:GetClass() == "weapon_lockpick") then
+				return false
+			end
+		end
 	end)
 end
 

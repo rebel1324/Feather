@@ -151,18 +151,6 @@ function playerMeta:GetInventory()
 	return self:GetLocalVar("inv")
 end
 
-local function InventoryPanelInit(self)
-	self.content:Clear()
-end
-
-local function MainMenuAdd(panel)
-	panel:AddButton(GetLang"menuinventory", function()
-		InventoryPanelInit(panel)
-	end)
-end
-
-hook.Add("OnMenuLoadButtons", "FeatherInventoryAdd", MainMenuAdd)
-
 do
 	feather.item = feather.item or {}
 	feather.items = feather.items or {}
