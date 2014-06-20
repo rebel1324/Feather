@@ -335,10 +335,6 @@ function GM:PlayerSpawnVehicle(client)
 	return client:IsAdmin()
 end
 
-function GM:PlayerSpawnObject(client)
-	return true
-end
-
 function GM:ShowHelp()
 end
 

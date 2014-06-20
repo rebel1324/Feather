@@ -166,11 +166,15 @@ function GM:CanTool(client, entity, tool)
 end
 
 hook.Add("PlayerDisconnected", "DestroyDisonnceted", function(client)
-	if client:IsAdmin() then return end
-	
 	for k, v in ipairs(ents.GetAll()) do
-		if v.Owner == client then
-			v:Remove()
+		if (v.Owner == client or v:GetNetVar("owner") == client) then
+			if client:IsAdmin() then
+				if v:GetNetVar("owner") then
+					v:SetNetVar("owner", nil) -- for cleaner net.
+				end
+			else
+				v:Remove()
+			end
 		end
 	end
 end)

@@ -68,13 +68,38 @@ if (SERVER) then
 		netstream.Start(client, "fr_ConfigInit", feather.config.vars)
 	end
 
+	function feather.config.reset()
+		local default, modded = feather.config.getAll()
+
+		for k, v in pairs(default) do
+			local info = default[k]
+			if (info.value != modded[k]) then
+				feather.config.set(k, info.value)
+			end
+		end
+	end
+
 	hook.Add("Initialize", "fr_ConfigLoader", feather.config.load)
 	hook.Add("ShutDown", "fr_ConfigSaver", feather.config.save)
 	hook.Add("PlayerInitialSpawn", "fr_SendConfig", feather.config.send)
 
 	netstream.Hook("fr_SetConfig", function(client, key, value)
+		if (!client:IsSuperAdmin()) then return end
+		
 		feather.config.set(key, value)
 		NotifyAll(GetLang("configchanged", client:Name(), key, tostring(value)))
+		
+		if type(value) == "table" then
+			netstream.Start(client, "fr_UpdateConfig")
+		end
+	end)
+
+	netstream.Hook("fr_ResetConfig", function(client, key, value)
+		if (!client:IsSuperAdmin()) then return end
+
+		feather.config.reset()
+		NotifyAll("ALL CONFIGS ARE CHANGED TO DEFAULT.")
+		netstream.Start(client, "fr_UpdateConfig")
 	end)
 else
 	netstream.Hook("fr_Config", function(key, value)

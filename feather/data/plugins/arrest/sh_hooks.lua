@@ -25,6 +25,12 @@ if (SERVER) then
 			return false, GetLang("arrestedpay")
 		end
 	end)
+
+	hook.Add("PlayerSpawnObject", "fr_ArrestSpawn", function(client)
+		if client:IsArrested() then
+			return false
+		end
+	end)
 else
 	surface.CreateFont("fr_Arrested", {
 		font = "Trebuchet MS",
