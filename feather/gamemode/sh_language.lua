@@ -2,6 +2,12 @@
 
 GM.Languages = {}
 
+function GetLanguageTable(lang)
+	GAMEMODE = GAMEMODE or GM -- get error and shit.
+
+	return GAMEMODE.Languages[lang]
+end
+
 function GetLang(name, ...)
 	GAMEMODE = GAMEMODE or GM -- get error and shit.
 

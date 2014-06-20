@@ -26,7 +26,7 @@ local function MainMenuAdd(panel)
 	end)
 end
 
-hook.Add("OnMenuLoadButtons", "FeatherInventoryAdd", MainMenuAdd)
+--hook.Add("OnMenuLoadButtons", "FeatherInventoryAdd", MainMenuAdd)
 
 
 local PNL = {}
@@ -38,6 +38,5 @@ function PNL:PaintOverHovered(w, h)
 	surface.SetDrawColor( 255, 255, 255, 255 )
 	surface.DrawOutlinedRect(0, 0, w, h)
 end
-
 
 vgui.Register("FeatherItemIcon", PNL, "SpawnIcon")	

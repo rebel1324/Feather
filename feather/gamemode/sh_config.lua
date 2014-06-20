@@ -37,6 +37,8 @@ function feather.config.getAll()
 end
 
 if (SERVER) then
+	cn.data.setBaseDir("feather")
+
 	function feather.config.load()
 		local saved = cn.data.read("config", {})
 		local buffer = {}

@@ -56,6 +56,7 @@ l.propbanned = "That prop is banned from the server."
 l.bigpropwait = "You have to wait %s seconds to spawn next big prop."
 l.toobigprop = "That prop is too big to spawn."
 l.jobbanned = "You're banned from this job for %s seconds."
+l.jobapplybanned = "You can't become this job because you're banned."
 l.arrestedpay = "You didn't received any pay because you're arrested"
 
 l.wanted = "Player %s is now wanted by the police.\nOrdered By: %s\nReason: %s"

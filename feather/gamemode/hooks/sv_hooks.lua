@@ -125,8 +125,8 @@ function GM:PlayerSay(client, text, public)
 end
 
 function GM:CanBecomeJob(client, data, teamindex)
-	if (client.bannedJobs and client.bannedJobs[teamindex] and client.bannedJobs[teamindex] < CurTime()) then
-		client:notify(GetLang"cantdo")
+	if (client.bannedJobs and client.bannedJobs[teamindex] and client.bannedJobs[teamindex] > CurTime()) then
+		return false, GetLang"jobapplybanned"
 	end
 end
 
@@ -199,12 +199,13 @@ function GM:Demote(from, to, reason, voted)
 				to.onvote = false
 			end
 		}
-		self:StartVote(client, GetLang("demote", to:Name(), reason), 10, funcs)
+		self:StartVote(from, GetLang("demote", to:Name(), reason), 10, funcs)
 
 		return false
 	else
-		client.bannedJobs[to:Team()] = CurTime() + feather.config.get("jobBanTime")
-		client:notify(GetLang("jobbanned", string.ToMinutesSeconds(feather.config.get("jobBanTime"))))
+		to.bannedJobs = to.bannedJobs or {}
+		to.bannedJobs[to:Team()] = CurTime() + feather.config.get("jobBanTime")
+		to:notify(GetLang("jobbanned", string.ToMinutesSeconds(feather.config.get("jobBanTime"))))
 
 		NotifyAll(GetLang("playerdemoted", to:Name()))
 		GAMEMODE:BecomeJob(to, to:Team(), TEAM_CITIZEN, true, false)
@@ -240,6 +241,7 @@ function GM:BecomeJob(client, oldjobindex, teamindex, voted, silent)
 
 	if result == false then
 		client:notify(fault or GetLang"cantbecomejob")
+		return
 	end
 
 	if teamindex == client:Team() then

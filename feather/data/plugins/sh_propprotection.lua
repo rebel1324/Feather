@@ -33,9 +33,8 @@ function GM:PlayerSpawnedProp(client, model, entity)
 	if entity:IsValid() then
 		local phys = entity:GetPhysicsObject()
 		if phys and phys:IsValid() then
-			local min, max = phys:GetAABB( )
+			local min, max = phys:GetAABB()
 			local size = min:Distance(max)
-			print(size)
 
 			if (size >= feather.config.get("tooBigProp")) then
 				client:notify(GetLang"toobigprop")
@@ -144,6 +143,21 @@ end
 
 function GM:CanTool(client, entity, tool)
 	entity = entity.Entity
+
+	if SERVER then
+		local tbl = constraint.GetAllConstrainedEntities(entity)
+
+		if (tbl) then
+			for k, v in pairs(tbl) do
+				if (v == entity) then continue end
+
+				if (!v.Owner or v.Owner != client or entity:GetNetVar("owner") != client) then
+					return (client:IsAdmin())
+				end
+			end
+		end
+	end
+
 	if entity and entity:IsValid() then
 		return (client:IsAdmin()) or (entity.Owner == client)
 	end

@@ -47,7 +47,6 @@ local function AddSlider(panel, key, var, name)
 	return textpnl
 end
 
-
 local function AddTextPanel(panel, key, var, name)
 	local textpnl = vgui.Create("DPanel")
 	

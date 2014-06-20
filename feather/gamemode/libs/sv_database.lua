@@ -46,6 +46,25 @@ local QUERY_CREATE_SQLITE = [[
 	);
 ]]
 
+local QUERY_DELETE_SQLITE = [[
+	DROP TABLE IF EXISTS fr_players CASCADE;
+	DROP TABLE IF EXISTS fr_licenses CASCADE;
+	DROP TABLE IF EXISTS fr_jailpos CASCADE;
+	DROP TABLE IF EXISTS fr_doordata CASCADE;
+	DROP TABLE IF EXISTS fr_entities CASCADE;
+
+]]
+
+local function RecreateDB()
+	if RC_CONFIRM and RC_CONFIRM > CurTime() then
+		cn.db.query(QUERY_DELETE_SQLITE .. QUERY_CREATE_SQLITE)
+	else
+		print("TYPE feather_recreatedb again in 10 seconds to confirm database wipe and recreate.")
+		RC_CONFIRM = CurTime() + 10
+	end
+end
+concommand.Add("feather_recreatedb", RecreateDB)
+
 hook.Add("Initialize", "fr_Database", function()
 	cn.db.initialize(DB_MODULE, function()
 		cn.db.query(QUERY_CREATE_SQLITE)
