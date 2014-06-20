@@ -130,6 +130,15 @@ function GetRandomEntity(class)
 	return table.Random(ents.FindByClass(class))
 end
 
+local strNum = "1234567890.-"
+function IsNumberString(str)
+	if (string.find( strNum, str )) then
+		return true
+	end
+
+	return false
+end
+
 -- For overriding.
 -- Actually... For koreans.... 
 local function pluralizeString(str, quantity)

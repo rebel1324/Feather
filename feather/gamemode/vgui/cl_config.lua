@@ -101,6 +101,8 @@ local function AddTablePanel(panel, key, var, name)
 	dlist.OnClickLine = function(pnl, line)
 		if (input.IsMouseDown(MOUSE_LEFT)) then
 			Derma_StringRequest("Enter the value to set", "Modify Table Value", pnl.data, function(data)
+				if IsNumberString(dlist.datakey) then dlist.datakey = tonumber(dlist.datakey) end
+
 				tbl[dlist.datakey] = data
 				netstream.Start("fr_SetConfig", key, tbl)
 			end)
@@ -108,15 +110,27 @@ local function AddTablePanel(panel, key, var, name)
 			local menu = DermaMenu()
 
 			local option = menu:AddOption("Delete Row", function()
+				if IsNumberString(dlist.datakey) then dlist.datakey = tonumber(dlist.datakey) end
+
+				table.remove(tbl, dlist.datakey)
+				netstream.Start("fr_SetConfig", key, tbl)
 			end)
 
 			local option = menu:AddOption("Modify Row", function()
+				Derma_StringRequest("Enter the value to set", "Modify Table Value", pnl.data, function(data)
+					if IsNumberString(dlist.datakey) then dlist.datakey = tonumber(dlist.datakey) end
+
+					tbl[dlist.datakey] = data
+					netstream.Start("fr_SetConfig", key, tbl)
+				end)
 			end)
 
 			local option = menu:AddOption("Add Row", function()
-				Derma_StringDoubleRequest("Enter the value to add", "Modify Table Value", pnl.data, function(data)
-					--tbl[dlist.datakey] = data
-					--netstream.Start("fr_SetConfig", key, tbl)
+				Derma_StringDoubleRequest("Enter the value to add", "Modify Table Value", table.Count(tbl) + 1, "", function(data, data2)
+					if IsNumberString(data) then data = tonumber(data) end
+
+					tbl[data] = data2
+					netstream.Start("fr_SetConfig", key, tbl)
 				end)
 			end)
 

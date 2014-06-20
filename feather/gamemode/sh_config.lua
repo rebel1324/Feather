@@ -87,8 +87,8 @@ if (SERVER) then
 		if (!client:IsSuperAdmin()) then return end
 		
 		feather.config.set(key, value)
-		NotifyAll(GetLang("configchanged", client:Name(), key, tostring(value)))
-		
+		NotifyAll(GetLang("configchanged", client:Name(), key, value))
+
 		if type(value) == "table" then
 			netstream.Start(client, "fr_UpdateConfig")
 		end
