@@ -174,3 +174,96 @@ JOB.onSuccess = function(client, info)
 	client:notify(GetLang("moneyearn", MoneyFormat(info.price)))
 end
 GM:AddMission(JOB)
+
+
+-- MISSION PROTEST
+-- Destroy all junks.
+
+local JOB = {}
+JOB.uid = "protest"
+JOB.names = {
+	"Protest Experience",
+	"I don't like govners.",
+	"I like my opinion",
+	"I hate everything",
+}
+JOB.moneymin = 200
+JOB.moneymax = 400
+JOB.desc = "Destory other shits."
+JOB.canAccept = function(client)
+	return true
+end
+local words = {
+	"Fuck da police",
+	"Legalize Weed",
+	"Communism is Best",
+	"North Korea Rules",
+	"wow very doge",
+	"FUCK YOU ALL",
+	"I HATE YOU ALL",
+	"I HAVE BIG PENIS",
+	"YAY2GAY MARRIAGE",
+	"I LOVE COKCS"
+}
+local seconds = 150
+local holdsec = 100
+local amount = 3
+JOB.onAccept = function(client)
+	local brd = IsEntityClose(client:GetPos(), 512, "feather_jobterminal")
+
+	if brd != false and brd:IsValid() then
+		local pbrd = ents.Create("feather_job_protest")
+		pbrd:SetPos(brd:GetPos() + brd:GetForward()*50)
+		pbrd:Spawn()
+		pbrd.owner = client
+		local str = table.Random(words)
+		pbrd:SetNetVar("word", tostring(str))
+		pbrd:SetNetVar("time", holdsec)
+		client:SetLocalVar("panel", pbrd:EntIndex())
+	else
+		client:ClearMission(true) -- failed.
+		return
+	end
+
+	client:notify(GetLang("garbagebriefing", amount, seconds))
+
+	timer.Create(client:SteamID64() .. "_PROTEST", seconds, 1, function()
+		if client:IsValid() then
+			client:ClearMission(true) -- failed.
+		end
+	end)
+end
+JOB.onEnded = function(client)
+	client:SetLocalVar("panel", nil)
+
+	for k, v in ipairs(ents.FindByClass("feather_job_protest")) do
+		if v.owner then 
+			if v.owner == client then
+				v:Remove()
+			elseif !v.owner:IsValid() then
+				v:Remove()
+			end
+		end
+	end
+	timer.Destroy(client:SteamID64() .. "_PROTEST")
+end
+JOB.onFailed = function(client)
+	if !client:IsValid() then return false end
+
+	client:notify(GetLang"deliveryfailed")
+end
+JOB.onSuccess = function(client, info)
+	client:GiveMoney(info.price)
+	client:notify(GetLang("moneyearn", MoneyFormat(info.price)))
+end
+GM:AddMission(JOB)
+
+hook.Add("OnPlayerArrested", "ProtestFail", function(client, arrester)
+	client.protest = false
+
+	if arrester then
+		local reward = math.random(200, 300)
+		arrester:notify(GetLang("earned", reward))
+		arrester:GiveMoney(reward)
+	end
+end)

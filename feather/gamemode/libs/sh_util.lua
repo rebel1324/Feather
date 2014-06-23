@@ -47,7 +47,7 @@ end
 function IsEntityClose(pos, range, class)
 	for k, v in pairs(ents.FindInSphere(pos, range)) do
 		if v:GetClass() == class then
-			return true
+			return v
 		end
 	end
 

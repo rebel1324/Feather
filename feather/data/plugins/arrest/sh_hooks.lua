@@ -1,5 +1,5 @@
-feather.config.create("arrestTime", 300)
-feather.config.create("wantedTime", 300)
+feather.config.create("arrestTime", 300, "Default Arrest Time.")
+feather.config.create("wantedTime", 300, "Default Wanted Time.")
 
 if (SERVER) then
 	hook.Add("CanDemote", "fr_ArrestDemote", function(client)

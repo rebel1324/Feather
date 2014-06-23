@@ -30,7 +30,7 @@ local PNL = {}
 
 function PNL:Init()
 	self:SetText("Help Menu")
-	self:SetSize(ScrW()/2, ScrH()/2)
+	self:SetSize(math.max(ScrW()/2, 640), math.max(ScrH()/2, 400))
 	self:Center()
 	self:MakePopup()
 	self:SetKeyboardInputEnabled(false)

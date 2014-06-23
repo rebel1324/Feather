@@ -37,9 +37,12 @@ if (SERVER) then
 	function ENT:Use(activator)
 	end
 else
+	local size = 1000
+	local scale = .06
 	function ENT:Draw()
-		self:SetRenderBounds(self:GetForward()*50 + self:GetUp()*50 + self:GetRight()*50, 
-							self:GetForward()*-50 + self:GetUp()*-50 + self:GetRight()*-50)
+		local bnd = size * scale * .5
+		self:SetRenderBounds(self:GetForward()*1 + self:GetUp()*bnd + self:GetRight()*bnd*1.5, 
+							self:GetForward()*-1 + self:GetUp()*-bnd + self:GetRight()*-bnd*1.5)
 	end
 	
 	function ENT:DrawTranslucent()
@@ -48,9 +51,8 @@ else
 		ang:RotateAroundAxis(self:GetRight(), 0)
 		ang:RotateAroundAxis(self:GetUp(), 90)
 
-		cam.Start3D2D(self:GetPos(), ang, .06)
+		cam.Start3D2D(self:GetPos(), ang, scale)
 			surface.SetDrawColor(0, 0, 0, 230)
-			local size = 1000
 			surface.DrawRect(-size*1.5/2, -size/2, size*1.5, size)
 
 			draw.SimpleText("ARRESTED CONVICTS", "fr_3d2dTextTitle", 0, -size/2 + 20, Color(255 ,255, 255), 1, 0)

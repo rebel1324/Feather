@@ -62,3 +62,39 @@ function PNL:Paint(w, h)
 end
 
 vgui.Register("FeatherFrame", PNL, "DFrame")
+
+local PNL = {}
+local margin = 10
+
+function PNL:Init()
+	self:SetVisible(false)
+	self:SetDrawOnTop(true)
+end
+
+function PNL:SetText(title, text)
+	str = Format("<color=black><font=fr_CategoryFont>%s</font>\n<font=fr_FrameFont>%s</font></color>", title, text)
+	self.markup = markup.Parse(str, 300)
+	if self.markup then
+		self:SetWide(self.markup:GetWidth() + margin*2)
+		self:SetTall(self.markup:GetHeight() + margin*1.5)
+	end
+end
+
+function PNL:Paint(w, h)
+	if self.markup then
+		surface.SetDrawColor(238, 238, 238)
+		surface.DrawRect(0, 0, w, h)
+		self.markup:Draw(margin, margin*.75, TEXT_ALIGN_LEFT, TEXT_ALIGN_LEFT)
+		surface.SetDrawColor(0, 0, 0)
+		surface.DrawOutlinedRect(0, 0, w, h)
+	end
+end
+
+function PNL:Think()
+	if self:IsVisible() then
+		local curx, cury = gui.MousePos()
+		self:SetPos(curx + 10, cury - self:GetTall() - 10)
+	end
+end
+
+vgui.Register("FeatherTooltip", PNL, "DPanel")	

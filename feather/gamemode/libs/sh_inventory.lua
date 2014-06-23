@@ -1,44 +1,4 @@
 local playerMeta = FindMetaTable("Player")
--- ITEM STRUCTURE
-/*
-	['uniqueid'] = {
-		name = 'SHIPMENT'
-
-		price = 100,
-		--desc = 'A Shipment that contains items' '** generic string decs.
-
-		desc = function(data)
-			return Format("A Shipment that contains %s of %s", data.amount, data.class)
-		end,
-
-		data = {
-			entity = true,
-			amount = 10,
-			class = 'item_healthkit',
-			price = 1000, -- data price overrides default price.
-		},
-
-		funcs = {
-			onUse = {
-			name = GetLang"use",
-			cond = true, -- it could be function.
-			func = function() 
-				-- Shipment use func
-				return true
-			end},
-
-			onDrop = {
-			name = GetLang"drop",
-			cond = true,
-			func = function()
-				-- Don't drop item.
-				return true, false -- first arg is consume item, second arg is drop item.
-			end},
-
-			-- can add more.
-		}
-	}
-*/
 -- Inventory Structure
 /*
 	local tbl = player:GetNetVar("inv")
@@ -152,12 +112,29 @@ function playerMeta:GetInventory()
 end
 
 do
+	-- heck, for food and stuffs.
+	hook.Add("OnFoodCreated", "ItemizeFood", function(fooddata, uid)
+		ITEM = feather.items[uid] or {}
+			ITEM.key = uid
+			ITEM.name = fooddata.name
+			ITEM.desc = "A Food that you can eat."
+			ITEM.price = fooddata.price
+			ITEM.model = fooddata.model
+
+			feather.items[uid] = ITEM
+		ITEM = nil
+	end)
+
 	feather.item = feather.item or {}
 	feather.items = feather.items or {}
 	feather.itemBases = feather.itemBases or {}
 
 	function feather.item.get(class)
 		return feather.items[class]
+	end
+
+	function feather.item.getAll()
+		return feather.items
 	end
 
 	function feather.item.load(directory)

@@ -299,6 +299,14 @@ function GM:OnPlayerDestory(entity, dmginfo)
 	end
 end
 
+function GM:GetFallDamage(client, vel)
+	if (GetConVarNumber("sv_falldamage") != 0 or feather.config.get("falldamage")) then
+        vel = vel - 320  
+        return vel*(100/(1024-320))
+	end
+	return 10
+end
+
 function GM:CanDrive(client)
 	return client:IsAdmin()
 end

@@ -208,7 +208,7 @@ local menubarsize = .25
 local menubartopsize = .12
 
 function PNL:Init()
-	self:SetSize(math.Clamp(ScrW()/2, 640, math.huge), math.Clamp(ScrH()/2, 480, math.huge))
+	self:SetSize(math.max(ScrW()/2, 640), math.max(ScrH()/2, 480))
 	self:Center()
 	self:DockPadding(0, 0, 0, 0)
 	self:MakePopup()
