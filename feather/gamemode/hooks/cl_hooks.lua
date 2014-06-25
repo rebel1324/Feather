@@ -195,8 +195,25 @@ end
 function GM:PlayerInfo(w, h)
 	local position = LocalPlayer():GetPos()
 	local shootPos = LocalPlayer():GetShootPos()
-	local aimVector = LocalPlayer():GetAimVector()
+	local filter = {}
 	local info = {}
+
+	-- Proper Thirdperson Support.
+	if (LocalPlayer():ShouldDrawLocalPlayer()) then
+		local a = hook.Run("CalcView", LocalPlayer(), EyePos(), EyeAngles())
+		if a.origin then
+			position = a.origin
+			shootPos = a.origin
+			filter = ents.FindInSphere(shootPos, 16)
+		else
+			local ve = self:GetViewEntity()
+			if ve and ve:IsValid() then
+				position = ve:GetPos()
+				shootPos = ve:GetPos()
+				filter = ve
+			end
+		end
+	end
 
 	function info:draw(text, color, color2)
 		local alpha = info.alpha
@@ -223,6 +240,7 @@ function GM:PlayerInfo(w, h)
 				local trace = util.TraceLine({
 					start = shootPos,
 					endpos = v:GetShootPos(),
+					filter = filter
 				})
 
 				if (trace.Hit and trace.Entity != v) then continue end

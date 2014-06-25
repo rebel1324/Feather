@@ -109,6 +109,8 @@ function GM:PlayerSetModel(client)
 	local index = client:Team()
 	local jobdata = self:GetJobData(index)
 
+	client:SetWalkSpeed(feather.config.get("walkSpeed"))
+	client:SetRunSpeed(feather.config.get("runSpeed"))
 	if jobdata and jobdata.model then
 		client:SetModel(table.Random(jobdata.model))
 	end

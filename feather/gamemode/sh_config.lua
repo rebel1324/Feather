@@ -12,6 +12,7 @@ function feather.config.set(key, value, receiver)
 
 	if (SERVER and !feather.config.default[key].nonShared) then
 		netstream.Start(receiver, "fr_Config", key, value)
+		hook.Run("OnConfigChanged", key, value, receiver)
 	end
 end
 
@@ -34,6 +35,11 @@ end
 
 function feather.config.getAll()
 	return feather.config.default, feather.config.vars
+end
+
+function GM:OnConfigChanged(key, value)
+	self:InitializeJobs()
+	self:InitializeChats()
 end
 
 if (SERVER) then
@@ -104,6 +110,7 @@ if (SERVER) then
 else
 	netstream.Hook("fr_Config", function(key, value)
 		feather.config.vars[key] = value
+		hook.Run("OnConfigChanged", key, value)
 	end)
 
 	netstream.Hook("fr_ConfigInit", function(data)

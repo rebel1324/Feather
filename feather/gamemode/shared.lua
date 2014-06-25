@@ -2,7 +2,6 @@ feather = feather or {}
 f = feather
 
 DeriveGamemode("cn")
-
 GM.Name = "Feather"
 GM.Author = "Chessnut and rebel1324"
 GM.TeamBased = true

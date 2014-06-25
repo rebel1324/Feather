@@ -5,7 +5,7 @@
 
 -- NUMBER VALUES
 feather.config.create("chatRange", 512, "Normal Chat Range.")
-feather.config.create("salary", 50, "Default Salary (reload required)")
+feather.config.create("salary", 50, "Default Salary")
 feather.config.create("jobChangeDelay", 5, "Job Change Delay.")
 feather.config.create("jobBanTime", 600, "Demote Job Ban Time.")
 feather.config.create("printerExplodeRate", 10, "Print Explode Chance")
@@ -23,6 +23,8 @@ feather.config.create("moneyRemoveTime", 300, "Money auto-remove Time.")
 feather.config.create("entityRemoveTime", 300, "Entity auto-remove Time.")
 feather.config.create("maxDoors", 10, "Max Doors.")
 feather.config.create("missionDelay", 10, "Mission Accept Cooltime")
+feather.config.create("runSpeed", 300, "Player Run Speed.")
+feather.config.create("walkSpeed", 120, "Player Walk Speed.")
 
 -- BOOLEAN VALUES
 feather.config.create("requireElectricity", true, "Machines/Entities Require Electricity")

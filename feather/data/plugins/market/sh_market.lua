@@ -1,21 +1,19 @@
+local jobs = GM.Jobs
+local govonly, nogov = {}, {}
+for k, v in ipairs(jobs) do
+	if v.goverment then
+		table.insert(govonly, k)
+	else
+		table.insert(nogov, k)
+	end
+end
+
 local ammo = {
 	{ammoname = "pistol", name = "Pistol Ammo", model = "models/Items/BoxSRounds.mdl", amount = 20, price = 50},
 	{ammoname = "smg1", name = "SMG Ammo", model = "models/Items/BoxMRounds.mdl", amount = 45, price = 100},
 	{ammoname = "ar2", name = "AR2 Ammo", model = "models/Items/BoxMRounds.mdl", amount = 30, price = 100},
 	{ammoname = "357", name = ".357 Ammo", model = "models/Items/357ammo.mdl", amount = 6, price = 100},
 }
-
-
-local jobs = GM.Jobs
-local policeonly = {}
-local nopolice = {}
-for k, v in ipairs(jobs) do
-	if v.goverment then
-		table.insert(policeonly, k)
-	else
-		table.insert(nopolice, k)
-	end
-end
 
 for k, v in ipairs(ammo) do
 	local data = GM:AddEntity(v.ammoname .. "ammo", "feather_ammo", v.name, "Ammunition", {}, v.name, v.model, v.price)
@@ -27,7 +25,7 @@ for k, v in ipairs(ammo) do
 	data.max = 5
 end
 
-GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", nopolice, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 1000)
+GM:AddEntity("moneyprinter", "feather_moneyprinter", "Money Printer", "General", nogov, "This machine prints money and gives you constant profit.", "models/props_c17/consolebox01a.mdl", 1000)
 GM:AddEntity("microwave", "feather_microwave", "Microwave", "General", {TEAM_COOK}, "This machine cooks foods to sell.", "models/props_c17/tv_monitor01.mdl", 500)
 
 GM:AddShipment("pistol", "weapon_pistol", 10, {TEAM_GUNDEALER}, "9mm Pistol", "Firearms", "A Pistol that fires shits", "models/weapons/w_pistol.mdl", 1800)
