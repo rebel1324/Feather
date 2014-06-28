@@ -49,40 +49,93 @@ local function CheckDataCompleteEqual(data1, data2)
 	return true
 end
 
+function GM:InsertItem(tbl, id, amt, data)
+	if (amt < 0) then
+		return
+	end
 
-function playerMeta:GiveItem(item, amount, data, forced)
-	local item = self:GetItem(item)
-	local inv = self:GetInventory()
-	local itemdata = feather.item.get(item)
-	data = data or {}
+	tbl = tbl or {}
+	tbl[id] = tbl[id] or {}
+	local item = {}
 
-	if (itemdata) then
-		if (item) then
-			for k, v in pairs(item) do
-				if (CheckDataCompleteEqual(v.data, data)) then
-					v.amount = v.amount + amount
+	if (data) then
+		item.data = data
+	end
 
-					return
-				end
-			end
+	table.insert(tbl[id], item)
+
+	return tbl
+end
+
+function GM:RemoveItem(tbl, id, amt, data, anything)
+	if (amt < 0 or !tbl or tbl[id]) then
+		return
+	end
+
+	for k, v in ipairs(tbl[id]) do
+		if (anything) then
+			table.remove(tbl[id], k)
+			return
 		end
 
-		data = table.Merge(data, itemdata.data)
-		table.insert(inv, {amount = amount, data = data})
+		if (data) then
+			if (CheckDataCompleteEqual(v.data, data)) then
+				table.remove(tbl[id], k)
+				return
+			end
+		else
+			if (!v.data or table.Count(v.data) == 0) then
+				table.remove(tbl[id], k)
+				return
+			end
+		end
+	end
+
+	return tbl
+end
+
+function playerMeta:GiveItem(item, amount, data, forced)
+	local inv = self:GetInventory() or {}
+	local itemdata = feather.item.get(item)
+	local t = table.GetKeys(feather.item.getAll())
+	if (itemdata) then
+		print(2)
+		if (itemdata.data or data) then
+			data = data or {}
+			data = table.Merge(data, itemdata.data)
+		end
+
+		inv = GAMEMODE:InsertItem(inv, item, amount, data)
+		PrintTable(inv)
 		self:SetNetVar("inv", inv) -- god, forsake me. I made whole table sync!!!!!!!!!!!!!! NOOOOOOOOOOOOO
 	end
 end
 
-function playerMeta:GetItem(item) -- yes, get item.
+local function itemgo(cliend, cmd, args)
+	local client = FindPlayer(table.concat(args, " "))
+
+	client:GiveItem("fastfood", 1)
+end
+concommand.Add("testitem", itemgo)
+
+function playerMeta:GetItems(item) -- yes, get items.
 	local inv = self:GetInventory()
+
 	return inv[item] or {}
 end
 
-function playerMeta:GetItemSpec(item, conditions)
-	local item = self:GetItem(item)
-	for k, v in pairs(item) do
-		if (CheckDataEqual(conditions, v.data)) then
-			return item.k
+function playerMeta:GetItemSpec(item, conditions, complete)
+	local items = self:GetItems(item)
+
+	for k, v in ipairs(items) do
+		if (complete) then
+			if (CheckDataEqual(conditions, v.data or {})) then
+				return k, v
+			end
+		else
+			if (CheckDataCompleteEqual(conditions, v.data or {})) then
+				return k, v
+			end
 		end
 	end
 
@@ -96,33 +149,29 @@ function playerMeta:HasItem(item, amount)
 end
 
 function playerMeta:GetItemCount(item)
-	local tbl = self:GetItem(item)
-	local amt = 0
-	for k, v in ipairs(tbl) do
-		if (v and v.amount )then
-			amt = amt + v.amount
-		end
-	end
+	local items = self:GetItems(item)
 
-	return (amt or 0)
+	return table.Count(items)
 end
 
 function playerMeta:GetInventory()
-	return self:GetLocalVar("inv")
+	return self:GetLocalVar("inv") or {}
 end
 
 do
 	-- heck, for food and stuffs.
-	hook.Add("OnFoodCreated", "ItemizeFood", function(fooddata, uid)
-		ITEM = feather.items[uid] or {}
-			ITEM.key = uid
-			ITEM.name = fooddata.name
-			ITEM.desc = "A Food that you can eat."
-			ITEM.price = fooddata.price
-			ITEM.model = fooddata.model
+	hook.Add("OnFoodDataCreated", "ItemizeFood", function(fooddata, uid)
+		if feather.items then
+			ITEM = feather.items[uid] or {}
+				ITEM.key = uid
+				ITEM.name = fooddata.name
+				ITEM.desc = "A Food that you can eat."
+				ITEM.price = fooddata.price
+				ITEM.model = fooddata.model
 
-			feather.items[uid] = ITEM
-		ITEM = nil
+				feather.items[uid] = ITEM
+			ITEM = nil
+		end
 	end)
 
 	feather.item = feather.item or {}

@@ -40,9 +40,12 @@ else
 	local size = 1000
 	local scale = .06
 	function ENT:Draw()
+		local ang = self:GetAngles()
+		local f, r, u = ang:Forward(), ang:Right(), ang:Up()
+		
 		local bnd = size * scale * .5
-		self:SetRenderBounds(self:GetForward()*1 + self:GetUp()*bnd + self:GetRight()*bnd*1.5, 
-							self:GetForward()*-1 + self:GetUp()*-bnd + self:GetRight()*-bnd*1.5)
+		self:SetRenderBounds(f*bnd*1.5 + u*bnd*1.5 + r*bnd*1.5, 
+							f*-bnd*1.5 + u*-bnd*1.5 + r*-bnd*1.5)
 	end
 	
 	function ENT:DrawTranslucent()

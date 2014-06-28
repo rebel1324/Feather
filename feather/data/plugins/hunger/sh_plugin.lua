@@ -20,7 +20,7 @@ function GM:AddFood(uniqueID, name, model, job, hunger, price, buyable)
 		category = "Food"
 	}
 
-	hook.Run("OnFoodCreated", self.FoodList[uniqueID], uniqueID)
+	hook.Run("OnFoodDataCreated", self.FoodList[uniqueID], uniqueID)
 	return self.FoodList[uniqueID]
 end
 

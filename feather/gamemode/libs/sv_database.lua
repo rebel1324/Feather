@@ -17,6 +17,11 @@ local QUERY_CREATE_SQLITE = [[
 		_inventory mediumtext
 	);
 
+	CREATE TABLE IF NOT EXISTS fr_items (
+		_key int PRIMARY KEY,
+		_data mediumtext,
+	);
+
 	CREATE TABLE IF NOT EXISTS fr_licenses (
 		_uniqueID mediumtext unique,
 		_name mediumtext,
@@ -54,6 +59,10 @@ local QUERY_DELETE_SQLITE = [[
 	DROP TABLE IF EXISTS fr_entities CASCADE;
 
 ]]
+
+function GetInvKey()
+
+end
 
 local function RecreateDB()
 	if RC_CONFIRM and RC_CONFIRM > CurTime() then

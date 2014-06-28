@@ -213,6 +213,8 @@ function GM:PlayerInfo(w, h)
 				filter = ve
 			end
 		end
+	else
+		filter = LocalPlayer()
 	end
 
 	function info:draw(text, color, color2)
@@ -242,7 +244,7 @@ function GM:PlayerInfo(w, h)
 					endpos = v:GetShootPos(),
 					filter = filter
 				})
-
+				
 				if (trace.Hit and trace.Entity != v) then continue end
 
 				local position = origin:ToScreen()

@@ -22,6 +22,16 @@ GM:AddMapPos(map, "garbage", Vector(-2451.3549804688, 1350.2510986328, -383.9687
 GM:AddMapPos(map, "garbage", Vector(-1469.0399169922, -1081.1253662109, -9.4270668029785))
 GM:AddMapPos(map, "garbage", Vector(-1983.6811523438, -989.18499755859, -20.190910339355))
 
+local map = "rp_downtown_v4c_v2"
+GM:AddMapPos(map, "package", Vector(3304.9699707031, 543.21246337891, -195.96875))
+GM:AddMapPos(map, "package", Vector(-1731.931640625, -2773.7231445313, -195.96875))
+GM:AddMapPos(map, "package", Vector(747.33343505859, -434.92031860352, -195.96875))
+GM:AddMapPos(map, "package", Vector(-1054.2475585938, 2080.515625, -195.96875))
+GM:AddMapPos(map, "garbage", Vector(-2300.3449707031, -198.14361572266, -195.96875))
+GM:AddMapPos(map, "garbage", Vector(-2161.4328613281, -199.76013183594, -195.96875))
+GM:AddMapPos(map, "garbage", Vector(-2328.0192871094, -349.59124755859, -195.96875))
+GM:AddMapPos(map, "garbage", Vector(-2182.5871582031, -337.41351318359, -195.96875))
+
 -- MISSION PACKAGE
 -- Bring entity A to entity B.
 
@@ -50,6 +60,7 @@ JOB.onAccept = function(client)
 	if !dest or !dest:IsValid() then
 		client:notify("Please place more than 1 package destination.")
 		client:ClearMission()
+		return
 	end
 
 	local pck = ents.Create("feather_job_pckobj")
